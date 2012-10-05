@@ -194,6 +194,26 @@ public class ImportPSIMI {
 	
 	return rv;
     }
+
+    final public static HashMap<String,String> parseXrefs(String xrefString) {
+	HashMap<String,String> rv = new HashMap<String,String>();
+	String[] xrefs = xrefString.split("\\|");
+	for (String xref : xrefs) {
+	    int pos = xref.indexOf(":");
+	    if (pos > -1) {
+		String key = xref.substring(0,pos).trim();
+		String val = xref.substring(pos+1).trim();
+		int l = val.length();
+		if ((l > 2) &&
+		    (val.charAt(0)=='"') &&
+		    (val.charAt(l-1)=='"'))
+		    val = val.substring(1,l-1);
+		rv.put(key,val);
+	    }
+	}
+	return rv;
+    }
+					  
     
     final public static void main(String argv[]) {
 	try {
@@ -218,8 +238,8 @@ public class ImportPSIMI {
 
 	    // read in file line by line
 	    BufferedReader infile = IO.openReader(argv[0]);
-	    String buffer = infile.readLine();
-	    while (buffer != null) {
+	    String buffer;
+	    while ((buffer=infile.readLine()) != null) {
 		StringTokenizer st = new StringTokenizer(buffer,"\t");
 
 		// feature ids
@@ -244,7 +264,7 @@ public class ImportPSIMI {
 		String publication = st.nextToken();
 		String publicationID = null;
 		int pos = publication.indexOf("pubmed:");
-		if (pos > 0) {
+		if (pos > -1) {
 		    int pubmedID = StringUtil.atoi(publication,pos+7);
 		    publicationID = lookupOrCreatePublication(pubmedID);
 		}
@@ -282,14 +302,14 @@ public class ImportPSIMI {
 		// experimental roles
 		String expRole1 = st.nextToken();
 		String expRole2 = st.nextToken();
-		boolean isDirected = false;
+		boolean isDirectional = false;
 		boolean reverseIDs = false;
 		if ((expRole1.equals("psi-mi:\"MI:0496\"(bait)")) &&
 		    (expRole2.equals("psi-mi:\"MI:0498\"(prey)")))
-		    isDirected = true;
+		    isDirectional = true;
 		else if ((expRole2.equals("psi-mi:\"MI:0496\"(bait)")) &&
 			 (expRole1.equals("psi-mi:\"MI:0498\"(prey)"))) {
-		    isDirected = true;
+		    isDirectional = true;
 		    reverseIDs = true;
 		}
 
@@ -297,25 +317,26 @@ public class ImportPSIMI {
 		st.nextToken();
 
 		// xrefs
-		String[] xrefs = st.nextToken().split("\\|");
-		String datasetName = null;
-		String datasetURL = null;
-		String url = null;
-		for (String xref : xrefs) {
-		    pos = xref.indexOf(":");
-		    if (pos > -1) {
-			String key = xref.substring(0,pos).trim();
-			String val = xref.substring(pos+1).trim();
-			if (key.equals("url"))
-			    url = val;
-			else if (key.equals("dataset"))
-			    datasetName = val;
-			else if (key.equals("dataseturl"))
-			    datasetURL = val;
-		    }
-		}
-
-		st.nextToken();
+		HashMap<String,String> xrefs1 = parseXrefs(st.nextToken());
+		HashMap<String,String> xrefs2 = parseXrefs(st.nextToken());
+		
+		// look for special cases
+		String datasetName = xrefs1.remove("dataset");
+		if (datasetName == null)
+		    datasetName = xrefs2.remove("dataset");
+		else
+		    xrefs2.remove("dataset");
+		String datasetURL = xrefs1.remove("dataseturl");
+		if (datasetURL == null)
+		    datasetURL = xrefs2.remove("dataseturl");
+		else
+		    xrefs2.remove("dataseturl");
+		String url = xrefs1.remove("url");
+		if (url == null)
+		    url = xrefs2.remove("url");
+		else
+		    xrefs2.remove("url");
+		
 		st.nextToken();
 		st.nextToken();
 		st.nextToken();
@@ -375,7 +396,7 @@ public class ImportPSIMI {
 							      interaction);
 		String interactionKey = datasetID+"_"+interactionID;
 		// update metadata if different
-		if (isDirected &&
+		if (isDirectional &&
 		    (!directionalInteractions.contains(interactionKey))) {
 		    directionalInteractions.add(interactionKey);
 		    stmt.executeUpdate("update interaction set is_directional=true where id="+interactionID);
@@ -419,17 +440,23 @@ public class ImportPSIMI {
 
 		// add feature(s)
 		if (reverseIDs && !isSpoke) {
-		    String fid = featureID1;
+		    String tmpS = featureID1;
 		    featureID1 = featureID2;
-		    featureID2 = fid;
+		    featureID2 = tmpS;
 
 		    int tmpI = stoich1;
 		    stoich1 = stoich2;
 		    stoich2 = tmpI;
+
+		    HashMap<String,String> tmpH = xrefs1;
+		    xrefs1 = xrefs2;
+		    xrefs2 = tmpH;
 		}
 
 		// add 1st feature
-		stmt2 = PPI.prepareStatement("insert into interaction_feature values (null, ?, ?, ?, null, ?)");
+		stmt2 = PPI.prepareStatement("insert into interaction_feature values (null, ?, ?, ?, null, ?)",
+					     Statement.RETURN_GENERATED_KEYS);
+		PreparedStatement stmt3 = PPI.prepareStatement("insert into interaction_data values (null, ?, ?, ?)");
 		stmt2.setInt(1,interactionID);
 		stmt2.setString(2,featureID1);
 		if (stoich1 > 0)
@@ -443,6 +470,15 @@ public class ImportPSIMI {
 		interactionRank.put(interactionKey, new Integer(rank));
 		stmt2.setInt(4,rank);
 		stmt2.executeUpdate();
+		ResultSet rs = stmt2.getGeneratedKeys();
+		rs.next();
+		stmt3.setInt(1,rs.getInt(1));
+		rs.close();
+		for (String key : xrefs1.keySet()) {
+		    stmt3.setString(2,key);
+		    stmt3.setString(3,xrefs1.get(key));
+		    stmt3.executeUpdate();
+		}
 
 		if (!isSpoke) {
 		    // add 2nd feature
@@ -455,7 +491,18 @@ public class ImportPSIMI {
 		    interactionRank.put(interactionKey, new Integer(rank));
 		    stmt2.setInt(4,rank);
 		    stmt2.executeUpdate();
+		    rs = stmt2.getGeneratedKeys();
+		    rs.next();
+		    stmt3.setInt(1,rs.getInt(1));
+		    rs.close();
+		    for (String key : xrefs1.keySet()) {
+			stmt3.setString(2,key);
+			stmt3.setString(3,xrefs1.get(key));
+			stmt3.executeUpdate();
+		    }
 		}
+		stmt3.close();
+		stmt2.close();
 	    }
 	}
 	catch (Exception e) {
