@@ -59,15 +59,19 @@ public final class Edge {
 	public float getStrength() {
 		return strength;
 	}
+	
 	public void setStrength(float strength) {
 		this.strength = strength;
 	}
+	
 	public float getConfidence() {
 		return confidence;
 	}
+	
 	public void setConfidence(float confidence) {
 		this.confidence = confidence;
 	}
+	
 	public String getId() {
 		return id;
 	}
@@ -78,6 +82,9 @@ public final class Edge {
 		return dataset;
 	}	
 	
-	
+	public String toString()
+	{
+		return name;
+	}
 	
 }
