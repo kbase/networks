@@ -94,9 +94,12 @@ public class RegPreciseAdaptor implements Adaptor{
 		List<Dataset> datasets = new Vector<Dataset>();
 		ConstrainedDataProvider dataProvider = getDataProvider();
 		try{
-			Regulome regulome = dataProvider.getRegulomeByKbaseId(taxon.getGenomeId());
-			Dataset dataset = buildDataset(regulome);
-			datasets.add(dataset);
+			Regulome regulome = dataProvider.getRegulomeByGenomeKbaseId(taxon.getGenomeId());
+			if(regulome != null)
+			{
+				Dataset dataset = buildDataset(regulome);
+				datasets.add(dataset);
+			}
 		}
 		finally{
 			dataProvider.close();
