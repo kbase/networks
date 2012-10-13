@@ -1,0 +1,8 @@
+use strict;
+use Data::Dumper;
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
+my $csO = Bio::KBase::CDMI::CDMIClient->new_for_script();
+
+my $gH = $csO->all_entities_Model(1,1000000,["id","name","type"]);
+print &Dumper($gH)

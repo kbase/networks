@@ -12,21 +12,21 @@ import us.kbase.networks.core.Taxon;
 public interface Adaptor {
 
 	
-	public List<Dataset> getDatasets();
+	public List<Dataset> getDatasets() throws AdaptorException;
 	
-	public List<Dataset> getDatasets(NetworkType networkType);
-	public List<Dataset> getDatasets(DatasetSource datasetSource);
-	public List<Dataset> getDatasets(Taxon taxon);
-	public List<Dataset> getDatasets(NetworkType networkType, DatasetSource datasetSource, Taxon taxon);
+	public List<Dataset> getDatasets(NetworkType networkType) throws AdaptorException;
+	public List<Dataset> getDatasets(DatasetSource datasetSource) throws AdaptorException;
+	public List<Dataset> getDatasets(Taxon taxon) throws AdaptorException;
+	public List<Dataset> getDatasets(NetworkType networkType, DatasetSource datasetSource, Taxon taxon) throws AdaptorException;
 	
-	public boolean hasDataset(Dataset dataset);
+	public boolean hasDataset(Dataset dataset) throws AdaptorException;
 	
-	public Network buildNetwork(Dataset dataset);
-	public Network buildNetwork(Dataset dataset, List<EdgeType> edgeTypes);	
+	public Network buildNetwork(Dataset dataset) throws AdaptorException;
+	public Network buildNetwork(Dataset dataset, List<EdgeType> edgeTypes) throws AdaptorException;	
 	
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId);
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId, List<EdgeType> edgeTypes);
+	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId) throws AdaptorException;
+	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId, List<EdgeType> edgeTypes) throws AdaptorException;
 	
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds);
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds, List<EdgeType> edgeTypes);	
+	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds) throws AdaptorException;
+	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds, List<EdgeType> edgeTypes) throws AdaptorException;	
 }

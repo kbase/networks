@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import org.apache.commons.collections15.Transformer;
 
 import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
@@ -51,27 +52,32 @@ public class RegPreciseAdaptorTest {
 //		test_hasDataset();
 		
 //		test_buildFirstNeighborNetwork1();
-		test_buildFirstNeighborNetwork2();
+		try {
+			test_buildFirstNeighborNetwork2();
+		} catch (AdaptorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 //		test_buildFirstNeighborNetwork3();
 		
 //		test_buildInternalNetwork();
 	}
 
-	private void test_buildInternalNetwork() {
+	private void test_buildInternalNetwork() throws AdaptorException {
 		Network network = adaptor.buildInternalNetwork(goodDataset, geneIds, Arrays.asList(EdgeType.GENE_GENE));
 		
 		printNetwork(network);
 		visualizeNetwork(network.getGraph());	
 	}
 
-	private void test_buildFirstNeighborNetwork3() {
+	private void test_buildFirstNeighborNetwork3() throws AdaptorException {
 		Network network = adaptor.buildFirstNeighborNetwork(goodDataset, geneId, Arrays.asList(EdgeType.GENE_GENE,EdgeType.GENE_CLUSTER));
 		
 		printNetwork(network);
 		visualizeNetwork(network.getGraph());		
 	}
 
-	private void test_buildFirstNeighborNetwork2() {
+	private void test_buildFirstNeighborNetwork2() throws AdaptorException {
 		Network network = adaptor.buildFirstNeighborNetwork(goodDataset, geneId, Arrays.asList(EdgeType.GENE_GENE));
 		
 		printNetwork(network);
@@ -79,7 +85,7 @@ public class RegPreciseAdaptorTest {
 		
 	}
 
-	private void test_buildFirstNeighborNetwork1() {
+	private void test_buildFirstNeighborNetwork1() throws AdaptorException {
 		Network network = adaptor.buildFirstNeighborNetwork(goodDataset, geneId, Arrays.asList(EdgeType.GENE_CLUSTER));
 		
 		printNetwork(network);
@@ -92,14 +98,14 @@ public class RegPreciseAdaptorTest {
 		System.out.println(network.getGraph().toString());
 	}
 
-	private void test_hasDataset() {
+	private void test_hasDataset() throws AdaptorException {
 				
 		System.out.println("Has good dataset: " + adaptor.hasDataset(goodDataset));		
 		System.out.println("Has bad  dataset: " + adaptor.hasDataset(badDataset));		
 	}
 	
 	
-	private void test_getDatasets4() {
+	private void test_getDatasets4() throws AdaptorException {
 		List<Dataset> datasets;
 		
 		datasets = adaptor.getDatasets(goodTaxon);		
@@ -109,7 +115,7 @@ public class RegPreciseAdaptorTest {
 		printDatasets("bad taxon " + badTaxon.getGenomeId(), datasets);		
 	}
 
-	private void test_getDatasets3() {
+	private void test_getDatasets3() throws AdaptorException {
 		List<Dataset> datasets;
 		
 		datasets = adaptor.getDatasets(DatasetSource.REGPECISE);		
@@ -125,7 +131,7 @@ public class RegPreciseAdaptorTest {
 	}
 
 
-	private void test_getDatasets2() {
+	private void test_getDatasets2() throws AdaptorException {
 		List<Dataset> datasets;
 		
 		datasets = adaptor.getDatasets(NetworkType.REGULATORY_NETOWRK);		
@@ -142,7 +148,7 @@ public class RegPreciseAdaptorTest {
 	}
 
 
-	private void test_getDatasets1() {
+	private void test_getDatasets1() throws AdaptorException {
 		List<Dataset> datasets = adaptor.getDatasets();
 		printDatasets("", datasets);
 	}
