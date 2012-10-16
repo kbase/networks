@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.adaptor.AdaptorRepository;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
@@ -40,7 +41,7 @@ public class NetworksAPI {
 		return Arrays.asList(DatasetSource.values());
 	}
 	
-	public List<Dataset> getDatasets()
+	public List<Dataset> getDatasets() throws AdaptorException
 	{
 		List<Dataset> datasets = new Vector<Dataset>();
 		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
@@ -50,7 +51,7 @@ public class NetworksAPI {
 		return datasets;
 	}
 	
-	public List<Dataset> getDatasets(NetworkType networkType)
+	public List<Dataset> getDatasets(NetworkType networkType) throws AdaptorException
 	{
 		List<Dataset> datasets = new Vector<Dataset>();
 		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
@@ -60,7 +61,7 @@ public class NetworksAPI {
 		return datasets;
 	}
 	
-	public List<Dataset> getDatasets(DatasetSource datasetSource)
+	public List<Dataset> getDatasets(DatasetSource datasetSource) throws AdaptorException
 	{
 		List<Dataset> datasets = new Vector<Dataset>();
 		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
@@ -71,7 +72,7 @@ public class NetworksAPI {
 	}		
 	
 			
-	public Network buildNetwork(Dataset dataset)
+	public Network buildNetwork(Dataset dataset) throws AdaptorException
 	{
 		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
 		{					

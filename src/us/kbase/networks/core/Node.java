@@ -21,7 +21,7 @@ public final class Node {
 		this.entity = entity;
 		this.type = type;
 	}
-
+	
 	public static Node buildGeneNode(String id, String name, Entity entity)
 	{
 		return new Node(id, name, entity, NodeType.GENE);
@@ -84,5 +84,11 @@ public final class Node {
 	public NodeType getType() {
 		return type;
 	}
+	
+	public String toString()
+	{
+		return name;
+	}
+
 	
 }

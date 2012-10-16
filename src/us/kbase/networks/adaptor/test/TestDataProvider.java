@@ -17,7 +17,7 @@ public class TestDataProvider {
 					"My dataset1", 
 					"Dataseet description 1", 
 					NetworkType.PROT_PROT_INTERACTION,
-					DatasetSource.ARANET, 
+					DatasetSource.PLANET, 
 					new Taxon("kb|g.125")),
 			
 			new Dataset(
