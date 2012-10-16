@@ -253,11 +253,15 @@ public class ImportPSIMI {
 
 		// experiment/annotation method
 		String method = parseKBField(st.nextToken());
-		int methodID = lookupMethod(method);
-		if (methodID==0) {
-		    // throw new Exception("Must create method '"+method+"'");
-		    methodID = createMethod(method);
+		int methodID = 0;
+		if (method != null) {
+		    methodID = lookupMethod(method);
+		    if (methodID==0) {
+			// throw new Exception("Must create method '"+method+"'");
+			methodID = createMethod(method);
+		    }
 		}
+		
 		st.nextToken();
 
 		// publication
