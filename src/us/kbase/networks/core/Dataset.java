@@ -6,6 +6,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+@JsonSerialize(using = DatasetSerializer.class)
+@JsonDeserialize(using = DatasetDeserializer.class)
 public class Dataset {
 
 	private String id;

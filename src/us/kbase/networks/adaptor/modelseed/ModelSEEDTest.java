@@ -66,11 +66,11 @@ public class ModelSEEDTest {
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_PATHWAY, DatasetSource.MODELSEED, ecoli);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
-		Network network = adaptor.buildInternalNetwork(datasets.get(0), Arrays.asList("kb|g.0.peg.10", "kb|g.0.peg.1032", "kb|g.0.peg.1002"));
+		Network network = adaptor.buildInternalNetwork(datasets.get(0), Arrays.asList("kb|g.0.peg.10", "kb|g.0.peg.1032", "kb|g.0.peg.1002", "kb|g.0.peg.880", "kb|g.0.peg.847", "kb|g.0.peg.843", "kb|g.0.peg.1247"));
 		assertNotNull("Should get a network back", network);
 		Graph<Node,Edge> g = network.getGraph();
 		assertNotNull("Network should have graph", g);
-		assertEquals("Graph should have 7 edges", g.getEdgeCount(), 7);
-		assertEquals("Graph should have 6 nodes", g.getVertexCount(), 6);
+		assertEquals("Graph should have 16 edges", g.getEdgeCount(), 16);
+		assertEquals("Graph should have 7 nodes", g.getVertexCount(), 7);
 	}
 }
