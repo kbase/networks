@@ -1,11 +1,11 @@
-package us.kbase.networks.importer;
+package us.kbase.networks.adaptor.ppi.importer;
 
 import java.sql.*;
 import java.io.*;
 import java.util.*;
 import org.strbio.util.*;
 import org.strbio.IO;
-import us.kbase.networks.local.PPI;
+import us.kbase.networks.adaptor.ppi.local.PPI;
 
 /**
    Import PPI data from a PSI-MI TAB 2.7 file, with KBase format

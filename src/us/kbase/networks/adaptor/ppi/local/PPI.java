@@ -1,4 +1,4 @@
-package us.kbase.networks.local;
+package us.kbase.networks.adaptor.ppi.local;
 
 import java.sql.*;
 import java.io.*;

@@ -1,11 +1,11 @@
-package us.kbase.networks.exporter;
+package us.kbase.networks.adaptor.ppi.exporter;
 
 import java.sql.*;
 import java.io.*;
 import java.util.*;
 import org.strbio.util.*;
 import org.strbio.IO;
-import us.kbase.networks.local.PPI;
+import us.kbase.networks.adaptor.ppi.local.PPI;
 
 /**
    Dump PPI data to a PSI-MI TAB 2.7 file, with KBase format
@@ -59,6 +59,8 @@ public class ExportPSIMI {
 	    String value = rs.getString(2);
 	    rv += key+":\""+value+"\"|";
 	}
+	rs.close();
+	stmt.close();
 	if (rv.length() == 0)
 	    return "-";
 	else

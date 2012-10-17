@@ -12,7 +12,10 @@ public enum DatasetSource {
 	INTACT("kb|netsource.6", "IntAct", "Plants ppi", "http://www.ebi.ac.uk/intact/"),	
 	AGRIS("kb|netsource.7", "AGRIS", "Arabidopsis gene regulatory information", "http://Arabidopsis.med.ohio-state.edu/"), 
 	PLANET("kb|netsource.8", "PlaNet", "Combined Sequence and Expression Comparisons across Plant Networks Derived from Seven Species", "http://aranet.mpimp-golm.mpg.de/"),
-	MODELSEED("kb|netsource.9", "ModelSEED", "Metabolic models", "http://www.theseed.org/models/");
+        MODELSEED("kb|netsource.9", "ModelSEED", "Metabolic models", "http://www.theseed.org/models/"),
+        MO("kb|netsource.10", "Microbes Online", "A resource for browsing and comparing microbial genomes", "http://www.microbesonline.org/"),
+	ECOCYC("kb|netsource.11", "EcoCyc", "EcoCyc is a scientific database for the bacterium Escherichia coli K-12 MG1655", "http://www.ecocyc.org/"),
+	PPI("kb|netsource.12", "PPI", "Other PPI datasets", "");
 	
 	
 	private String id;
