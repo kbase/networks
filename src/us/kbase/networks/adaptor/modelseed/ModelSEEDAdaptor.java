@@ -165,7 +165,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 			Node ssNode = Node.buildClusterNode(getNodeId(), fs.id, new Entity(fs.id));
 			graph.addVertex(ssNode);
 			Edge edge = new Edge(getEdgeId(), "Member of subsystem", dataset);
-			graph.addEdge(edge, geneNode, ssNode, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);
+			graph.addEdge(edge, ssNode, geneNode, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
 		}
 
 		return network;
@@ -204,24 +204,39 @@ public class ModelSEEDAdaptor implements Adaptor {
 			return network;
 		}
 
-		Map<String,Node> ssToNode = new HashMap<String,Node>();
+		// find out what subsystems genes are in
+		Map<String,List<Node>> ssToGeneNodes = new HashMap<String,List<Node>>();
 
 		for (String geneId : geneIds) {
 			Node geneNode = Node.buildGeneNode(getNodeId(), geneId, new Entity(geneId));
 			graph.addVertex(geneNode);
 
 			for (fields_Subsystem fs : getSubsystemFieldsForGene(geneId)) {
-				Node ssNode = ssToNode.get(fs.id);
-				if (ssNode == null) {
-					ssNode = Node.buildClusterNode(getNodeId(), fs.id, new Entity(fs.id));
-					ssToNode.put(fs.id,ssNode);
-					graph.addVertex(ssNode);
+				List<Node> geneNodes = ssToGeneNodes.get(fs.id);
+				if (geneNodes == null) {
+					geneNodes = new ArrayList<Node>();
+					ssToGeneNodes.put(fs.id,geneNodes);
 				}
-				Edge edge = new Edge(getEdgeId(), "Member of subsystem", dataset);
-				graph.addEdge(edge, geneNode, ssNode, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);
+				geneNodes.add(geneNode);
 			}
 		}
 
+		// build edges between genes in same subsystems; but don't build duplicate edges
+		Map<Node, Set<Node>> genePairs = new HashMap<Node, Set<Node>>();
+		
+		for (String ss : ssToGeneNodes.keySet()) {
+			for (Node node1 : ssToGeneNodes.get(ss)) {
+				if (! genePairs.containsKey(node1)) {genePairs.put(node1, new HashSet<Node>());}
+				for (Node node2 : ssToGeneNodes.get(ss)) {
+					if (! genePairs.containsKey(node2)) {genePairs.put(node2, new HashSet<Node>());}
+					if (node1 == node2) {continue;}
+					if (genePairs.get(node1).contains(node2) || genePairs.get(node2).contains(node1)) {continue;}
+					Edge edge = new Edge(getEdgeId(), "Member of same subsystem", dataset);
+					graph.addEdge(edge, node1, node2, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);
+					genePairs.get(node1).add(node2);
+				}
+			}
+		}
 		return network;
 	}
 
