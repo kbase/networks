@@ -1,9 +1,5 @@
 package us.kbase.networks.adaptor.genericMySQL;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
