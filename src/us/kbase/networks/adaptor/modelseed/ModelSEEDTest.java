@@ -1,13 +1,12 @@
 package us.kbase.networks.adaptor.modelseed;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import edu.uci.ics.jung.graph.Graph;
 
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
@@ -18,6 +17,7 @@ import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
 import us.kbase.networks.core.Taxon;
+import edu.uci.ics.jung.graph.Graph;
 
 public class ModelSEEDTest {
 	Adaptor adaptor;

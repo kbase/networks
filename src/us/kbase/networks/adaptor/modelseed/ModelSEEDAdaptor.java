@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -150,7 +151,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId, List<EdgeType> edgeTypes) throws AdaptorException {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
 		Network network = new Network(getNetworkId(), "", graph);	
-		Node geneNode = Node.buildGeneNode(geneId, geneId, new Entity(geneId));
+		Node geneNode = Node.buildGeneNode(getNodeId(), geneId, new Entity(geneId));
 		if( !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
 		{
 			return network;
@@ -159,15 +160,18 @@ public class ModelSEEDAdaptor implements Adaptor {
 		try {
 			List<tuple_118> tps = cdmi.get_relationship_HasFunctional(Arrays.asList(geneId), new ArrayList<String>(),
 					new ArrayList<String>(), Arrays.asList("id"));
-			
 			for (tuple_118 tp : tps) {
 				List<tuple_83> tps2 = cdmi.get_relationship_IsIncludedIn(Arrays.asList(tp.e_3.id), 
 						new ArrayList<String>(), new ArrayList<String>(), Arrays.asList("id")); 
+				// filter duplicates
+				Set<String> subsystems = new HashSet<String>();
 				for (tuple_83 tp2 : tps2) {
-					Node ssNode = Node.buildClusterNode(getNodeId(), tp2.e_3.description, new Entity(tp2.e_3.id));
+					if (subsystems.contains(tp2.e_3.id)) continue; 
+					Node ssNode = Node.buildClusterNode(getNodeId(), tp2.e_3.id, new Entity(tp2.e_3.id));
 					graph.addVertex(ssNode);
 					Edge edge = new Edge(getEdgeId(), "Member of subsystem", dataset);
 					graph.addEdge(edge, geneNode, ssNode, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);
+					subsystems.add(tp2.e_3.id);
 				}
 			}
 		} catch (Exception e) {
