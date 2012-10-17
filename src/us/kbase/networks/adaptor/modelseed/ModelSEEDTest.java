@@ -1,7 +1,10 @@
 package us.kbase.networks.adaptor.modelseed;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -11,14 +14,19 @@ import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
+import us.kbase.networks.core.Edge;
+import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
+import us.kbase.networks.core.Node;
 import us.kbase.networks.core.Taxon;
+import edu.uci.ics.jung.graph.Graph;
 
 public class ModelSEEDTest {
-	Adaptor adaptor = new ModelSEEDAdaptorFactory().buildAdaptor();
+	Adaptor adaptor;
 	
 	@Before
 	public void setUp() throws Exception {
+		adaptor = new ModelSEEDAdaptorFactory().buildAdaptor();
 	}
 
 	@Test
@@ -37,5 +45,32 @@ public class ModelSEEDTest {
 		}
 		
 	}
-
+	
+	@Test
+	public void shouldReturnNetworkForEcoliGene() throws AdaptorException {
+		Taxon ecoli = new Taxon("kb|g.0");
+		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_PATHWAY, DatasetSource.MODELSEED, ecoli);
+		assertNotNull("should return a list of Datasets", datasets);
+		assertTrue("list should contain at least one dataset", datasets.size() > 0);
+		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), "kb|g.0.peg.10");
+		assertNotNull("Should get a network back", network);
+		Graph<Node,Edge> g = network.getGraph();
+		assertNotNull("Network should have graph", g);
+		assertEquals("Graph should have 2 edges", g.getEdgeCount(), 2);
+		assertEquals("Graph should have 3 nodes", g.getVertexCount(), 3);
+	}
+	
+	@Test
+	public void shouldReturnNetworkForEcoliGenes() throws AdaptorException {
+		Taxon ecoli = new Taxon("kb|g.0");
+		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_PATHWAY, DatasetSource.MODELSEED, ecoli);
+		assertNotNull("should return a list of Datasets", datasets);
+		assertTrue("list should contain at least one dataset", datasets.size() > 0);
+		Network network = adaptor.buildInternalNetwork(datasets.get(0), Arrays.asList("kb|g.0.peg.10", "kb|g.0.peg.1032", "kb|g.0.peg.1002"));
+		assertNotNull("Should get a network back", network);
+		Graph<Node,Edge> g = network.getGraph();
+		assertNotNull("Network should have graph", g);
+		assertEquals("Graph should have 7 edges", g.getEdgeCount(), 7);
+		assertEquals("Graph should have 6 nodes", g.getVertexCount(), 6);
+	}
 }
