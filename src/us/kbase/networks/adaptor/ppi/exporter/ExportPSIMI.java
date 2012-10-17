@@ -38,7 +38,7 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
 */
 public class ExportPSIMI {
     /**
-       encode all the data interaction_data, as well as special
+       encode all the data in interaction_data, as well as special
        variables, in xrefs field
     */
     final public static String encodeXrefs(int interactionFeatureID,
@@ -69,7 +69,7 @@ public class ExportPSIMI {
     
     final public static void main(String argv[]) {
 	try {
-	    PPI.connectRW();
+	    PPI.connect();
 	    Statement stmt = PPI.createStatement();
 	    Statement stmt2 = PPI.createStatement();
 	    Statement stmt3 = PPI.createStatement();
