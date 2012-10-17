@@ -3,8 +3,10 @@ package us.kbase.networks.adaptor;
 import java.util.List;
 import java.util.Vector;
 
+import us.kbase.networks.adaptor.mak.MAKAdaptorFactory;
+import us.kbase.networks.adaptor.modelseed.ModelSEEDAdaptorFactory;
+import us.kbase.networks.adaptor.ppi.PPIAdaptorFactory;
 import us.kbase.networks.adaptor.regprecise.RegPreciseAdaptorFactory;
-import us.kbase.networks.adaptor.test.TestAdaptorFactory;
 
 public class AdaptorRepository {
 	
@@ -16,8 +18,10 @@ public class AdaptorRepository {
 	{
 		// Register all adaptors; property file in the future
 		
-		registerAdaptor(new TestAdaptorFactory());
 		registerAdaptor(new RegPreciseAdaptorFactory());
+		registerAdaptor(new ModelSEEDAdaptorFactory());
+		registerAdaptor(new MAKAdaptorFactory());
+		registerAdaptor(new PPIAdaptorFactory());		
 	}
 	
 	public static AdaptorRepository getAdaptorRepository() throws AdaptorException

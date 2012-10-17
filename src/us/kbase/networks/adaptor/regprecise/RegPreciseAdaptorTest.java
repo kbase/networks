@@ -41,7 +41,7 @@ public class RegPreciseAdaptorTest {
 	Taxon badTaxon  = new Taxon("kb|g.QQQQQ");
 	
 	
-	private void run() {
+	private void run() throws AdaptorException{
 		
 //		test_getDatasets1();
 //		test_getDatasets2();
@@ -52,12 +52,7 @@ public class RegPreciseAdaptorTest {
 //		test_hasDataset();
 		
 //		test_buildFirstNeighborNetwork1();
-		try {
-			test_buildFirstNeighborNetwork2();
-		} catch (AdaptorException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		test_buildFirstNeighborNetwork2();
 //		test_buildFirstNeighborNetwork3();
 		
 //		test_buildInternalNetwork();
@@ -207,7 +202,7 @@ public class RegPreciseAdaptorTest {
 	}
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws AdaptorException {
 		new RegPreciseAdaptorTest().run();
 	}
 }

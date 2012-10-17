@@ -1,13 +1,13 @@
-package us.kbase.networks.adaptor.test;
+package us.kbase.networks.adaptor.mak;
 
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorFactory;
 
-public class TestAdaptorFactory implements AdaptorFactory{
+public class MAKAdaptorFactory implements AdaptorFactory {
 
 	@Override
 	public Adaptor buildAdaptor() {
-		return new TestAdaptor();
+		return new MAKAdaptor();
 	}
 
 }
