@@ -17,12 +17,12 @@ public class NetworksAPI {
 	private static NetworksAPI networksAPI;
 	private AdaptorRepository adaptorRepository; 	
 	
-	private NetworksAPI(){		
+	private NetworksAPI() throws AdaptorException{		
 		adaptorRepository = AdaptorRepository.getAdaptorRepository();
 	}
 		
 	
-	public static NetworksAPI getNetowrksAPI()
+	public static NetworksAPI getNetworksAPI() throws AdaptorException
 	{
 		if(networksAPI == null)
 		{

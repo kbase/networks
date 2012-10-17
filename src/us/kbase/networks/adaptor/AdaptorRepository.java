@@ -12,7 +12,7 @@ public class AdaptorRepository {
 	private static AdaptorRepository repository;
 	private List<Adaptor> adaptors = new Vector<Adaptor>();
 	
-	private AdaptorRepository()
+	private AdaptorRepository() throws AdaptorException
 	{
 		// Register all adaptors; property file in the future
 		
@@ -20,7 +20,7 @@ public class AdaptorRepository {
 		registerAdaptor(new RegPreciseAdaptorFactory());
 	}
 	
-	public static AdaptorRepository getAdaptorRepository()
+	public static AdaptorRepository getAdaptorRepository() throws AdaptorException
 	{
 		if(repository == null)
 		{
@@ -29,7 +29,7 @@ public class AdaptorRepository {
 		return repository;
 	}
 	
-	private void registerAdaptor(AdaptorFactory factory)
+	private void registerAdaptor(AdaptorFactory factory) throws AdaptorException
 	{
 		adaptors.add(factory.buildAdaptor());
 	}

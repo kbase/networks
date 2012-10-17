@@ -4,61 +4,76 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.SparseMultigraph;
+
+import us.kbase.CDMI.CDMI_API;
+import us.kbase.CDMI.CDMI_EntityAPI;
+import us.kbase.CDMI.fields_Model;
+import us.kbase.CDMI.tuple_118;
+import us.kbase.CDMI.tuple_132;
+import us.kbase.CDMI.tuple_51;
+import us.kbase.CDMI.tuple_83;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.adaptor.regprecise.RegPreciseAdaptor;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
+import us.kbase.networks.core.Edge;
 import us.kbase.networks.core.EdgeType;
+import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
+import us.kbase.networks.core.Node;
 import us.kbase.networks.core.Taxon;
 
 public class ModelSEEDAdaptor implements Adaptor {
 
+	private CDMI_EntityAPI cdmi;
+	private int uniqueIndex = 0;
+
+	
+	public ModelSEEDAdaptor() throws AdaptorException {
+		super();
+		try {
+			this.cdmi = new CDMI_EntityAPI("http://bio-data-1.mcs.anl.gov/services/cdmi_api");
+		} catch (MalformedURLException e) {
+			throw new AdaptorException("Unable to initialize CDMI_EntityAPI", e);
+		}
+	}
+
 	@Override
 	public List<Dataset> getDatasets() throws AdaptorException {
 		List<Dataset> datasets = new ArrayList<Dataset>();
-		// exec Perl script, turn results into Datasets
-		Object stuff = buildPerlProcess("get_all_models");
-		System.out.println(stuff);
-		return datasets;
-	}
 
-	private Object buildPerlProcess(String script) throws AdaptorException {
-		// assume perl is installed and available
-		ProcessBuilder pb = new ProcessBuilder("perl", script);
-		Map<String, String> env = pb.environment();
-		if (! env.containsKey("PERL5LIB")) {
-			env.put("PERL5LIB", "/Applications/KBase.app/deployment/lib");
-		}
-		
-		String stuff = null;
-		pb.directory(new File("scripts"));
 		try {
-			Process p = pb.start();
-			int code = p.waitFor();
-			if (code != 0) {
-				throw new AdaptorException("Error code returned when attempting to run Perl script");
+			Map<String, fields_Model> models = cdmi.all_entities_Model(0, Integer.MAX_VALUE, Arrays.asList("id", "name"));
+
+			for (String id : models.keySet()) {
+				String name = models.get(id).name;
+				List<tuple_132> genomeIds = cdmi.get_relationship_Models(Arrays.asList(id), new ArrayList<String>(), 
+						new ArrayList<String>(), Arrays.asList("id"));
+				List<Taxon> taxons = new ArrayList<Taxon>();
+				for (tuple_132 tuple : genomeIds) {
+					taxons.add(new Taxon(tuple.e_3.id));
+				}
+				datasets.add(new Dataset(getDatasetId(id), name, "Metabolic pathway for " + name + " genome.", NetworkType.METABOLIC_PATHWAY, 
+						DatasetSource.MODELSEED, taxons));
 			}
-			// CHANGE THIS TO READ AND PARSE JSON
-			BufferedReader outReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line = null;
-			while ((line = outReader.readLine()) != null) {
-				stuff += line;
-			}
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+			throw new AdaptorException("Error while getting models", e);
 		}
-		catch (InterruptedException ie) {
-			throw new AdaptorException("Exception while running Perl script: " + script, ie);
-		}
-		catch (IOException ioe) {
-			throw new AdaptorException("Exception while running Perl script: " + script, ioe);
-		}
-		return stuff;
+
+		return datasets;
 	}
 
 	@Override
@@ -82,15 +97,24 @@ public class ModelSEEDAdaptor implements Adaptor {
 	}
 
 	@Override
-	public List<Dataset> getDatasets(Taxon taxon) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Dataset> getDatasets(Taxon taxon) throws AdaptorException {
+		List<Dataset> datasets = new ArrayList<Dataset>();
+
+		for (Dataset ds : getDatasets()) {
+			for (Taxon t : ds.getTaxons()) {
+				if (t.equals(taxon)) {
+					datasets.add(ds);
+				}
+			}
+		}
+		
+		return datasets;
 	}
 
 	@Override
 	public List<Dataset> getDatasets(NetworkType networkType,
-			DatasetSource datasetSource, Taxon taxon) {
-		List<Dataset> datasets = new Vector<Dataset>();
+			DatasetSource datasetSource, Taxon taxon) throws AdaptorException {
+		List<Dataset> datasets = new ArrayList<Dataset>();
 
 		if(networkType == NetworkType.METABOLIC_PATHWAY)		
 			if(datasetSource == DatasetSource.MODELSEED)
@@ -101,9 +125,8 @@ public class ModelSEEDAdaptor implements Adaptor {
 	}
 
 	@Override
-	public boolean hasDataset(Dataset dataset) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean hasDataset(Dataset dataset) throws AdaptorException {
+		return getDatasets().contains(dataset);
 	}
 
 	@Override
@@ -119,16 +142,40 @@ public class ModelSEEDAdaptor implements Adaptor {
 	}
 
 	@Override
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId) {
-		// TODO Auto-generated method stub
-		return null;
+	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId) throws AdaptorException {
+		return buildFirstNeighborNetwork(dataset, geneId, Arrays.asList(EdgeType.GENE_CLUSTER));
 	}
 
 	@Override
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId,
-			List<EdgeType> edgeTypes) {
-		// TODO Auto-generated method stub
-		return null;
+	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId, List<EdgeType> edgeTypes) throws AdaptorException {
+		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
+		Network network = new Network(getNetworkId(), "", graph);	
+		Node geneNode = Node.buildGeneNode(geneId, geneId, new Entity(geneId));
+		if( !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
+		{
+			return network;
+		}
+		
+		try {
+			List<tuple_118> tps = cdmi.get_relationship_HasFunctional(Arrays.asList(geneId), new ArrayList<String>(),
+					new ArrayList<String>(), Arrays.asList("id"));
+			
+			for (tuple_118 tp : tps) {
+				List<tuple_83> tps2 = cdmi.get_relationship_IsIncludedIn(Arrays.asList(tp.e_3.id), 
+						new ArrayList<String>(), new ArrayList<String>(), Arrays.asList("id")); 
+				for (tuple_83 tp2 : tps2) {
+					Node ssNode = Node.buildClusterNode(getNodeId(), tp2.e_3.description, new Entity(tp2.e_3.id));
+					graph.addVertex(ssNode);
+					Edge edge = new Edge(getEdgeId(), "Member of subsystem", dataset);
+					graph.addEdge(edge, geneNode, ssNode, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);
+				}
+			}
+		} catch (Exception e) {
+			throw new AdaptorException("Error in buildFirstNeighborNetwork for " + geneId, e);
+		}
+		
+		
+		return network;
 	}
 
 	@Override
@@ -144,4 +191,19 @@ public class ModelSEEDAdaptor implements Adaptor {
 		return null;
 	}
 
+	private String getDatasetId(String id) {
+		return RegPreciseAdaptor.DATASET_ID_PREFIX + id;
+	}		
+	
+	private String getNodeId() {
+		return RegPreciseAdaptor.NODE_ID_PREFIX + (uniqueIndex ++);
+	}
+	
+	private String getEdgeId() {
+		return RegPreciseAdaptor.EDGE_ID_PREFIX + (uniqueIndex++);
+	}
+
+	private String getNetworkId() {
+		return RegPreciseAdaptor.NETWORK_ID_PREFIX + (uniqueIndex++);
+	}	
 }
