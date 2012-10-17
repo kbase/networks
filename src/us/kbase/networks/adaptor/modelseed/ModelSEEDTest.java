@@ -1,8 +1,10 @@
 package us.kbase.networks.adaptor.modelseed;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -54,7 +56,21 @@ public class ModelSEEDTest {
 		assertNotNull("Should get a network back", network);
 		Graph<Node,Edge> g = network.getGraph();
 		assertNotNull("Network should have graph", g);
-		assertTrue("Graph should have edges", g.getEdges().size() > 0);
+		assertEquals("Graph should have 2 edges", g.getEdgeCount(), 2);
+		assertEquals("Graph should have 3 nodes", g.getVertexCount(), 3);
 	}
-
+	
+	@Test
+	public void shouldReturnNetworkForEcoliGenes() throws AdaptorException {
+		Taxon ecoli = new Taxon("kb|g.0");
+		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_PATHWAY, DatasetSource.MODELSEED, ecoli);
+		assertNotNull("should return a list of Datasets", datasets);
+		assertTrue("list should contain at least one dataset", datasets.size() > 0);
+		Network network = adaptor.buildInternalNetwork(datasets.get(0), Arrays.asList("kb|g.0.peg.10", "kb|g.0.peg.1032", "kb|g.0.peg.1002"));
+		assertNotNull("Should get a network back", network);
+		Graph<Node,Edge> g = network.getGraph();
+		assertNotNull("Network should have graph", g);
+		assertEquals("Graph should have 7 edges", g.getEdgeCount(), 7);
+		assertEquals("Graph should have 6 nodes", g.getVertexCount(), 6);
+	}
 }

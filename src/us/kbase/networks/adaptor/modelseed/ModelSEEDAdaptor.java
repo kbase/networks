@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,7 @@ import edu.uci.ics.jung.graph.SparseMultigraph;
 import us.kbase.CDMI.CDMI_API;
 import us.kbase.CDMI.CDMI_EntityAPI;
 import us.kbase.CDMI.fields_Model;
+import us.kbase.CDMI.fields_Subsystem;
 import us.kbase.CDMI.tuple_118;
 import us.kbase.CDMI.tuple_132;
 import us.kbase.CDMI.tuple_51;
@@ -41,7 +44,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 	private CDMI_EntityAPI cdmi;
 	private int uniqueIndex = 0;
 
-	
+
 	public ModelSEEDAdaptor() throws AdaptorException {
 		super();
 		try {
@@ -108,7 +111,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 				}
 			}
 		}
-		
+
 		return datasets;
 	}
 
@@ -152,57 +155,84 @@ public class ModelSEEDAdaptor implements Adaptor {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
 		Network network = new Network(getNetworkId(), "", graph);	
 		Node geneNode = Node.buildGeneNode(getNodeId(), geneId, new Entity(geneId));
+		graph.addVertex(geneNode);
 		if( !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
 		{
 			return network;
 		}
-		
+
+		for (fields_Subsystem fs : getSubsystemFieldsForGene(geneId)) {
+			Node ssNode = Node.buildClusterNode(getNodeId(), fs.id, new Entity(fs.id));
+			graph.addVertex(ssNode);
+			Edge edge = new Edge(getEdgeId(), "Member of subsystem", dataset);
+			graph.addEdge(edge, geneNode, ssNode, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);
+		}
+
+		return network;
+	}
+
+	private Collection<fields_Subsystem> getSubsystemFieldsForGene(String geneId) throws AdaptorException {
+		Map<String, fields_Subsystem> fs = new HashMap<String, fields_Subsystem>();
 		try {
 			List<tuple_118> tps = cdmi.get_relationship_HasFunctional(Arrays.asList(geneId), new ArrayList<String>(),
 					new ArrayList<String>(), Arrays.asList("id"));
 			for (tuple_118 tp : tps) {
 				List<tuple_83> tps2 = cdmi.get_relationship_IsIncludedIn(Arrays.asList(tp.e_3.id), 
 						new ArrayList<String>(), new ArrayList<String>(), Arrays.asList("id")); 
-				// filter duplicates
-				Set<String> subsystems = new HashSet<String>();
 				for (tuple_83 tp2 : tps2) {
-					if (subsystems.contains(tp2.e_3.id)) continue; 
-					Node ssNode = Node.buildClusterNode(getNodeId(), tp2.e_3.id, new Entity(tp2.e_3.id));
-					graph.addVertex(ssNode);
-					Edge edge = new Edge(getEdgeId(), "Member of subsystem", dataset);
-					graph.addEdge(edge, geneNode, ssNode, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);
-					subsystems.add(tp2.e_3.id);
+					fs.put(tp2.e_3.id, tp2.e_3);
 				}
 			}
 		} catch (Exception e) {
-			throw new AdaptorException("Error in buildFirstNeighborNetwork for " + geneId, e);
+			throw new AdaptorException("Error getting subsystem fields for " + geneId, e);
 		}
-		
-		
-		return network;
+		return fs.values();
 	}
 
 	@Override
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds) {
-		// TODO Auto-generated method stub
-		return null;
+	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds) throws AdaptorException {
+		return buildInternalNetwork(dataset, geneIds, Arrays.asList(EdgeType.GENE_CLUSTER));
 	}
 
 	@Override
 	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds,
-			List<EdgeType> edgeTypes) {
-		// TODO Auto-generated method stub
-		return null;
+			List<EdgeType> edgeTypes) throws AdaptorException {
+		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
+		Network network = new Network(getNetworkId(), "", graph);	
+		if( !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
+		{
+			return network;
+		}
+
+		Map<String,Node> ssToNode = new HashMap<String,Node>();
+
+		for (String geneId : geneIds) {
+			Node geneNode = Node.buildGeneNode(getNodeId(), geneId, new Entity(geneId));
+			graph.addVertex(geneNode);
+
+			for (fields_Subsystem fs : getSubsystemFieldsForGene(geneId)) {
+				Node ssNode = ssToNode.get(fs.id);
+				if (ssNode == null) {
+					ssNode = Node.buildClusterNode(getNodeId(), fs.id, new Entity(fs.id));
+					ssToNode.put(fs.id,ssNode);
+					graph.addVertex(ssNode);
+				}
+				Edge edge = new Edge(getEdgeId(), "Member of subsystem", dataset);
+				graph.addEdge(edge, geneNode, ssNode, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);
+			}
+		}
+
+		return network;
 	}
 
 	private String getDatasetId(String id) {
 		return RegPreciseAdaptor.DATASET_ID_PREFIX + id;
 	}		
-	
+
 	private String getNodeId() {
 		return RegPreciseAdaptor.NODE_ID_PREFIX + (uniqueIndex ++);
 	}
-	
+
 	private String getEdgeId() {
 		return RegPreciseAdaptor.EDGE_ID_PREFIX + (uniqueIndex++);
 	}
