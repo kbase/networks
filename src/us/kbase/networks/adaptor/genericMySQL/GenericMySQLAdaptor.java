@@ -211,7 +211,7 @@ public class GenericMySQLAdaptor implements Adaptor{
 		Node query = getNode(this.NODE_ID_PREFIX + geneId, geneId, new Entity(geneId), nt);
 		graph.addVertex(query);
 		try {
-			this.pstFindIntNetwork.setString(0, geneId);
+			this.pstFindIntNetwork.setString(1, geneId);
 			ResultSet rs = this.pstFindIntNetwork.executeQuery();
 			while(rs.next()) {
 				String neighborId = rs.getString(rsIdx);
