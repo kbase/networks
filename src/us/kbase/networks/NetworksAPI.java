@@ -21,7 +21,6 @@ public class NetworksAPI {
 		adaptorRepository = AdaptorRepository.getAdaptorRepository();
 	}
 		
-	
 	public static NetworksAPI getNetworksAPI() throws AdaptorException
 	{
 		if(networksAPI == null)
@@ -31,7 +30,7 @@ public class NetworksAPI {
 		return networksAPI;
 	}
 	
-	public List<NetworkType> getNetworTypes()
+	public List<NetworkType> getNetworkTypes()
 	{
 		return Arrays.asList(NetworkType.values());
 	}
