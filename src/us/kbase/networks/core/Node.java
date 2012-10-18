@@ -89,6 +89,34 @@ public final class Node {
 	{
 		return name;
 	}
-
 	
+	public String getEntityId()
+	{
+		return entity.getId();
+	}
+	
+	public Node clone()
+	{
+		Node node = new Node(id, name, entity, type);
+		addProperies(node);
+		addUserAnnotations(node);		
+
+		return node;		
+	}
+	
+	public void addUserAnnotations(Node node)
+	{
+		for(Map.Entry<String, String> entry : userAnnotations.entrySet() )
+		{
+			node.addUserAnnotation(entry.getKey(), entry.getValue());
+		}
+	}
+	
+	public void addProperies(Node node)
+	{
+		for(Map.Entry<String, String> entry : properties.entrySet() )
+		{
+			node.addProperty(entry.getKey(), entry.getValue());
+		}
+	}
 }
