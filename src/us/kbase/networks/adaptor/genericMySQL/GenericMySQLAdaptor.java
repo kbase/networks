@@ -208,10 +208,14 @@ public class GenericMySQLAdaptor implements Adaptor{
 //		EdgeType et = Enum.valueOf(EdgeType.class, dataset.getProperty("default.edgeType"));
 		int rsIdx = Integer.parseInt(dataset.getProperty("sql.findNeighbor.rsIndex"));
 		
+		String [] psIdxes = dataset.getProperty("sql.findNeighbor.psIndex").split(":"); 
+		
 		Node query = getNode(this.NODE_ID_PREFIX + geneId, geneId, new Entity(geneId), nt);
 		graph.addVertex(query);
 		try {
-			this.pstFindIntNetwork.setString(1, geneId);
+			for(String psIdx : psIdxes) {
+				this.pstFindIntNetwork.setString(Integer.parseInt(psIdx), geneId);
+			}
 			ResultSet rs = this.pstFindIntNetwork.executeQuery();
 			while(rs.next()) {
 				String neighborId = rs.getString(rsIdx);

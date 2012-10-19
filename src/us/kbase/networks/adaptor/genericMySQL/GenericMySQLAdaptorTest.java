@@ -54,7 +54,8 @@ public class GenericMySQLAdaptorTest {
 				new Taxon("kb|g.3701"));
 		dataset.addProperty("default.nodeType", NodeType.PROTEIN.toString());
 		dataset.addProperty("default.edgeType", EdgeType.GENE_GENE.toString());
-		dataset.addProperty("sql.findNeighbor.rsIndex", "0");
+		dataset.addProperty("sql.findNeighbor.psIndex", "1");
+		dataset.addProperty("sql.findNeighbor.rsIndex", "1");
 		// permanent solution : not used now
 		dataset.addProperty("sql.findNeighbor", "select B.protein from interaction_exchange A" 
 				+ " join interaction_exchange B ON A.group_description = B.group_description" 
@@ -92,9 +93,14 @@ public class GenericMySQLAdaptorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		config = new PropertiesConfiguration(testConfig);
+//		config = new PropertiesConfiguration(testConfig);
+//		adaptor = new GenericMySQLAdaptor(config);
+//		FileReader fr = new FileReader(this.testDataset);
+//		dataset = (Dataset) m.readValue(fr, Dataset.class);
+
+		config = new PropertiesConfiguration("plant-rn.config");
 		adaptor = new GenericMySQLAdaptor(config);
-		FileReader fr = new FileReader(this.testDataset);
+		FileReader fr = new FileReader("agris.json");
 		dataset = (Dataset) m.readValue(fr, Dataset.class);
 	}
 
