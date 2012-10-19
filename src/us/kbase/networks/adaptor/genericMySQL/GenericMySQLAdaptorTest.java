@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
@@ -93,14 +94,9 @@ public class GenericMySQLAdaptorTest {
 
 	@Before
 	public void setUp() throws Exception {
-//		config = new PropertiesConfiguration(testConfig);
-//		adaptor = new GenericMySQLAdaptor(config);
-//		FileReader fr = new FileReader(this.testDataset);
-//		dataset = (Dataset) m.readValue(fr, Dataset.class);
-
-		config = new PropertiesConfiguration("plant-rn.config");
+		config = new PropertiesConfiguration(testConfig);
 		adaptor = new GenericMySQLAdaptor(config);
-		FileReader fr = new FileReader("agris.json");
+		FileReader fr = new FileReader(this.testDataset);
 		dataset = (Dataset) m.readValue(fr, Dataset.class);
 	}
 

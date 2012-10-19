@@ -1,6 +1,7 @@
 package us.kbase.networks.adaptor.genericMySQL;
 
 import java.io.FileReader;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -78,9 +79,9 @@ public class GenericMySQLAdaptor implements Adaptor{
 	}
 	
 	private Dataset loadDataset(String rn) throws AdaptorException {
-		FileReader fr;
+		InputStream fr;
 		try {
-			fr = new FileReader(rn);
+			fr = getClass().getResourceAsStream("/"+ rn);
 			/* The content of rn:
 			 * {
 				  "id" : "id",
