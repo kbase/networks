@@ -213,11 +213,18 @@ public class GenericMySQLAdaptor implements Adaptor{
 		
 		Node query = getNode(this.NODE_ID_PREFIX + geneId, geneId, new Entity(geneId), nt);
 		graph.addVertex(query);
+		
+		
 		try {
 			for(String psIdx : psIdxes) {
-				this.pstFindIntNetwork.setString(Integer.parseInt(psIdx), geneId);
+				if(dataset.getProperty("sql.findNeighbor.like").equals("yes")) {
+					this.pstFindNeighbor.setString(Integer.parseInt(psIdx), geneId + '%');					
+				}
+				else {
+					this.pstFindNeighbor.setString(Integer.parseInt(psIdx), geneId);
+				}
 			}
-			ResultSet rs = this.pstFindIntNetwork.executeQuery();
+			ResultSet rs = this.pstFindNeighbor.executeQuery();
 			while(rs.next()) {
 				String neighborId = rs.getString(rsIdx);
 				Node neighbor = getNode(this.NODE_ID_PREFIX + neighborId, neighborId, new Entity(neighborId), nt);

@@ -64,6 +64,8 @@ public class GenericMySQLAdaptorTest {
 		dataset.addProperty("sql.findIntNetwork", "select B.protein from interaction_exchange A" 
 				+ " join interaction_exchange B ON A.group_description = B.group_description" 
 				+ " where A.protein <> B.protein and A.protein like ? ");
+		dataset.addProperty("sql.findNeighbor.like", "yes");
+		dataset.addProperty("sql.findIntNetwork.like", "yes");
 		FileWriter fw = new FileWriter(testDataset);
 		JsonGenerator jg = jf.createJsonGenerator(fw);
         jg.useDefaultPrettyPrinter();
@@ -98,6 +100,13 @@ public class GenericMySQLAdaptorTest {
 		adaptor = new GenericMySQLAdaptor(config);
 		FileReader fr = new FileReader(this.testDataset);
 		dataset = (Dataset) m.readValue(fr, Dataset.class);
+
+//		config = new PropertiesConfiguration("plant-ppi.config");
+//		adaptor = new GenericMySQLAdaptor(config);
+//		FileReader fr = new FileReader("intact.json");
+//		dataset = (Dataset) m.readValue(fr, Dataset.class);
+	
+	
 	}
 
 	@After
@@ -168,11 +177,11 @@ public class GenericMySQLAdaptorTest {
 
 		// empty result test
 		Network n1 = adaptor.buildFirstNeighborNetwork(dataset, "AT5G03240");
-		assertTrue("Returned results", n1.getGraph().getVertexCount() > 0);
+		assertTrue("Returned results", n1.getGraph().getVertexCount() == 1);
 
 		// at least one result
 		Network n2 = adaptor.buildFirstNeighborNetwork(dataset, "AT5G22340");
-		assertTrue("Returned results", n2.getGraph().getVertexCount() > 0);
+		assertTrue("Returned results", n2.getGraph().getVertexCount() > 1);
 	}
 
 	@Test
