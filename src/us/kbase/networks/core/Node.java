@@ -7,7 +7,7 @@ import java.util.Set;
 public final class Node {
 	
 	private String id;	
-	private String name;
+	protected String name;
 	private Entity entity;
 	private NodeType type;
 			
