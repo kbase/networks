@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Set;
 
 
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 
 
 public final class DatasetSerializer extends JsonSerializer<Dataset> {
@@ -33,6 +31,7 @@ public final class DatasetSerializer extends JsonSerializer<Dataset> {
 		jg.writeStringField("networkType", ds.getNetworkType().toString());
 		jg.writeStringField("datasetSource", ds.getDatasetSource().toString());
 
+		// TODO: make taxon to be object list instead of string list
 		jg.writeFieldName("taxon");
 		jg.writeStartArray();
 		List<Taxon> tl = ds.getTaxons();
