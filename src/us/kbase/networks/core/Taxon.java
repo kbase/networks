@@ -1,7 +1,7 @@
 package us.kbase.networks.core;
 
-public class Taxon {
-	private String genomeId;
+public final class Taxon {
+	protected String genomeId;
 
 	public Taxon(String genomeId) {
 		super();
