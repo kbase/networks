@@ -1,8 +1,8 @@
 package us.kbase.networks.core;
 
-public class Entity {
+public final class Entity {
 	
-	private String id;
+	protected String id;
 	
 	public Entity(String id) {
 		super();
