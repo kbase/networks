@@ -1,9 +1,18 @@
 module KBaseNetwork : KBaseNetwork
 {
+
   typedef string NetworkType;
   typedef string DatasetSource;
   typedef string Taxon;
+  typedef string Type;
+  typedef string Value;
   
+  typedef structure {
+    Type type;
+    Value value;
+  } Parameter;
+
+  typedef list<Parameter> ParameterList;
   
   typedef structure {
     string id;
@@ -34,11 +43,11 @@ module KBaseNetwork : KBaseNetwork
     string nodeId1;
     string nodeId2;
     string name;
+    float  confidence;
+    float  strength;
     mapping<string,string> properties;
     mapping<string,string> userAnnotations;  
   } Edge;
-  
-  
   
   typedef structure {
     
@@ -46,17 +55,14 @@ module KBaseNetwork : KBaseNetwork
     string name;
     list<Edge> edges;
     list<Node> nodes;
+    mapping<string,string> properties;
+    mapping<string,string> userAnnotations;  
   } Network;
   
   typedef list<Dataset> DatasetList;
   
-  funcdef getDatasets() returns(DatasetList datasetList);
-    
-  funcdef getDatasets(NetworkType netowrkType) returns(DatasetList datasetList);
-  funcdef getDatasets(DatasetSource datasetSource) returns(DatasetList datasetList);
-  funcdef getDatasets(Taxon taxon) returns(DatasetList datasetList);
-  
-  funcdef getDatasets(NetworkType netowrkType, DatasetSource datasetSource, Taxon taxon) returns(DatasetList datasetList);
-
-  funcdef buildNetwork(Dataset dataset) returns(Network network);  
+  funcdef getDatasets(ParameterList) returns(DatasetList datasetList);
+  funcdef buildNetwork(ParameterList) returns(Network network);  
+  funcdef buildFirstNeighborNetwork(ParameterList) returns(Network network);
+  funcdef buildInternalNetwork(ParameterList) returns(Network network);
 };

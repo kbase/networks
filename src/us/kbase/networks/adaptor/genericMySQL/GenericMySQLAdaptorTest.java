@@ -40,8 +40,6 @@ public class GenericMySQLAdaptorTest {
 	private Configuration config = null;
 	private Adaptor adaptor = null;
 	
-	
-	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 
