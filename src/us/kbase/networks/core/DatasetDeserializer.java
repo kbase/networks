@@ -13,13 +13,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public final class DatasetDeserializer extends JsonDeserializer<Dataset> {
-
-	@Override
-	public Dataset deserialize(JsonParser jp, DeserializationContext dc)
-			throws IOException, JsonProcessingException {
-		ObjectMapper m = new ObjectMapper();
-		// TODO: Error checking code later
-		JsonNode root = m.readTree(jp);
+	
+	public Dataset deserialize(JsonNode root) {
 		JsonNode idNode = root.path("id");
 		JsonNode nameNode = root.path("name");
 		JsonNode descNode = root.path("description");
@@ -45,6 +40,17 @@ public final class DatasetDeserializer extends JsonDeserializer<Dataset> {
 		}
 		
 		return result;
+		
+	}
+	
+	
+	@Override
+	public Dataset deserialize(JsonParser jp, DeserializationContext dc)
+			throws IOException, JsonProcessingException {
+		ObjectMapper m = new ObjectMapper();
+		// TODO: Error checking code later
+		JsonNode root = m.readTree(jp);		
+		return deserialize(root);
 	}
 
 }

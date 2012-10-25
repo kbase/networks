@@ -16,6 +16,7 @@ import edu.uci.ics.jung.graph.SparseMultigraph;
 
 public final class NetworkDeserializer extends JsonDeserializer<Network> {
 
+	DatasetDeserializer dd = new DatasetDeserializer();
 	@Override
 	public Network deserialize(JsonParser jp, DeserializationContext dc)
 			throws IOException, JsonProcessingException {

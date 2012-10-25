@@ -55,6 +55,7 @@ module KBaseNetwork : KBaseNetwork
     string name;
     list<Edge> edges;
     list<Node> nodes;
+    list<Dataset> datasets;
     mapping<string,string> properties;
     mapping<string,string> userAnnotations;  
   } Network;
