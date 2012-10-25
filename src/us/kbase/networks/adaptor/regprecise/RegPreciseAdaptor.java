@@ -258,7 +258,7 @@ public class RegPreciseAdaptor implements Adaptor{
 				List<KBaseGene2GeneDTO> genePairs = dataProvider.getCoregulatedGenePairs(geneIds);				
 				for(KBaseGene2GeneDTO genePair: genePairs)
 				{
-					System.out.println(genePair.getGeneKBaseId1() + "\t" + genePair.getGeneKBaseId2() + "\t" + genePair.getRegulatorName());
+//					System.out.println(genePair.getGeneKBaseId1() + "\t" + genePair.getGeneKBaseId2() + "\t" + genePair.getRegulatorName());
 					Node node1 = queryNodesHash.get(genePair.getGeneKBaseId1());
 					Node node2 = queryNodesHash.get(genePair.getGeneKBaseId2());
 					Edge edge = buildGeneGeneEdge(genePair, dataset); 
@@ -315,9 +315,9 @@ public class RegPreciseAdaptor implements Adaptor{
 	
 	private ConstrainedDataProvider getDataProvider()
 	{
-		System.out.print("RegPreciseAdaptor: Get connection...");
+//		System.out.print("RegPreciseAdaptor: Get connection...");
 		ConstrainedDataProvider dataProvider = new StatusConstrainedDataProvider(Term.TERM_REGULOG_STATE_PUBLIC, Term.TERM_COLLECTION_STATE_PUBLIC);
-		System.out.println("Done!"); 
+//		System.out.println("Done!"); 
 		
 		return dataProvider; 
 	}
