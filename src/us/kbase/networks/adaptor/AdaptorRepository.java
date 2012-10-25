@@ -5,6 +5,9 @@ import java.util.Vector;
 
 import us.kbase.networks.adaptor.mak.MAKAdaptorFactory;
 import us.kbase.networks.adaptor.modelseed.ModelSEEDAdaptorFactory;
+import us.kbase.networks.adaptor.plant.PlantFAAdaptorFactory;
+import us.kbase.networks.adaptor.plant.PlantPPIAdaptorFactory;
+import us.kbase.networks.adaptor.plant.PlantRNAdaptorFactory;
 import us.kbase.networks.adaptor.ppi.PPIAdaptorFactory;
 import us.kbase.networks.adaptor.regprecise.RegPreciseAdaptorFactory;
 
@@ -22,6 +25,9 @@ public class AdaptorRepository {
 		registerAdaptor(new ModelSEEDAdaptorFactory());
 		registerAdaptor(new MAKAdaptorFactory());
 		registerAdaptor(new PPIAdaptorFactory());		
+//		registerAdaptor(new PlantPPIAdaptorFactory());		
+//		registerAdaptor(new PlantFAAdaptorFactory());		
+//		registerAdaptor(new PlantRNAdaptorFactory());		
 	}
 	
 	public static AdaptorRepository getAdaptorRepository() throws AdaptorException

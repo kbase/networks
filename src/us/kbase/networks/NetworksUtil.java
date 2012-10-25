@@ -1,9 +1,8 @@
-package us.kbase.networks.adaptor.mak;
+package us.kbase.networks;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Paint;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -16,44 +15,26 @@ import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.BasicVisualizationServer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 
-import us.kbase.networks.adaptor.Adaptor;
-import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.adaptor.regprecise.RegPreciseAdaptor;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.Edge;
-import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.Node;
 import us.kbase.networks.core.NodeType;
-import us.kbase.networks.core.Taxon;
 
-public class MAKAdaptorTest {
+public class NetworksUtil {
 
-	Adaptor adaptor = new MAKAdaptorFactory().buildAdaptor();
-	String geneId = "kb|g.20848.CDS.2811";
-	Dataset goodDataset = new Dataset("kb|dataset.mak1", "", "", null, null, (Taxon) null);
-	
-	private void run() throws AdaptorException {
-		test_getDatasets1();
-		test_buildFirstNeighborNetwork1();
-	}
-
-	
-	private void test_buildFirstNeighborNetwork1() throws AdaptorException {
-		Network network = adaptor.buildFirstNeighborNetwork(goodDataset, geneId, Arrays.asList(EdgeType.GENE_CLUSTER));
-		
-		printNetwork(network);
-		visualizeNetwork(network.getGraph());		
+	public static void printNetwork(Network network) {
+		System.out.println("//------- Network");
+		System.out.println("Nodes count = " + network.getGraph().getVertexCount());
+		System.out.println("Edges count = " + network.getGraph().getEdgeCount());
+		System.out.println("Network: " + network.getGraph().toString());
 	}
 	
-	
-	private void test_getDatasets1() throws AdaptorException {
-		List<Dataset> datasets = adaptor.getDatasets();
-		printDatasets("", datasets);
-	}
-
-	private void printDatasets(String paramName, List<Dataset> datasets)
+	public static void printDatasets(String paramName, List<Dataset> datasets)
 	{
+		System.out.println("//------- Datasets");
+		System.out.println("Datasets count (" + paramName + "): = " + datasets.size());
 		for(Dataset dataset: datasets)
 		{
 			System.out.println(dataset.getId() 
@@ -61,19 +42,11 @@ public class MAKAdaptorTest {
 					+ "\t" + dataset.getDatasetSource().getName()
 					+ "\t" + dataset.getName()
 					);
-		}
-		
-		System.out.println("------------------------");
-		System.out.println("Datasets count (" + paramName + "): " + datasets.size());
-	}
-		
-	private void printNetwork(Network network) {
-		System.out.println("Nodes count = " + network.getGraph().getVertexCount());
-		System.out.println("Edges count = " + network.getGraph().getEdgeCount());
-		System.out.println(network.getGraph().toString());
+		}		
 	}	
 	
-	private void visualizeNetwork(final Graph<Node,Edge> graph)
+	
+	public static void visualizeNetwork(final Graph<Node,Edge> graph)
 	{
 		Layout<Node, String> layout = new CircleLayout(graph);
 		layout.setSize(new Dimension(600,600));
@@ -96,13 +69,23 @@ public class MAKAdaptorTest {
 				}
 				else if(node.getType() == NodeType.CLUSTER)
 				{
-					color = Color.red;
-				}
-				
+					if(node.getEntityId().contains("regulon"))
+					{
+						color = color.blue;
+					}
+					else if(node.getName().startsWith("complex "))
+					{
+						color = Color.yellow;
+					}
+					else{
+						color = Color.red;	
+					}					
+				}				
 				return color;
 			}
 		};
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);	
+//		vv.getRenderContext().setEdgeFillPaintTransformer(edgePaint);
 		JFrame frame = new JFrame("Simple Graph View"); 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 		frame.getContentPane().add(vv); 
@@ -110,7 +93,14 @@ public class MAKAdaptorTest {
 		frame.setVisible(true);
 	}	
 	
-	public static void main(String[] args) throws AdaptorException {
-		new MAKAdaptorTest().run();		
-	}
+	public static void removeDataset(List<Dataset> datasets, String datasetId) {
+		for(Dataset ds: datasets)
+		{
+			if(ds.getId().equals(datasetId))
+			{
+				datasets.remove(ds);
+				break;
+			}
+		}
+	}	
 }
