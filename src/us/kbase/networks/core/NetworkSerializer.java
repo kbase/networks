@@ -46,6 +46,7 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 					jg.writeStartObject();
 						jg.writeStringField("id", node.getEntityId());
 					jg.writeEndObject();
+					jg.writeStringField("type", node.getType().toString());
 					
 					// TODO: Not included in client type spec
 					// It could be properties later
@@ -115,8 +116,8 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 			}
 			jg.writeEndArray();
 
-			// dataset
-			jg.writeFieldName("dataset");
+			// datasets
+			jg.writeFieldName("datasets");
 			jg.writeStartArray();
 			for(Dataset dataset : datasetList) {
 				dser.serialize(dataset, jg, sp);

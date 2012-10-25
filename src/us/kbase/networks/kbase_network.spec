@@ -2,6 +2,7 @@ module KBaseNetwork : KBaseNetwork
 {
 
   typedef string NetworkType;
+  typedef string NodeType;
   typedef string DatasetSource;
   typedef string Taxon;
   typedef string Type;
@@ -24,27 +25,27 @@ module KBaseNetwork : KBaseNetwork
     mapping<string,string> properties;
   } Dataset;
 
-  
   typedef structure {
     string id;
   } KBaseEntity;
   
-  
   typedef structure {
     string id;  
-    KBaseEntity entity;
     string name;
+    KBaseEntity entity;
+    NodeType type;
     mapping<string,string> properties;
     mapping<string,string> userAnnotations;
   } Node;
   
   typedef structure {
     string id;  
+    string name;
     string nodeId1;
     string nodeId2;
-    string name;
     float  confidence;
     float  strength;
+    string datasetId;
     mapping<string,string> properties;
     mapping<string,string> userAnnotations;  
   } Edge;
