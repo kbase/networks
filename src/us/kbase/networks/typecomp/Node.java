@@ -12,8 +12,9 @@ import org.codehaus.jackson.*;
 public class Node
 {
     public String id;
-    public KBaseEntity entity;
     public String name;
+    public KBaseEntity entity;
+    public String type;
     public Map<String, String> properties;
     public Map<String, String> userAnnotations;
 }

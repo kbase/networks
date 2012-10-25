@@ -164,25 +164,40 @@ Network is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	edges has a value which is a reference to a list where each element is an Edge
 	nodes has a value which is a reference to a list where each element is a Node
+	datasets has a value which is a reference to a list where each element is a Dataset
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Edge is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
-	name has a value which is a string
 	confidence has a value which is a float
 	strength has a value which is a float
+	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	entity has a value which is a KBaseEntity
 	name has a value which is a string
+	entity has a value which is a KBaseEntity
+	type has a value which is a NodeType
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 KBaseEntity is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+NodeType is a string
+Dataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	networkType has a value which is a NetworkType
+	datasetSource has a value which is a DatasetSource
+	taxons has a value which is a reference to a list where each element is a Taxon
+	properties has a value which is a reference to a hash where the key is a string and the value is a string
+NetworkType is a string
+DatasetSource is a string
+Taxon is a string
 
 </pre>
 
@@ -203,25 +218,40 @@ Network is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	edges has a value which is a reference to a list where each element is an Edge
 	nodes has a value which is a reference to a list where each element is a Node
+	datasets has a value which is a reference to a list where each element is a Dataset
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Edge is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
-	name has a value which is a string
 	confidence has a value which is a float
 	strength has a value which is a float
+	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	entity has a value which is a KBaseEntity
 	name has a value which is a string
+	entity has a value which is a KBaseEntity
+	type has a value which is a NodeType
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 KBaseEntity is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+NodeType is a string
+Dataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	networkType has a value which is a NetworkType
+	datasetSource has a value which is a DatasetSource
+	taxons has a value which is a reference to a list where each element is a Taxon
+	properties has a value which is a reference to a hash where the key is a string and the value is a string
+NetworkType is a string
+DatasetSource is a string
+Taxon is a string
 
 
 =end text
@@ -290,25 +320,40 @@ Network is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	edges has a value which is a reference to a list where each element is an Edge
 	nodes has a value which is a reference to a list where each element is a Node
+	datasets has a value which is a reference to a list where each element is a Dataset
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Edge is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
-	name has a value which is a string
 	confidence has a value which is a float
 	strength has a value which is a float
+	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	entity has a value which is a KBaseEntity
 	name has a value which is a string
+	entity has a value which is a KBaseEntity
+	type has a value which is a NodeType
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 KBaseEntity is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+NodeType is a string
+Dataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	networkType has a value which is a NetworkType
+	datasetSource has a value which is a DatasetSource
+	taxons has a value which is a reference to a list where each element is a Taxon
+	properties has a value which is a reference to a hash where the key is a string and the value is a string
+NetworkType is a string
+DatasetSource is a string
+Taxon is a string
 
 </pre>
 
@@ -329,25 +374,40 @@ Network is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	edges has a value which is a reference to a list where each element is an Edge
 	nodes has a value which is a reference to a list where each element is a Node
+	datasets has a value which is a reference to a list where each element is a Dataset
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Edge is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
-	name has a value which is a string
 	confidence has a value which is a float
 	strength has a value which is a float
+	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	entity has a value which is a KBaseEntity
 	name has a value which is a string
+	entity has a value which is a KBaseEntity
+	type has a value which is a NodeType
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 KBaseEntity is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+NodeType is a string
+Dataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	networkType has a value which is a NetworkType
+	datasetSource has a value which is a DatasetSource
+	taxons has a value which is a reference to a list where each element is a Taxon
+	properties has a value which is a reference to a hash where the key is a string and the value is a string
+NetworkType is a string
+DatasetSource is a string
+Taxon is a string
 
 
 =end text
@@ -416,25 +476,40 @@ Network is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	edges has a value which is a reference to a list where each element is an Edge
 	nodes has a value which is a reference to a list where each element is a Node
+	datasets has a value which is a reference to a list where each element is a Dataset
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Edge is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
-	name has a value which is a string
 	confidence has a value which is a float
 	strength has a value which is a float
+	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	entity has a value which is a KBaseEntity
 	name has a value which is a string
+	entity has a value which is a KBaseEntity
+	type has a value which is a NodeType
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 KBaseEntity is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+NodeType is a string
+Dataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	networkType has a value which is a NetworkType
+	datasetSource has a value which is a DatasetSource
+	taxons has a value which is a reference to a list where each element is a Taxon
+	properties has a value which is a reference to a hash where the key is a string and the value is a string
+NetworkType is a string
+DatasetSource is a string
+Taxon is a string
 
 </pre>
 
@@ -455,25 +530,40 @@ Network is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	edges has a value which is a reference to a list where each element is an Edge
 	nodes has a value which is a reference to a list where each element is a Node
+	datasets has a value which is a reference to a list where each element is a Dataset
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Edge is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
-	name has a value which is a string
 	confidence has a value which is a float
 	strength has a value which is a float
+	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
-	entity has a value which is a KBaseEntity
 	name has a value which is a string
+	entity has a value which is a KBaseEntity
+	type has a value which is a NodeType
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 KBaseEntity is a reference to a hash where the following keys are defined:
 	id has a value which is a string
+NodeType is a string
+Dataset is a reference to a hash where the following keys are defined:
+	id has a value which is a string
+	name has a value which is a string
+	description has a value which is a string
+	networkType has a value which is a NetworkType
+	datasetSource has a value which is a DatasetSource
+	taxons has a value which is a reference to a list where each element is a Taxon
+	properties has a value which is a reference to a hash where the key is a string and the value is a string
+NetworkType is a string
+DatasetSource is a string
+Taxon is a string
 
 
 =end text
@@ -557,6 +647,32 @@ sub version {
 
 
 =head2 NetworkType
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 NodeType
 
 =over 4
 
@@ -829,8 +945,9 @@ id has a value which is a string
 <pre>
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-entity has a value which is a KBaseEntity
 name has a value which is a string
+entity has a value which is a KBaseEntity
+type has a value which is a NodeType
 properties has a value which is a reference to a hash where the key is a string and the value is a string
 userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 
@@ -842,8 +959,9 @@ userAnnotations has a value which is a reference to a hash where the key is a st
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
-entity has a value which is a KBaseEntity
 name has a value which is a string
+entity has a value which is a KBaseEntity
+type has a value which is a NodeType
 properties has a value which is a reference to a hash where the key is a string and the value is a string
 userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 
@@ -867,11 +985,12 @@ userAnnotations has a value which is a reference to a hash where the key is a st
 <pre>
 a reference to a hash where the following keys are defined:
 id has a value which is a string
+name has a value which is a string
 nodeId1 has a value which is a string
 nodeId2 has a value which is a string
-name has a value which is a string
 confidence has a value which is a float
 strength has a value which is a float
+datasetId has a value which is a string
 properties has a value which is a reference to a hash where the key is a string and the value is a string
 userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 
@@ -883,11 +1002,12 @@ userAnnotations has a value which is a reference to a hash where the key is a st
 
 a reference to a hash where the following keys are defined:
 id has a value which is a string
+name has a value which is a string
 nodeId1 has a value which is a string
 nodeId2 has a value which is a string
-name has a value which is a string
 confidence has a value which is a float
 strength has a value which is a float
+datasetId has a value which is a string
 properties has a value which is a reference to a hash where the key is a string and the value is a string
 userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 
@@ -914,6 +1034,7 @@ id has a value which is a string
 name has a value which is a string
 edges has a value which is a reference to a list where each element is an Edge
 nodes has a value which is a reference to a list where each element is a Node
+datasets has a value which is a reference to a list where each element is a Dataset
 properties has a value which is a reference to a hash where the key is a string and the value is a string
 userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 
@@ -928,6 +1049,7 @@ id has a value which is a string
 name has a value which is a string
 edges has a value which is a reference to a list where each element is an Edge
 nodes has a value which is a reference to a list where each element is a Node
+datasets has a value which is a reference to a list where each element is a Dataset
 properties has a value which is a reference to a hash where the key is a string and the value is a string
 userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
 
