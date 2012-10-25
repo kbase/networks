@@ -33,7 +33,7 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
       interaction_dataset.data_source.  We only dump kb: ontology
       rather than using the psi-mi: ontology.
 
-  @version 1.0, 10/3/12
+  @version 1.1, 10/25/12
   @author JMC
 */
 public class ExportPSIMI {
@@ -41,7 +41,7 @@ public class ExportPSIMI {
        encode all the data in interaction_data, as well as special
        variables, in xrefs field
     */
-    final public static String encodeXrefs(int interactionFeatureID,
+    final public static String encodeXrefs(int interactionProteinID,
 					   String datasetName,
 					   String datasetURL,
 					   String url) throws Exception {
@@ -53,7 +53,7 @@ public class ExportPSIMI {
 	if (url != null)
 	    rv += "url:\""+url+"\"|";
 	Statement stmt = PPI.createStatement();
-	ResultSet rs = stmt.executeQuery("select description, data from interaction_data where interaction_feature_id="+interactionFeatureID);
+	ResultSet rs = stmt.executeQuery("select description, data from interaction_data where interaction_protein_id="+interactionProteinID);
 	while (rs.next()) {
 	    String key = rs.getString(1);
 	    String value = rs.getString(2);
@@ -108,7 +108,7 @@ public class ExportPSIMI {
 
 		    // need to know how many components, to
 		    // decide how to encode
-		    rs = stmt.executeQuery("select count(*) from interaction_feature where interaction_id="+interactionID);
+		    rs = stmt.executeQuery("select count(*) from interaction_protein where interaction_id="+interactionID);
 		    rs.next();
 		    int nComponents = rs.getInt(1);
 		    rs.close();
@@ -127,19 +127,19 @@ public class ExportPSIMI {
 		    String firstXrefs = null;
 
 		    // get components in order
-		    rs = stmt.executeQuery("select id, feature_id, stoichiometry from interaction_feature where interaction_id="+interactionID+" order by rank asc");
+		    rs = stmt.executeQuery("select id, protein_id, stoichiometry from interaction_protein where interaction_id="+interactionID+" order by rank asc");
 		    while (rs.next()) {
-			int interactionFeatureID = rs.getInt(1);
-			String featureID = rs.getString(2);
+			int interactionProteinID = rs.getInt(1);
+			String proteinID = rs.getString(2);
 			int stoichiometry = rs.getInt(3);
 
-			String xrefs = encodeXrefs(interactionFeatureID,
+			String xrefs = encodeXrefs(interactionProteinID,
 						   datasetName,
 						   datasetURL,
 						   url);
 			
 			if ((firstComponent==null) && (isSpoke)) {
-			    firstComponent = featureID;
+			    firstComponent = proteinID;
 			    firstStoichiometry = stoichiometry;
 			    firstXrefs = xrefs;
 			}
@@ -155,8 +155,8 @@ public class ExportPSIMI {
 			    sto1 = ""+stoichiometry;
 			String sto2 = "-";
 			String pid2 = null;
-			int pos = featureID.indexOf(".",5);
-			String genome1 = featureID.substring(0,pos);
+			int pos = proteinID.indexOf(".",5);
+			String genome1 = proteinID.substring(0,pos);
 			String genome2 = null;
 			String xrefs2 = null;
 
@@ -170,7 +170,7 @@ public class ExportPSIMI {
 			}
 			else {
 			    rs.next();
-			    int interactionFeatureID2 = rs.getInt(1);
+			    int interactionProteinID2 = rs.getInt(1);
 			    pid2 = rs.getString(2);
 			    int stoichiometry2 = rs.getInt(3);
 
@@ -178,13 +178,13 @@ public class ExportPSIMI {
 			    genome2 = pid2.substring(0,pos);
 			    if (stoichiometry2 > 0)
 				sto2 = ""+stoichiometry2;
-			    xrefs2 = encodeXrefs(interactionFeatureID2,
+			    xrefs2 = encodeXrefs(interactionProteinID2,
 						 datasetName,
 						 datasetURL,
 						 url);
 			}
 
-			System.out.println(featureID+"\t"+pid2+"\t-\t-\t-\t-\t"+method+"\t-\t"+publication+"\t"+genome1+"\t"+genome2+"\tpsi-mi:\"MI:0915\"(physical association)\t"+datasetSource+"\t"+interaction+"\t"+confidenceStr+"\t"+expansionMethod+"\t-\t-\t"+role1+"\t"+role2+"\t-\t-\t"+xrefs+"\t"+xrefs2+"\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t"+sto1+"\t"+sto2+"\t-\t-");
+			System.out.println(proteinID+"\t"+pid2+"\t-\t-\t-\t-\t"+method+"\t-\t"+publication+"\t"+genome1+"\t"+genome2+"\tpsi-mi:\"MI:0915\"(physical association)\t"+datasetSource+"\t"+interaction+"\t"+confidenceStr+"\t"+expansionMethod+"\t-\t-\t"+role1+"\t"+role2+"\t-\t-\t"+xrefs+"\t"+xrefs2+"\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t"+sto1+"\t"+sto2+"\t-\t-");
 		    }
 		    rs.close();
 		}

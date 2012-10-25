@@ -35,7 +35,7 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-  @version 1.0, 10/3/12
+  @version 1.1, 10/25/12
   @author JMC
 */
 public class ImportPSIMI {
@@ -242,9 +242,9 @@ public class ImportPSIMI {
 	    while ((buffer=infile.readLine()) != null) {
 		StringTokenizer st = new StringTokenizer(buffer,"\t");
 
-		// feature ids
-		String featureID1 = st.nextToken();
-		String featureID2 = st.nextToken();
+		// protein ids
+		String proteinID1 = st.nextToken();
+		String proteinID2 = st.nextToken();
 
 		st.nextToken();
 		st.nextToken();
@@ -442,11 +442,11 @@ public class ImportPSIMI {
 		    stmt2.close();
 		}
 
-		// add feature(s)
+		// add protein(s)
 		if (reverseIDs && !isSpoke) {
-		    String tmpS = featureID1;
-		    featureID1 = featureID2;
-		    featureID2 = tmpS;
+		    String tmpS = proteinID1;
+		    proteinID1 = proteinID2;
+		    proteinID2 = tmpS;
 
 		    int tmpI = stoich1;
 		    stoich1 = stoich2;
@@ -457,12 +457,12 @@ public class ImportPSIMI {
 		    xrefs2 = tmpH;
 		}
 
-		// add 1st feature
-		stmt2 = PPI.prepareStatement("insert into interaction_feature values (null, ?, ?, ?, null, ?)",
+		// add 1st protein
+		stmt2 = PPI.prepareStatement("insert into interaction_protein values (null, ?, ?, ?, null, ?)",
 					     Statement.RETURN_GENERATED_KEYS);
 		PreparedStatement stmt3 = PPI.prepareStatement("insert into interaction_data values (null, ?, ?, ?)");
 		stmt2.setInt(1,interactionID);
-		stmt2.setString(2,featureID1);
+		stmt2.setString(2,proteinID1);
 		if (stoich1 > 0)
 		    stmt2.setInt(3,stoich1);
 		else
@@ -485,8 +485,8 @@ public class ImportPSIMI {
 		}
 
 		if (!isSpoke) {
-		    // add 2nd feature
-		    stmt2.setString(2,featureID2);
+		    // add 2nd protein
+		    stmt2.setString(2,proteinID2);
 		    if (stoich2 > 0)
 		    stmt2.setInt(3,stoich2);
 		    else

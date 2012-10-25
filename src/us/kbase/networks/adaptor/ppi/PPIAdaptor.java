@@ -116,7 +116,7 @@ public class PPIAdaptor implements Adaptor {
 	List<Dataset> rv = new Vector<Dataset>();
 	try{
 	    PPI.connect();
-	    PreparedStatement stmt = PPI.prepareStatement("select distinct(i.interaction_dataset_id) from interaction i, interaction_feature f where f.interaction_id=i.id and f.feature_id like ?");
+	    PreparedStatement stmt = PPI.prepareStatement("select distinct(i.interaction_dataset_id) from interaction i, interaction_protein f where f.interaction_id=i.id and f.protein_id like ?");
 
 	    String genomeID = taxon.getGenomeId();
 	    stmt.setString(1,genomeID+".%");
@@ -144,10 +144,10 @@ public class PPIAdaptor implements Adaptor {
 	List<Dataset> rv = new Vector<Dataset>();
 	try{
 	    PPI.connect();
-	    PreparedStatement stmt = PPI.prepareStatement("select distinct(i.interaction_dataset_id) from interaction i, interaction_feature f where f.interaction_id=i.id and f.feature_id=?");
+	    PreparedStatement stmt = PPI.prepareStatement("select distinct(i.interaction_dataset_id) from interaction i, interaction_protein f where f.interaction_id=i.id and f.protein_id=?");
 
-	    String featureID = entity.getId();
-	    stmt.setString(1,featureID);
+	    String proteinID = entity.getId();
+	    stmt.setString(1,proteinID);
 
 	    ResultSet rs = stmt.executeQuery();
 	    while (rs.next()) {
@@ -231,7 +231,7 @@ public class PPIAdaptor implements Adaptor {
 	    // for CLUSTER edges, just need complex that gene is in
 	    if (edgeTypes.contains(EdgeType.GENE_CLUSTER) ||
 		edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
-		PreparedStatement stmt = PPI.prepareStatement("select i.id, f.id from interaction i, interaction_feature f where i.interaction_dataset_id=? and f.interaction_id=i.id and f.feature_id=?");
+		PreparedStatement stmt = PPI.prepareStatement("select i.id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and f.protein_id=?");
 
 		stmt.setInt(1,datasetID);
 		stmt.setString(2,geneID);
@@ -251,7 +251,7 @@ public class PPIAdaptor implements Adaptor {
 		ResultSet rs = stmt.executeQuery();
 		while (rs.next()) {
 		    int complexID = rs.getInt(1);
-		    int interactionFeatureID = rs.getInt(2);
+		    int interactionProteinID = rs.getInt(2);
 
 		    Node n1 = buildComplexNode(complexID);
 		    graph.addVertex(n1);
@@ -259,7 +259,7 @@ public class PPIAdaptor implements Adaptor {
 		    if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
 			Edge e = buildEdge(n1,
 					   n2g,
-					   interactionFeatureID,
+					   interactionProteinID,
 					   dataset);
 			graph.addEdge(e,
 				      n1,
@@ -269,7 +269,7 @@ public class PPIAdaptor implements Adaptor {
 		    if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
 			Edge e = buildEdge(n1,
 					   n2p,
-					   interactionFeatureID,
+					   interactionProteinID,
 					   dataset);
 			graph.addEdge(e,
 				      n1,
@@ -282,8 +282,8 @@ public class PPIAdaptor implements Adaptor {
 	    }
 	    if (edgeTypes.contains(EdgeType.GENE_GENE) ||
 		edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) {
-		// get all features in same complex as query
-		PreparedStatement stmt = PPI.prepareStatement("select i.id, f1.feature_id, f1.id from interaction i, interaction_feature f1, interaction_feature f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.feature_id=? order by f1.rank asc");
+		// get all proteins in same complex as query
+		PreparedStatement stmt = PPI.prepareStatement("select i.id, f1.protein_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.protein_id=? order by f1.rank asc");
 		stmt.setInt(1,datasetID);
 		stmt.setString(2,geneID);
 
@@ -295,7 +295,7 @@ public class PPIAdaptor implements Adaptor {
 		while (rs.next()) {
 		    int complexID = rs.getInt(1);
 		    String geneID2 = rs.getString(2);
-		    int interactionFeatureID = rs.getInt(3);
+		    int interactionProteinID = rs.getInt(3);
 
 		    // if new complex, fully connect all nodes in last complex
 		    if (complexID != lastComplexID) {
@@ -315,12 +315,12 @@ public class PPIAdaptor implements Adaptor {
 		    Node node;
 		    if (edgeTypes.contains(EdgeType.GENE_GENE)) {
 			node = buildNode(geneID2, NodeType.GENE);
-			node.addProperty("interaction_feature_id",""+interactionFeatureID);
+			node.addProperty("interaction_protein_id",""+interactionProteinID);
 			graph.addVertex(node);
 		    }
 		    if (edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) {
 			node = buildNode(geneID2, NodeType.PROTEIN);
-			node.addProperty("interaction_feature_id",""+interactionFeatureID);
+			node.addProperty("interaction_protein_id",""+interactionProteinID);
 			graph.addVertex(node);
 		    }
 
@@ -402,7 +402,7 @@ public class PPIAdaptor implements Adaptor {
 	    PPI.connect();
 
 	    // get all complexes / proteins in this dataset
-	    PreparedStatement stmt = PPI.prepareStatement("select i.id, i.description, f.feature_id, f.id from interaction i, interaction_feature f where i.interaction_dataset_id=? and f.interaction_id=i.id and order by f.rank asc");
+	    PreparedStatement stmt = PPI.prepareStatement("select i.id, i.description, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and order by f.rank asc");
 	    stmt.setInt(1,datasetID);
 
 	    Vector<Node> nodesInComplexG = new Vector<Node>(); // gene
@@ -415,7 +415,7 @@ public class PPIAdaptor implements Adaptor {
 		int complexID = rs.getInt(1);
 		String complexDescription = rs.getString(2);
 		String geneID = rs.getString(3);
-		int interactionFeatureID = rs.getInt(4);
+		int interactionProteinID = rs.getInt(4);
 
 		// if new complex, process all of last complex
 		if (complexID != lastComplexID) {
@@ -457,13 +457,13 @@ public class PPIAdaptor implements Adaptor {
 		if ((edgeTypes.contains(EdgeType.GENE_GENE)) ||
 		    (edgeTypes.contains(EdgeType.GENE_CLUSTER))) {
 		    node = buildNode(geneID, NodeType.GENE);
-		    node.addProperty("interaction_feature_id",""+interactionFeatureID);
+		    node.addProperty("interaction_protein_id",""+interactionProteinID);
 		    graph.addVertex(node);
 		}
 		if ((edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) ||
 		    (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER))) {
 		    node = buildNode(geneID, NodeType.PROTEIN);
-		    node.addProperty("interaction_feature_id",""+interactionFeatureID);
+		    node.addProperty("interaction_protein_id",""+interactionProteinID);
 		    graph.addVertex(node);
 		}
 		rs.close();
@@ -528,7 +528,7 @@ public class PPIAdaptor implements Adaptor {
 	    rs.close();
 
 	    Vector<Taxon> taxons = new Vector<Taxon>();
-	    rs = stmt.executeQuery("select distinct(substring_index(f.feature_id,'.',2)) from interaction_feature f, interaction i where f.interaction_id=i.id and i.interaction_dataset_id="+datasetID);
+	    rs = stmt.executeQuery("select distinct(substring_index(f.protein_id,'.',2)) from interaction_protein f, interaction i where f.interaction_id=i.id and i.interaction_dataset_id="+datasetID);
 	    while (rs.next())
 		taxons.add(new Taxon(rs.getString(1)));
 	    rs.close();
@@ -606,18 +606,19 @@ public class PPIAdaptor implements Adaptor {
     /**
        make a node representing a protein or gene
     */
-    private Node buildNode(String featureID,
+    private Node buildNode(String proteinID,
 			   NodeType nodeType) {
 	Node rv;
 	if (nodeType==NodeType.GENE) {
+	    // fixme:  should use API to lookup gene from protein
 	    rv = Node.buildGeneNode(getNodeID(),
-				    featureID,
-				    new Entity(featureID));
+				    proteinID,
+				    new Entity(proteinID));
 	}
 	else {
 	    rv = Node.buildProteinNode(getNodeID(),
-				       featureID,
-				       new Entity(featureID));
+				       proteinID,
+				       new Entity(proteinID));
 	}
 	
 	// todo: add properties, such as aliases
@@ -625,12 +626,12 @@ public class PPIAdaptor implements Adaptor {
     }
 
     /**
-       make an edge between 2 nodes.  interactionFeatureID refers
+       make an edge between 2 nodes.  interactionProteinID refers
        to the 2nd node.
     */
     private Edge buildEdge(Node n1,
 			   Node n2,
-			   int interactionFeatureID,
+			   int interactionProteinID,
 			   Dataset d)
 	throws AdaptorException {
 	Edge rv = null;
@@ -638,10 +639,10 @@ public class PPIAdaptor implements Adaptor {
 	    Statement stmt = PPI.createStatement();
 	    ResultSet rs;
 
-	    rs = stmt.executeQuery("select i.interaction_dataset_id, i.description, i.is_directional, i.confidence, m.description, i.data_url, i.citation_id, f.stoichiometry, f.strength, f.rank, i.id from interaction_feature f, interaction i left join interaction_detection_type m on m.id=i.detection_method_id where f.interaction_id=i.id and f.id="+interactionFeatureID);
+	    rs = stmt.executeQuery("select i.interaction_dataset_id, i.description, i.is_directional, i.confidence, m.description, i.data_url, i.citation_id, f.stoichiometry, f.strength, f.rank, i.id from interaction_protein f, interaction i left join interaction_detection_type m on m.id=i.detection_method_id where f.interaction_id=i.id and f.id="+interactionProteinID);
 	    if (!rs.next()) {
 		stmt.close();
-		throw new Exception("Interaction_feature not found: "+interactionFeatureID);
+		throw new Exception("Interaction_protein not found: "+interactionProteinID);
 	    }
 	    int datasetID = rs.getInt(1);
 	    String interactionName = rs.getString(2);
@@ -666,7 +667,7 @@ public class PPIAdaptor implements Adaptor {
 
 	    rv.addProperty("interaction_dataset_id",""+datasetID);
 	    rv.addProperty("interaction_id",""+interactionID);
-	    rv.addProperty("interaction_feature_id",""+interactionFeatureID);
+	    rv.addProperty("interaction_protein_id",""+interactionProteinID);
 	    rv.addProperty("description",""+interactionName);
 	    if (isDirectional)
 		rv.addProperty("is_directional", "1");
@@ -689,7 +690,7 @@ public class PPIAdaptor implements Adaptor {
 	    if (rank > 0)
 		rv.addProperty("rank", ""+rank);
 
-	    rs = stmt.executeQuery("select description, data from interaction_data where interaction_feature_id="+interactionFeatureID);
+	    rs = stmt.executeQuery("select description, data from interaction_data where interaction_protein_id="+interactionProteinID);
 	    while (rs.next())
 		rv.addProperty("data_"+rs.getString(1),rs.getString(2));
 	    rs.close();
@@ -711,13 +712,13 @@ public class PPIAdaptor implements Adaptor {
 	int n = nodes.size();
 	for (int i=0; i<n; i++) {
 	    Node n1 = nodes.get(i);
-	    int interactionFeatureID =
-		    StringUtil.atoi(n1.getProperty("interaction_feature_id"));
+	    int interactionProteinID =
+		    StringUtil.atoi(n1.getProperty("interaction_protein_id"));
 
 	    // dummy edge, in order to find out node properties:
 	    Edge e = buildEdge(n1,
 			       n1,
-			       interactionFeatureID,
+			       interactionProteinID,
 			       d);
 
 	    for (String propertyName : e.getPropertyNames())
@@ -726,13 +727,13 @@ public class PPIAdaptor implements Adaptor {
 	    for (int j=i+1; j<n; j++) {
 		Node n2 = nodes.get(j);
 
-		interactionFeatureID =
-		    StringUtil.atoi(n2.getProperty("interaction_feature_id"));
+		interactionProteinID =
+		    StringUtil.atoi(n2.getProperty("interaction_protein_id"));
 
 		// real edge between the 2 nodes
 		e = buildEdge(n1,
 			      n2,
-			      interactionFeatureID,
+			      interactionProteinID,
 			      d);
 
 		g.addEdge(e,
@@ -754,12 +755,12 @@ public class PPIAdaptor implements Adaptor {
 			    Dataset d)
 	throws AdaptorException {
 	for (Node n : nodes) {
-	    int interactionFeatureID =
-		StringUtil.atoi(n.getProperty("interaction_feature_id"));
+	    int interactionProteinID =
+		StringUtil.atoi(n.getProperty("interaction_protein_id"));
 		
 	    Edge e = buildEdge(complexNode,
 			       n,
-			       interactionFeatureID,
+			       interactionProteinID,
 			       d);
 
 	    for (String propertyName : e.getPropertyNames())

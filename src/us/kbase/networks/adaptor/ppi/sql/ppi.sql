@@ -1,10 +1,11 @@
 # temporary protein interaction schema,
 # awaiting integration into CDM
 #
+# 10/25/12 - changed to point to ProteinSequences in CS instead of Features
 # 10/2/12 - created by JMC, based on InteractionSchema_v3_Sept2012 by Miriam
 
 drop table if exists interaction_data;
-drop table if exists interaction_feature;
+drop table if exists interaction_protein;
 drop table if exists interaction;
 drop table if exists interaction_dataset;
 drop table if exists interaction_detection_type;
@@ -49,23 +50,23 @@ create table if not exists interaction (
        foreign key (citation_id) references tmp_publication(id) on delete cascade on update cascade
 ) comment='Interaction - Protein complex or pairwise interaction' engine=innodb;
 
-create table if not exists interaction_feature (
+create table if not exists interaction_protein (
        id integer unsigned not null auto_increment,
        interaction_id integer unsigned not null,
-       feature_id varchar(250) not null,
+       protein_id varchar(250) not null,
        stoichiometry integer unsigned comment 'if applicable',
        strength double comment 'optional numeric measure of strength',
-       rank integer unsigned comment 'numbered starting with 1 within interaction, if features are ordered',
+       rank integer unsigned comment 'numbered starting with 1 within interaction, if proteins are ordered',
        primary key (id),
        foreign key (interaction_id) references interaction(id) on delete cascade on update cascade
-       # foreign key (feature_id) references Feature(id) on delete cascade on update cascade,
-) comment='Link betweeen Features and Interactions' engine=innodb;
+       # foreign key (protein_id) references ProteinSequence(id) on delete cascade on update cascade,
+) comment='Link betweeen Proteins and Interactions' engine=innodb;
 
 create table if not exists interaction_data (
        id integer unsigned not null auto_increment,
-       interaction_feature_id integer unsigned not null,
+       interaction_protein_id integer unsigned not null,
        description text not null comment 'type of data',
        data text not null comment 'the data itself',
        primary key (id),
-       foreign key (interaction_feature_id) references interaction_feature(id) on delete cascade on update cascade
-) comment='Additional data linked to particular interaction features' engine=innodb;
+       foreign key (interaction_protein_id) references interaction_protein(id) on delete cascade on update cascade
+) comment='Additional data linked to particular interaction proteins' engine=innodb;
