@@ -402,7 +402,7 @@ public class PPIAdaptor implements Adaptor {
 	    PPI.connect();
 
 	    // get all complexes / proteins in this dataset
-	    PreparedStatement stmt = PPI.prepareStatement("select i.id, i.description, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and order by f.rank asc");
+	    PreparedStatement stmt = PPI.prepareStatement("select i.id, i.description, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id order by f.rank asc");
 	    stmt.setInt(1,datasetID);
 
 	    Vector<Node> nodesInComplexG = new Vector<Node>(); // gene
