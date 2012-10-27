@@ -4,8 +4,13 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import edu.uci.ics.jung.graph.Graph;
 
+@JsonSerialize(using = NetworkSerializer.class)
+@JsonDeserialize(using = NetworkDeserializer.class)
 public class Network {
 
 	private String id;

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.util.Pair;
 
 
 public final class NetworkSerializer extends JsonSerializer<Network> {
@@ -86,8 +87,15 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 				
 					jg.writeStringField("id", edge.getId());
 					jg.writeStringField("name", edge.getName());
-					jg.writeStringField("nodeId1", graph.getSource(edge).getId());
-					jg.writeStringField("nodeId2", graph.getDest(edge).getId());
+					if(graph.getSource(edge) != null) {
+						jg.writeStringField("nodeId1", graph.getSource(edge).getId());
+						jg.writeStringField("nodeId2", graph.getDest(edge).getId());
+					}
+					else {
+						Pair<Node> nodePair = graph.getEndpoints(edge);
+						jg.writeStringField("nodeId1", nodePair.getFirst().getId());
+						jg.writeStringField("nodeId2", nodePair.getSecond().getId());
+					}
 					jg.writeNumberField("strength", edge.getStrength());
 					jg.writeNumberField("confidence", edge.getConfidence());
 

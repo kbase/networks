@@ -33,7 +33,7 @@ public final class NetworkDeserializer extends JsonDeserializer<Network> {
 		JsonNode nameNode = root.path("name");
 		JsonNode entityNode = root.path("entity");
 		JsonNode entityIdNode = entityNode.path("id");
-		JsonNode typeNode = entityNode.path("type");
+		JsonNode typeNode = root.path("type");
 		JsonNode propertiesNode = root.path("properties");
 		JsonNode userAnnotationsNode = root.path("userAnnotations");
 		
@@ -134,7 +134,7 @@ public final class NetworkDeserializer extends JsonDeserializer<Network> {
 			if(!dm.containsKey(datasetIdNode.asText())) {
 				throw new IOException("Couldn't find proper dataset from the dataset list of Network : " + datasetIdNode.asText());
 			}
-			Edge edge = new Edge(idEdgeNode.asText(), nameEdgeNode.asText(), dm.get(dm.get(datasetIdNode.asText())));
+			Edge edge = new Edge(idEdgeNode.asText(), nameEdgeNode.asText(), dm.get(datasetIdNode.asText()));
 			edge.setConfidence((float)confidenceNode.asDouble());
 			edge.setStrength((float)strengthNode.asDouble());
 			
@@ -160,7 +160,9 @@ public final class NetworkDeserializer extends JsonDeserializer<Network> {
 		Network result = new Network(idNode.asText(), nameNode.asText(), graph);
 		
 		for(String key : properties.keySet()) {
-			result.addProperty(key, properties.get(key));
+			if(!key.equals("graphType")) {
+				result.addProperty(key, properties.get(key));
+			}
 		}
 		for(String key : userAnnotations.keySet()) {
 			result.addUserAnnotation(key, userAnnotations.get(key));
