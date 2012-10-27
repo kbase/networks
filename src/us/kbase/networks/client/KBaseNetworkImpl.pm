@@ -172,11 +172,13 @@ Edge is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
+	jungEdgeType has a value which is a JungEdgeType
 	confidence has a value which is a float
 	strength has a value which is a float
 	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
+JungEdgeType is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -226,11 +228,13 @@ Edge is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
+	jungEdgeType has a value which is a JungEdgeType
 	confidence has a value which is a float
 	strength has a value which is a float
 	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
+JungEdgeType is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -328,11 +332,13 @@ Edge is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
+	jungEdgeType has a value which is a JungEdgeType
 	confidence has a value which is a float
 	strength has a value which is a float
 	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
+JungEdgeType is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -382,11 +388,13 @@ Edge is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
+	jungEdgeType has a value which is a JungEdgeType
 	confidence has a value which is a float
 	strength has a value which is a float
 	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
+JungEdgeType is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -484,11 +492,13 @@ Edge is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
+	jungEdgeType has a value which is a JungEdgeType
 	confidence has a value which is a float
 	strength has a value which is a float
 	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
+JungEdgeType is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -538,11 +548,13 @@ Edge is a reference to a hash where the following keys are defined:
 	name has a value which is a string
 	nodeId1 has a value which is a string
 	nodeId2 has a value which is a string
+	jungEdgeType has a value which is a JungEdgeType
 	confidence has a value which is a float
 	strength has a value which is a float
 	datasetId has a value which is a string
 	properties has a value which is a reference to a hash where the key is a string and the value is a string
 	userAnnotations has a value which is a reference to a hash where the key is a string and the value is a string
+JungEdgeType is a string
 Node is a reference to a hash where the following keys are defined:
 	id has a value which is a string
 	name has a value which is a string
@@ -802,6 +814,32 @@ a string
 
 
 
+=head2 JungEdgeType
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
 =head2 Parameter
 
 =over 4
@@ -988,6 +1026,7 @@ id has a value which is a string
 name has a value which is a string
 nodeId1 has a value which is a string
 nodeId2 has a value which is a string
+jungEdgeType has a value which is a JungEdgeType
 confidence has a value which is a float
 strength has a value which is a float
 datasetId has a value which is a string
@@ -1005,6 +1044,7 @@ id has a value which is a string
 name has a value which is a string
 nodeId1 has a value which is a string
 nodeId2 has a value which is a string
+jungEdgeType has a value which is a JungEdgeType
 confidence has a value which is a float
 strength has a value which is a float
 datasetId has a value which is a string

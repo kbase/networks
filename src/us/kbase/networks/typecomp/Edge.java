@@ -15,6 +15,7 @@ public class Edge
     public String name;
     public String nodeId1;
     public String nodeId2;
+    public String jungEdgeType;
     public Float confidence;
     public Float strength;
     public String datasetId;
