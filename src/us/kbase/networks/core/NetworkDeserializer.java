@@ -125,6 +125,7 @@ public final class NetworkDeserializer extends JsonDeserializer<Network> {
 			JsonNode nameEdgeNode            = edgeNode.path("name");
 			JsonNode nodeId1Node             = edgeNode.path("nodeId1");
 			JsonNode nodeId2Node             = edgeNode.path("nodeId2");
+			JsonNode jungEdgeTypeNode        = edgeNode.path("jungEdgeType");
 			JsonNode confidenceNode          = edgeNode.path("confidence");
 			JsonNode strengthNode            = edgeNode.path("strength");
 			JsonNode datasetIdNode           = edgeNode.path("datasetId");
@@ -154,7 +155,7 @@ public final class NetworkDeserializer extends JsonDeserializer<Network> {
 				throw new IOException("Couldn't find proper node id from the dataset list of Network : " + nodeId2Node.asText());
 			}
 			
-			graph.addEdge(edge, nm.get(nodeId1Node.asText()), nm.get(nodeId2Node.asText()));
+			graph.addEdge(edge, nm.get(nodeId1Node.asText()), nm.get(nodeId2Node.asText()), edu.uci.ics.jung.graph.util.EdgeType.valueOf(jungEdgeTypeNode.asText()));
 		}
 		
 		Network result = new Network(idNode.asText(), nameNode.asText(), graph);

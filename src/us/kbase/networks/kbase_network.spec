@@ -7,6 +7,7 @@ module KBaseNetwork : KBaseNetwork
   typedef string Taxon;
   typedef string Type;
   typedef string Value;
+  typedef string JungEdgeType;
   
   typedef structure {
     Type type;
@@ -43,6 +44,7 @@ module KBaseNetwork : KBaseNetwork
     string name;
     string nodeId1;
     string nodeId2;
+    JungEdgeType jungEdgeType;
     float  confidence;
     float  strength;
     string datasetId;
