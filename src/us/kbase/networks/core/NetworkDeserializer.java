@@ -40,13 +40,14 @@ public final class NetworkDeserializer extends JsonDeserializer<Network> {
 		Node node = null;
 		switch(NodeType.valueOf(typeNode.textValue())) {
 			case GENE:
-				node = Node.buildGeneNode(idNode.asText(), nameNode.asText(), new Entity(entityIdNode.asText()));
+				node = Node.buildGeneNode(idNode.asText(), nameNode.asText(), new Entity(entityIdNode.asText(), EntityType.GENE));
 				break;
 			case PROTEIN:
-				node = Node.buildProteinNode(idNode.asText(), nameNode.asText(), new Entity(entityIdNode.asText()));
+				node = Node.buildProteinNode(idNode.asText(), nameNode.asText(), new Entity(entityIdNode.asText(), EntityType.PROTEIN));
 				break;
 			case CLUSTER:
-				node = Node.buildClusterNode(idNode.asText(), nameNode.asText(), new Entity(entityIdNode.asText()));
+				// TODO: PPI_COMPLEX is not the only EntityType for clusters; need to expand NodeType or replace with EntityType
+				node = Node.buildClusterNode(idNode.asText(), nameNode.asText(), new Entity(entityIdNode.asText(), EntityType.PPI_COMPLEX));
 				break;
 			default:
 				throw new IOException("No appropriate NodeType : " + typeNode.textValue());      // TODO: add new exception type later

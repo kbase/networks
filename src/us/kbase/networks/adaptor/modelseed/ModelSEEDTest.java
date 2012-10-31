@@ -15,6 +15,8 @@ import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
+import us.kbase.networks.core.Entity;
+import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
@@ -48,7 +50,7 @@ public class ModelSEEDTest {
 	@Test
 	public void shouldReturnDataSetForEcoli() throws AdaptorException {
 		Taxon ecoli = new Taxon(genomeId);
-		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_PATHWAY, DatasetSource.MODELSEED, ecoli);
+		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
 		for (Dataset dataset : datasets) {
@@ -58,9 +60,20 @@ public class ModelSEEDTest {
 	}
 	
 	@Test
+	public void shouldReturnDataSetForEcoliGene() throws AdaptorException {
+		List<Dataset> datasets = adaptor.getDatasets(new Entity(queryGeneId, EntityType.GENE));
+		assertNotNull("should return a list of Datasets", datasets);
+		assertTrue("list should contain at least one dataset", datasets.size() > 0);
+		for (Dataset dataset : datasets) {
+			assertTrue("dataset taxons should contain E. coli", dataset.getTaxons().contains(new Taxon(genomeId)));
+		}
+		
+	}
+	
+	@Test
 	public void shouldReturnNetworkForEcoliGene() throws AdaptorException {
 		Taxon ecoli = new Taxon(genomeId);
-		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_PATHWAY, DatasetSource.MODELSEED, ecoli);
+		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
 		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), queryGeneId);
@@ -74,7 +87,7 @@ public class ModelSEEDTest {
 	@Test
 	public void shouldReturnNetworkForEcoliGenes() throws AdaptorException {
 		Taxon ecoli = new Taxon("kb|g.0");
-		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_PATHWAY, DatasetSource.MODELSEED, ecoli);
+		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
 		Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGeneIds);

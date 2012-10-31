@@ -94,6 +94,10 @@ public class AdaptorInvocationHandler implements InvocationHandler{
 			{
 				arg = processTaxon((Taxon) arg, SOURCE_GENOME_ID, TARGET_GENOME_ID); 
 			}
+			else if(arg instanceof Entity)
+			{
+				arg = new Entity(processSourceGeneId(((Entity) arg).getId()), ((Entity) arg).getType()); 
+			}
 			args[i] = arg;
 		}
 	}
@@ -140,7 +144,7 @@ public class AdaptorInvocationHandler implements InvocationHandler{
 		return list;		
 	}
 
-	private Object processSourceGeneId(String geneId) {
+	private String processSourceGeneId(String geneId) {
 		if(geneId.startsWith(SOURCE_GENOME_ID))
 		{
 			String targetGeneId = source2targetGeneIdsMap.get(geneId);

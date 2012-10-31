@@ -17,6 +17,7 @@ import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
 import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
+import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
@@ -60,7 +61,7 @@ public class MAKAdaptor implements Adaptor{
 	public List<Dataset> getDatasets(NetworkType networkType) throws AdaptorException {
 		
 		List<Dataset> datasets = new Vector<Dataset>();
-		if(networkType == NetworkType.REGULATORY_NETOWRK)
+		if(networkType == NetworkType.REGULATORY_NETWORK)
 		{
 			datasets.addAll(getDatasets());
 		}		
@@ -100,7 +101,7 @@ public class MAKAdaptor implements Adaptor{
 			DatasetSource datasetSource, Taxon taxon) throws AdaptorException {
 		List<Dataset> datasets = new Vector<Dataset>();
 
-		if(networkType == NetworkType.REGULATORY_NETOWRK)		
+		if(networkType == NetworkType.REGULATORY_NETWORK)		
 			if(datasetSource == DatasetSource.MAK_BI_CLUSTER)
 			{
 				datasets.addAll(getDatasets(taxon));
@@ -209,7 +210,7 @@ public class MAKAdaptor implements Adaptor{
 				makDataset.getKbaseId(),
 				makDataset.getName(),
 				makDataset.getDescription(),
-				NetworkType.REGULATORY_NETOWRK,
+				NetworkType.REGULATORY_NETWORK,
 				DatasetSource.MAK_BI_CLUSTER,
 				taxons
 			);		
@@ -226,7 +227,7 @@ public class MAKAdaptor implements Adaptor{
 		 Node node = Node.buildClusterNode(
 				 getNodeId(), 
 				 bicluster.getName() + " bicluster" , 
-				 new Entity(bicluster.getKbaseId()));
+				 new Entity(bicluster.getKbaseId(), EntityType.BICLUSTER));
 		 
 		 return node;
 	}
@@ -236,7 +237,7 @@ public class MAKAdaptor implements Adaptor{
 		Node node = Node.buildGeneNode(
 				getNodeId(), 
 				gene.getKbaseId(), 
-				new Entity(gene.getKbaseId()));
+				new Entity(gene.getKbaseId(), EntityType.GENE));
 
 		return node;
 	}
@@ -258,6 +259,13 @@ public class MAKAdaptor implements Adaptor{
 	
 	private String getNetworkId() {
 		return NETWORK_ID_PREFIX + (uniqueIndex++);
+	}
+
+
+	@Override
+	public List<Dataset> getDatasets(Entity entity) throws AdaptorException {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 
 }
