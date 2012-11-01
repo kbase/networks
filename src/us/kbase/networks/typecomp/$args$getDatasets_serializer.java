@@ -1,4 +1,4 @@
-package us.kbase.networks.client;
+package us.kbase.networks.typecomp;
 
 import java.io.*;
 import java.util.*;
