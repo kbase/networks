@@ -38,10 +38,10 @@ public class RegPreciseAdaptorDemo {
 //		test_hasDataset();
 		
 //		test_buildFirstNeighborNetwork1();
-		test_buildFirstNeighborNetwork2();
+//		test_buildFirstNeighborNetwork2();
 //		test_buildFirstNeighborNetwork3();
 		
-//		test_buildInternalNetwork();
+		test_buildInternalNetwork();
 	}
 
 	private void test_buildInternalNetwork() throws AdaptorException {

@@ -191,11 +191,12 @@ public class RegPreciseAdaptor implements Adaptor{
 				if(regulators != null)
 				for(KBaseRegulatorDTO regulator: regulators)
 				{
+					if(regulator.getKbaseId() == null) continue;
 					Node regulatorNode = buildRegulatorNode(regulator);
 					graph.addVertex(regulatorNode);
 					Edge edge = buildGeneRegulatorEdge(regulator, queryGene, dataset); 
 					graph.addEdge(edge, regulatorNode, queryNode, 
-							edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);					
+							edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);					
 				}			
 				
 				//Process genes from the same regulon
@@ -203,6 +204,7 @@ public class RegPreciseAdaptor implements Adaptor{
 				if(targetGenes != null)
 				for(KBaseGeneDTO targetGene: targetGenes)
 				{
+					if(targetGene.getKbaseId() == null) continue;
 					Node targetGeneNode = buildGeneNode(targetGene);
 					graph.addVertex(targetGeneNode);
 					Edge edge = buildGeneGeneEdge(targetGene, queryGene, dataset); 
@@ -263,7 +265,7 @@ public class RegPreciseAdaptor implements Adaptor{
 					Node node2 = queryNodesHash.get(genePair.getGeneKBaseId2());
 					Edge edge = buildGeneGeneEdge(genePair, dataset); 
 					graph.addEdge(edge, node1, node2,
-							edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);						
+							edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);						
 				}
 			}							
 		}

@@ -1,7 +1,9 @@
 package us.kbase.networks;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -112,8 +114,11 @@ public class NetworksAPI {
 			{
 				if(adaptor.hasDataset(dataset) )
 				{
-					Network network = adaptor.buildFirstNeighborNetwork(dataset, geneId);
-					networks.add(network);
+					Network network = adaptor.buildFirstNeighborNetwork(dataset, geneId, edgeTypes);
+					if(network != null)
+					{
+						networks.add(network);
+					}
 				}				
 			}
 		}			
@@ -121,6 +126,31 @@ public class NetworksAPI {
 		return buildUnionNetwork(networks);		
 	}
 
+	public Network buildInternalNetwork(List<Dataset> datasets, List<String> geneIds,
+			List<EdgeType> edgeTypes) throws AdaptorException 
+	{		
+		List<Network> networks = new Vector<Network>();
+		
+		for(Dataset dataset: datasets)
+		{
+			for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
+			{
+				if(adaptor.hasDataset(dataset) )
+				{
+					Network network = adaptor.buildInternalNetwork(dataset, geneIds, edgeTypes);
+					if(network != null)
+					{
+						networks.add(network);
+					}
+				}				
+			}
+		}			
+		
+		return buildUnionNetwork(networks);		
+	}
+	
+	
+	
 	private Network buildUnionNetwork(List<Network> networks) {
 		Hashtable<String, Node> entityId2NodeHash =
 			getNonredundantEntityId2NodeHash(networks);
@@ -136,21 +166,35 @@ public class NetworksAPI {
 				
 		// Add all edges
 		for(Network nw: networks)
-		{
+		{			
 			Graph<Node, Edge> nwGraph = nw.getGraph();			
 			for(Edge nwEdge:  nwGraph.getEdges())
 			{				
 				edu.uci.ics.jung.graph.util.EdgeType nwEdgeType = nwGraph.getEdgeType(nwEdge);
-//				if(nwEdgeType == edu.uci.ics.jung.graph.util.EdgeType.DIRECTED)
+				Node nwSourceNode = null;
+				Node nwDestNode = null;
+				
+				
+				if(nwEdgeType == edu.uci.ics.jung.graph.util.EdgeType.DIRECTED)
 				{
-					Node nwSourceNode = nwGraph.getSource(nwEdge);
-					Node sourceNode = entityId2NodeHash.get(nwSourceNode.getEntityId());
-					
-					Node nwDestNode = nwGraph.getDest(nwEdge);
-					Node destNode = entityId2NodeHash.get(nwDestNode.getEntityId());
-					
-					graph.addEdge(nwEdge, sourceNode, destNode, nwEdgeType);
+					nwSourceNode = nwGraph.getSource(nwEdge);
+					nwDestNode = nwGraph.getDest(nwEdge);
 				}
+				else if(nwEdgeType == edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED){
+					Collection<Node> nwNodes = nwGraph.getIncidentVertices(nwEdge);
+					
+					// Consider only edges that connect two nodes 
+					if(nwNodes.size() != 2) continue;
+					
+					Iterator<Node> iterator = nwNodes.iterator();
+					nwSourceNode = iterator.next(); 
+					nwDestNode = iterator.next(); 
+				}
+				
+				Node sourceNode = entityId2NodeHash.get(nwSourceNode.getEntityId());
+				Node destNode = entityId2NodeHash.get(nwDestNode.getEntityId());
+				
+				graph.addEdge(nwEdge, sourceNode, destNode, nwEdgeType);				
 			}
 		}
 		
