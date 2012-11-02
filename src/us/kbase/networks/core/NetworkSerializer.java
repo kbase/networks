@@ -87,7 +87,7 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 				
 					jg.writeStringField("id", edge.getId());
 					jg.writeStringField("name", edge.getName());
-					if(graph.getSource(edge) != null) {
+					if(graph.getEdgeType(edge) == edu.uci.ics.jung.graph.util.EdgeType.DIRECTED) {
 						jg.writeStringField("nodeId1", graph.getSource(edge).getId());
 						jg.writeStringField("nodeId2", graph.getDest(edge).getId());
 					}
@@ -96,6 +96,7 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 						jg.writeStringField("nodeId1", nodePair.getFirst().getId());
 						jg.writeStringField("nodeId2", nodePair.getSecond().getId());
 					}
+					jg.writeStringField("jungEdgeType",graph.getEdgeType(edge).toString());
 					jg.writeNumberField("strength", edge.getStrength());
 					jg.writeNumberField("confidence", edge.getConfidence());
 

@@ -94,8 +94,8 @@ public class RegPreciseAdaptorDemo {
 	private void test_getDatasets3() throws AdaptorException {
 		List<Dataset> datasets;
 		
-		datasets = adaptor.getDatasets(DatasetSource.REGPECISE);		
-		NetworksUtil.printDatasets(DatasetSource.REGPECISE.getName(), datasets);
+		datasets = adaptor.getDatasets(DatasetSource.REGPRECISE);		
+		NetworksUtil.printDatasets(DatasetSource.REGPRECISE.getName(), datasets);
 		
 		datasets = adaptor.getDatasets(DatasetSource.AGRIS);		
 		NetworksUtil.printDatasets(DatasetSource.AGRIS.getName(), datasets);
@@ -110,14 +110,14 @@ public class RegPreciseAdaptorDemo {
 	private void test_getDatasets2() throws AdaptorException {
 		List<Dataset> datasets;
 		
-		datasets = adaptor.getDatasets(NetworkType.REGULATORY_NETOWRK);		
-		NetworksUtil.printDatasets(NetworkType.REGULATORY_NETOWRK.getName(), datasets);
+		datasets = adaptor.getDatasets(NetworkType.REGULATORY_NETWORK);		
+		NetworksUtil.printDatasets(NetworkType.REGULATORY_NETWORK.getName(), datasets);
 		
 		datasets = adaptor.getDatasets(NetworkType.FUNCTIONAL_ASSOCIATION);		
 		NetworksUtil.printDatasets(NetworkType.FUNCTIONAL_ASSOCIATION.getName(), datasets);
 		
-		datasets = adaptor.getDatasets(NetworkType.METABOLIC_PATHWAY);		
-		NetworksUtil.printDatasets(NetworkType.METABOLIC_PATHWAY.getName(), datasets);
+		datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM);		
+		NetworksUtil.printDatasets(NetworkType.METABOLIC_SUBSYSTEM.getName(), datasets);
 		
 		datasets = adaptor.getDatasets(NetworkType.PROT_PROT_INTERACTION);		
 		NetworksUtil.printDatasets(NetworkType.PROT_PROT_INTERACTION.getName(), datasets);

@@ -24,6 +24,7 @@ import us.kbase.CDMI.fields_Model;
 import us.kbase.CDMI.fields_Subsystem;
 import us.kbase.CDMI.tuple_118;
 import us.kbase.CDMI.tuple_132;
+import us.kbase.CDMI.tuple_136;
 import us.kbase.CDMI.tuple_51;
 import us.kbase.CDMI.tuple_83;
 import us.kbase.networks.adaptor.Adaptor;
@@ -34,6 +35,7 @@ import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
 import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
+import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
@@ -69,7 +71,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 				for (tuple_132 tuple : genomeIds) {
 					taxons.add(new Taxon(tuple.e_3.id));
 				}
-				datasets.add(new Dataset(getDatasetId(id), name, "Metabolic pathway for " + name + " genome.", NetworkType.METABOLIC_PATHWAY, 
+				datasets.add(new Dataset(getDatasetId(id), name, "Subsystems for " + name + " genome.", NetworkType.METABOLIC_SUBSYSTEM, 
 						DatasetSource.MODELSEED, taxons));
 			}
 		} catch (Exception e) {
@@ -79,11 +81,37 @@ public class ModelSEEDAdaptor implements Adaptor {
 
 		return datasets;
 	}
+	
+	public List<Dataset> getDatasets(Entity entity) throws AdaptorException {
+		List<Dataset> datasets = new ArrayList<Dataset>();
+		
+		if (entity.getType() == EntityType.GENE) {
+			List<tuple_136> genomeIds;
+			try {
+				genomeIds = cdmi.get_relationship_IsOwnedBy(Arrays.asList(entity.getId()), new ArrayList<String>(), 
+						new ArrayList<String>(), Arrays.asList("id"));
+			} catch (Exception e) {
+				throw new AdaptorException("Error while accessing CDMI", e);
+			}
+			if (genomeIds.size() == 1) {
+				Taxon et = new Taxon(genomeIds.get(0).e_3.id);
+				for (Dataset ds : getDatasets()) {
+					for (Taxon t : ds.getTaxons()) {
+						if (t.equals(et)) {
+							datasets.add(ds);
+						}
+					}
+				}	
+			}
+		}
+		
+		return datasets;
+	}
 
 	@Override
 	public List<Dataset> getDatasets(NetworkType networkType) throws AdaptorException {
 		List<Dataset> datasets = new ArrayList<Dataset>();
-		if(networkType == NetworkType.METABOLIC_PATHWAY)
+		if(networkType == NetworkType.METABOLIC_SUBSYSTEM)
 		{
 			datasets.addAll(getDatasets());
 		}		
@@ -92,7 +120,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 
 	@Override
 	public List<Dataset> getDatasets(DatasetSource datasetSource) throws AdaptorException {
-		List<Dataset> datasets = new Vector<Dataset>();
+		List<Dataset> datasets = new ArrayList<Dataset>();
 		if(datasetSource == DatasetSource.MODELSEED)
 		{
 			datasets.addAll(getDatasets());
@@ -120,7 +148,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 			DatasetSource datasetSource, Taxon taxon) throws AdaptorException {
 		List<Dataset> datasets = new ArrayList<Dataset>();
 
-		if(networkType == NetworkType.METABOLIC_PATHWAY)		
+		if(networkType == NetworkType.METABOLIC_SUBSYSTEM)		
 			if(datasetSource == DatasetSource.MODELSEED)
 			{
 				datasets.addAll(getDatasets(taxon));
@@ -154,7 +182,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId, List<EdgeType> edgeTypes) throws AdaptorException {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
 		Network network = new Network(getNetworkId(), "", graph);	
-		Node geneNode = Node.buildGeneNode(getNodeId(), geneId, new Entity(geneId));
+		Node geneNode = Node.buildGeneNode(getNodeId(), geneId, new Entity(geneId, EntityType.GENE));
 		graph.addVertex(geneNode);
 		if( !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
 		{
@@ -162,7 +190,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 		}
 
 		for (fields_Subsystem fs : getSubsystemFieldsForGene(geneId)) {
-			Node ssNode = Node.buildClusterNode(getNodeId(), fs.id, new Entity(fs.id));
+			Node ssNode = Node.buildClusterNode(getNodeId(), fs.id, new Entity(fs.id, EntityType.SUBSYSTEM));
 			graph.addVertex(ssNode);
 			Edge edge = new Edge(getEdgeId(), "Member of subsystem", dataset);
 			graph.addEdge(edge, ssNode, geneNode, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
@@ -208,7 +236,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 		Map<String,List<Node>> ssToGeneNodes = new HashMap<String,List<Node>>();
 
 		for (String geneId : geneIds) {
-			Node geneNode = Node.buildGeneNode(getNodeId(), geneId, new Entity(geneId));
+			Node geneNode = Node.buildGeneNode(getNodeId(), geneId, new Entity(geneId, EntityType.GENE));
 			graph.addVertex(geneNode);
 
 			for (fields_Subsystem fs : getSubsystemFieldsForGene(geneId)) {

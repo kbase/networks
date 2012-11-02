@@ -214,7 +214,7 @@ public class NetworksAPI {
 					entityId2NodeHash.put(refNode.getEntity().getId(), refNode);					
 				}
 				
-				refNode.addProperies(node);
+				refNode.addProperties(node);
 				refNode.addUserAnnotations(node);
 			}
 		}

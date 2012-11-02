@@ -3,10 +3,12 @@ package us.kbase.networks.core;
 public final class Entity {
 	
 	protected String id;
+	protected EntityType type;
 	
-	public Entity(String id) {
+	public Entity(String id, EntityType type) {
 		super();
 		this.id = id;
+		this.type = type;
 	}
 
 	@Override
@@ -26,7 +28,6 @@ public final class Entity {
 	
 	public EntityType getType()
 	{
-		//TODO
-		return null;
+		return type;
 	}	
 }

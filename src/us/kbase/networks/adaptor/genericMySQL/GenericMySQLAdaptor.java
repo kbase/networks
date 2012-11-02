@@ -19,6 +19,7 @@ import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
 import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
+import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
@@ -211,7 +212,7 @@ public class GenericMySQLAdaptor implements Adaptor{
 		
 		String [] psIdxes = dataset.getProperty("sql.findNeighbor.psIndex").split(":"); 
 		
-		Node query = getNode(this.NODE_ID_PREFIX + geneId, geneId, new Entity(geneId), nt);
+		Node query = getNode(this.NODE_ID_PREFIX + geneId, geneId, new Entity(geneId, EntityType.GENE), nt);
 		graph.addVertex(query);
 		
 		
@@ -227,7 +228,7 @@ public class GenericMySQLAdaptor implements Adaptor{
 			ResultSet rs = this.pstFindNeighbor.executeQuery();
 			while(rs.next()) {
 				String neighborId = rs.getString(rsIdx);
-				Node neighbor = getNode(this.NODE_ID_PREFIX + neighborId, neighborId, new Entity(neighborId), nt);
+				Node neighbor = getNode(this.NODE_ID_PREFIX + neighborId, neighborId, new Entity(neighborId, EntityType.UNKNOWN), nt);
 				graph.addVertex(neighbor);
 				graph.addEdge(new Edge(this.EDGE_ID_PREFIX+geneId+":"+neighborId, geneId+":"+neighborId, dataset), 
 						query, neighbor);
@@ -252,7 +253,7 @@ public class GenericMySQLAdaptor implements Adaptor{
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
 		NodeType nt = Enum.valueOf(NodeType.class, dataset.getProperty("default.nodeType"));
 		for(String geneId : geneIds) {
-			Node node = getNode(this.NODE_ID_PREFIX + geneId, geneId, new Entity(geneId), nt);
+			Node node = getNode(this.NODE_ID_PREFIX + geneId, geneId, new Entity(geneId, EntityType.GENE), nt);
 			graph.addVertex(node);
 		}
 		Set<Node> intCollection = new HashSet<Node>(graph.getVertices());
@@ -278,6 +279,12 @@ public class GenericMySQLAdaptor implements Adaptor{
 		EdgeType et = Enum.valueOf(EdgeType.class, dataset.getProperty("default.edgeType"));
 		if(!edgeTypes.contains(et)) return null;
 		return buildInternalNetwork(dataset, geneIds);
+	}
+
+	@Override
+	public List<Dataset> getDatasets(Entity entity) throws AdaptorException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

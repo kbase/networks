@@ -5,6 +5,7 @@ import java.util.List;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.EdgeType;
+import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Taxon;
@@ -28,5 +29,7 @@ public interface Adaptor {
 	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId, List<EdgeType> edgeTypes) throws AdaptorException;
 	
 	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds) throws AdaptorException;
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds, List<EdgeType> edgeTypes) throws AdaptorException;	
+	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds, List<EdgeType> edgeTypes) throws AdaptorException;
+
+	public List<Dataset> getDatasets(Entity entity) throws AdaptorException;
 }

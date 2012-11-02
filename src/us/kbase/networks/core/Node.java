@@ -98,7 +98,7 @@ public final class Node {
 	public Node clone()
 	{
 		Node node = new Node(id, name, entity, type);
-		addProperies(node);
+		addProperties(node);
 		addUserAnnotations(node);		
 
 		return node;		
@@ -112,7 +112,7 @@ public final class Node {
 		}
 	}
 	
-	public void addProperies(Node node)
+	public void addProperties(Node node)
 	{
 		for(Map.Entry<String, String> entry : properties.entrySet() )
 		{

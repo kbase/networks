@@ -581,7 +581,7 @@ public class PPIAdaptor implements Adaptor {
 	
 	    rv = Node.buildClusterNode(getNodeID(),
 				       "complex "+interactionName,
-				       new Entity(CLUSTER_PPI_ID_PREFIX+interactionID));
+				       new Entity(CLUSTER_PPI_ID_PREFIX+interactionID, EntityType.PPI_COMPLEX));
 	    rv.addProperty("interaction_dataset_id",""+datasetID);
 	    rv.addProperty("interaction_id",""+interactionID);
 	    rv.addProperty("description",""+interactionName);
@@ -613,12 +613,12 @@ public class PPIAdaptor implements Adaptor {
 	    // fixme:  should use API to lookup gene from protein
 	    rv = Node.buildGeneNode(getNodeID(),
 				    proteinID,
-				    new Entity(proteinID));
+				    new Entity(proteinID, EntityType.PROTEIN));
 	}
 	else {
 	    rv = Node.buildProteinNode(getNodeID(),
 				       proteinID,
-				       new Entity(proteinID));
+				       new Entity(proteinID, EntityType.PROTEIN));
 	}
 	
 	// todo: add properties, such as aliases

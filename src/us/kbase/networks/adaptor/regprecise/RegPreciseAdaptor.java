@@ -9,11 +9,13 @@ import java.util.Set;
 import java.util.Vector;
 
 import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
 import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
+import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
@@ -72,7 +74,7 @@ public class RegPreciseAdaptor implements Adaptor{
 	@Override
 	public List<Dataset> getDatasets(NetworkType networkType) {
 		List<Dataset> datasets = new Vector<Dataset>();
-		if(networkType == NetworkType.REGULATORY_NETOWRK)
+		if(networkType == NetworkType.REGULATORY_NETWORK)
 		{
 			datasets.addAll(getDatasets());
 		}		
@@ -82,7 +84,7 @@ public class RegPreciseAdaptor implements Adaptor{
 	@Override
 	public List<Dataset> getDatasets(DatasetSource datasetSource) {
 		List<Dataset> datasets = new Vector<Dataset>();
-		if(datasetSource == DatasetSource.REGPECISE)
+		if(datasetSource == DatasetSource.REGPRECISE)
 		{
 			datasets.addAll(getDatasets());
 		}		
@@ -112,8 +114,8 @@ public class RegPreciseAdaptor implements Adaptor{
 			DatasetSource datasetSource, Taxon taxon) {
 		List<Dataset> datasets = new Vector<Dataset>();
 		
-		if(networkType == NetworkType.REGULATORY_NETOWRK)		
-		if(datasetSource == DatasetSource.REGPECISE)
+		if(networkType == NetworkType.REGULATORY_NETWORK)		
+		if(datasetSource == DatasetSource.REGPRECISE)
 		{
 			datasets.addAll(getDatasets(taxon));
 		}		
@@ -296,8 +298,8 @@ public class RegPreciseAdaptor implements Adaptor{
 				getDatasetId(regulome.getRegulomeKBaseId()),
 				regulome.getGenomeName(),
 				"Regulome for " + regulome.getGenomeName() + " genome.",
-				NetworkType.REGULATORY_NETOWRK,
-				DatasetSource.REGPECISE,
+				NetworkType.REGULATORY_NETWORK,
+				DatasetSource.REGPRECISE,
 				taxons
 			);		
 	}
@@ -309,8 +311,8 @@ public class RegPreciseAdaptor implements Adaptor{
 					getDatasetId(regulome.getKbaseId()),
 					regulome.getGenome().getName(),
 					"Regulome for " + regulome.getGenome().getName() + " genome.",
-					NetworkType.REGULATORY_NETOWRK,
-					DatasetSource.REGPECISE,
+					NetworkType.REGULATORY_NETWORK,
+					DatasetSource.REGPRECISE,
 					taxons
 		);		
 	}
@@ -362,7 +364,7 @@ public class RegPreciseAdaptor implements Adaptor{
 		Node node = Node.buildGeneNode(
 				getNodeId(), 
 				gene.getName(), 
-				new Entity(gene.getKbaseId()));
+				new Entity(gene.getKbaseId(), EntityType.GENE));
 		if(gene.getLocusTag() != null)
 		{
 			node.addProperty(NODE_PROPERTY_LOCUS_TAG, gene.getLocusTag());
@@ -374,7 +376,7 @@ public class RegPreciseAdaptor implements Adaptor{
 		 Node node = Node.buildClusterNode(
 				 getNodeId(), 
 				 regulon.getRegulatorName() + " regulon" , 
-				 new Entity(regulon.getKbaseId()));
+				 new Entity(regulon.getKbaseId(), EntityType.REGULON));
 		 
 		 node.addProperty(NODE_PROPERTY_REGULATION_TYPE, regulon.getRegulationType());
 		 return node;
@@ -384,7 +386,7 @@ public class RegPreciseAdaptor implements Adaptor{
 		Node node = Node.buildGeneNode(
 				getNodeId(), 
 				regulator.getName(),
-				new Entity(regulator.getKbaseId()));
+				new Entity(regulator.getKbaseId(), EntityType.GENE));
 		
 		node.addProperty(NODE_PROPERTY_REGULATOR, "");
 		if(regulator.getLocusTag() != null)
@@ -452,5 +454,11 @@ public class RegPreciseAdaptor implements Adaptor{
 		List<String> geneIds = Arrays.asList(geneId);
 		List<KBaseGeneDTO> genes = dataProvider.getRegulatedGenes(geneIds);
 		return genes.size() > 0 ? genes.get(0) : null;
+	}
+
+	@Override
+	public List<Dataset> getDatasets(Entity entity) throws AdaptorException {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 }
