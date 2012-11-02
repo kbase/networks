@@ -17,8 +17,7 @@
       <include name="*.jar"/>
     </fileset>
   </path>
-
-
+  
   <target name="init">
     <!-- Create the time stamp -->
     <tstamp/>
@@ -53,6 +52,15 @@
     <!-- Delete the ${build} and ${dist} directory trees -->
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
+  </target>
+  
+  <target name="run" description="Run a main class">
+	  <java classname="${run.class}">
+		  <classpath>
+			  <path refid="compile.classpath" />
+			  <pathelement path="${build}" />
+		  </classpath>
+	  </java>
   </target>
 </project>
 
