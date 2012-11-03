@@ -122,6 +122,10 @@ public class AdaptorInvocationHandler implements InvocationHandler{
 	}
 
 	private Object processSourceDataset(Dataset dataset) throws IllegalArgumentException, IllegalAccessException, SecurityException, NoSuchFieldException {
+		if(dataset.getTaxons() == null) {
+			return dataset;
+		}
+		
 		for(Taxon taxon: dataset.getTaxons())
 		{
 			processTaxon(taxon, SOURCE_GENOME_ID, TARGET_GENOME_ID);

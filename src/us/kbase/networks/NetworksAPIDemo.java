@@ -1,5 +1,6 @@
 package us.kbase.networks;
 
+import java.awt.print.Printable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,6 +51,7 @@ public class NetworksAPIDemo {
 		Taxon taxon = new Taxon(genomeId);
 		
 		List<Dataset> datasets = api.getDatasets(taxon);
+		NetworksUtil.printDatasets("", datasets);
 		Network network = api.buildInternalNetwork(datasets, geneIds, Arrays.asList(EdgeType.GENE_GENE));
 		
 		NetworksUtil.printNetwork(network);

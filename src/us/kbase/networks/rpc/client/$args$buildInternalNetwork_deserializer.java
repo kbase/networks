@@ -20,7 +20,9 @@ public class $args$buildInternalNetwork_deserializer extends JsonDeserializer<$a
 		return null;
 	}
 	p.nextToken();
-	res.ParameterList = p.readValueAs(new TypeReference<List<Parameter>>(){});
+	res.datasetIds = p.readValueAs(new TypeReference<List<String>>(){});
+	res.geneIds = p.readValueAs(new TypeReference<List<String>>(){});
+	res.edgeTypes = p.readValueAs(new TypeReference<List<String>>(){});
 	JsonToken t = p.nextToken();
 //	System.out.println("exit $args$buildInternalNetwork_deserializer with token " + t);
 

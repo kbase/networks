@@ -15,7 +15,7 @@ public class Dataset
     public String name;
     public String description;
     public String networkType;
-    public String datasetSource;
+    public String sourceReference;
     public List<String> taxons;
     public Map<String, String> properties;
 }

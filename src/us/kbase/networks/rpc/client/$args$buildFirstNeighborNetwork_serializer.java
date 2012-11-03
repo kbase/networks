@@ -14,7 +14,9 @@ public class $args$buildFirstNeighborNetwork_serializer extends JsonSerializer<$
 	throws IOException, JsonProcessingException
     {
 	jgen.writeStartArray();
-	jgen.writeObject(value.ParameterList);
+	jgen.writeObject(value.datasetIds);
+	jgen.writeObject(value.geneId);
+	jgen.writeObject(value.edgeTypes);
 	jgen.writeEndArray();
     }
 }

@@ -13,7 +13,9 @@ import org.codehaus.jackson.*;
 @JsonDeserialize(using = $args$buildInternalNetwork_deserializer.class)
 public class $args$buildInternalNetwork
 {
-    public List<Parameter> ParameterList;
+    public List<String> datasetIds;
+    public List<String> geneIds;
+    public List<String> edgeTypes;
 }
 
 

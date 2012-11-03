@@ -14,7 +14,9 @@ public class $args$buildInternalNetwork_serializer extends JsonSerializer<$args$
 	throws IOException, JsonProcessingException
     {
 	jgen.writeStartArray();
-	jgen.writeObject(value.ParameterList);
+	jgen.writeObject(value.datasetIds);
+	jgen.writeObject(value.geneIds);
+	jgen.writeObject(value.edgeTypes);
 	jgen.writeEndArray();
     }
 }

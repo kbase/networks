@@ -13,7 +13,9 @@ import org.codehaus.jackson.*;
 @JsonDeserialize(using = $args$buildFirstNeighborNetwork_deserializer.class)
 public class $args$buildFirstNeighborNetwork
 {
-    public List<Parameter> ParameterList;
+    public List<String> datasetIds;
+    public String geneId;
+    public List<String> edgeTypes;
 }
 
 

@@ -43,10 +43,17 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 				
 					jg.writeStringField("id", node.getId());
 					jg.writeStringField("name", node.getName());
+					
+/*	
+ * PSN: for client, let us have jst entityId
+ * 				
 					jg.writeFieldName("entity"); 
 					jg.writeStartObject();
 						jg.writeStringField("id", node.getEntityId());
 					jg.writeEndObject();
+*/					
+					jg.writeStringField("entityId", node.getEntityId());
+					
 					jg.writeStringField("type", node.getType().toString());
 					
 					// TODO: Not included in client type spec
@@ -96,7 +103,13 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 						jg.writeStringField("nodeId1", nodePair.getFirst().getId());
 						jg.writeStringField("nodeId2", nodePair.getSecond().getId());
 					}
+/*
+ * PSN: it is either directed or not. We can keep it in "directed" property. It is more user-friendly...
+ * 					
 					jg.writeStringField("jungEdgeType",graph.getEdgeType(edge).toString());
+*/					
+					jg.writeStringField("directed", "" +(graph.getEdgeType(edge) == edu.uci.ics.jung.graph.util.EdgeType.DIRECTED));
+					
 					jg.writeNumberField("strength", edge.getStrength());
 					jg.writeNumberField("confidence", edge.getConfidence());
 
@@ -128,9 +141,14 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 			// datasets
 			jg.writeFieldName("datasets");
 			jg.writeStartArray();
+			
+/*
+ * PSN: We will provide it once we can load new instances of datasets; otherwise only "id" property is not null 
+ * 			
 			for(Dataset dataset : datasetList) {
 				dser.serialize(dataset, jg, sp);
 			}
+*/			
 			jg.writeEndArray();
 
 	

@@ -13,7 +13,7 @@ public class Node
 {
     public String id;
     public String name;
-    public KBaseEntity entity;
+    public String entityId;
     public String type;
     public Map<String, String> properties;
     public Map<String, String> userAnnotations;

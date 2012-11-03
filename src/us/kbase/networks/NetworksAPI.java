@@ -17,6 +17,7 @@ import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
 import us.kbase.networks.core.EdgeType;
+import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
@@ -78,7 +79,21 @@ public class NetworksAPI {
 			datasets.addAll(adaptor.getDatasets(datasetSource));
 		}		
 		return datasets;
-	}		
+	}	
+	
+	public List<Dataset> getDatasets(Entity entity) throws AdaptorException
+	{
+		List<Dataset> datasets = new Vector<Dataset>();
+		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
+		{
+			List<Dataset> adaptorDatasets = adaptor.getDatasets(entity);
+			if(adaptorDatasets != null)
+			{
+				datasets.addAll(adaptorDatasets);
+			}
+		}		
+		return datasets;		
+	}
 	
 	public List<Dataset> getDatasets(Taxon taxon) throws AdaptorException
 	{

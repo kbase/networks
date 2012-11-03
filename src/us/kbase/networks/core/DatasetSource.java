@@ -1,6 +1,9 @@
 package us.kbase.networks.core;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+
+@JsonSerialize(using = DatasetSourceSerializer.class)
 public enum DatasetSource {
 
 
