@@ -139,7 +139,7 @@ public class PPIAdaptor implements Adaptor {
     /**
        get PPI datasets containing a requested entity
     */
-    public List<Dataset> getDatasets(Entity entity)
+    @Override public List<Dataset> getDatasets(Entity entity)
 	throws AdaptorException {
 	List<Dataset> rv = new Vector<Dataset>();
 	try{
@@ -466,8 +466,6 @@ public class PPIAdaptor implements Adaptor {
 		    node.addProperty("interaction_protein_id",""+interactionProteinID);
 		    graph.addVertex(node);
 		}
-		rs.close();
-		stmt.close();
 		if (edgeTypes.contains(EdgeType.GENE_GENE)) {
 		    connectAll(nodesInComplexG,
 			       graph,
@@ -491,6 +489,9 @@ public class PPIAdaptor implements Adaptor {
 			       dataset);
 		}
 	    }
+	    rs.close();
+	    stmt.close();
+	    
 	}
 	catch (Exception e) {
 	    throw new AdaptorException(e.getMessage());
