@@ -13,7 +13,7 @@ import edu.uci.ics.jung.graph.*;
 /**
    Class implementing an Adaptor for PPI data in KBase Networks API
 
-   @version 1.2, 10/25/12
+   @version 1.3, 11/6/12
    @author JMC
 */
 public class PPIAdaptor implements Adaptor {
@@ -283,7 +283,7 @@ public class PPIAdaptor implements Adaptor {
 	    if (edgeTypes.contains(EdgeType.GENE_GENE) ||
 		edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) {
 		// get all proteins in same complex as query
-		PreparedStatement stmt = PPI.prepareStatement("select i.id, f1.protein_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.protein_id=? order by f1.rank asc");
+		PreparedStatement stmt = PPI.prepareStatement("select i.id, f1.protein_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.protein_id=? order by i.id asc, f1.rank asc");
 		stmt.setInt(1,datasetID);
 		stmt.setString(2,geneID);
 
@@ -363,7 +363,8 @@ public class PPIAdaptor implements Adaptor {
 	Network network = buildNetwork(dataset,edgeTypes);
 	Graph<Node, Edge> graph = network.getGraph();
 	Collection<Node> allNodes = graph.getVertices();
-	for (Node n : allNodes) {
+	Vector<Node> v = new Vector<Node>(allNodes);
+	for (Node n : v) {
 	    if (!geneIDs.contains(n.getName()))
 		graph.removeVertex(n);  // also removes appropriate edges
 	}
@@ -402,7 +403,7 @@ public class PPIAdaptor implements Adaptor {
 	    PPI.connect();
 
 	    // get all complexes / proteins in this dataset
-	    PreparedStatement stmt = PPI.prepareStatement("select i.id, i.description, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id order by f.rank asc");
+	    PreparedStatement stmt = PPI.prepareStatement("select i.id, i.description, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id order by i.id asc, f.rank asc");
 	    stmt.setInt(1,datasetID);
 
 	    Vector<Node> nodesInComplexG = new Vector<Node>(); // gene
@@ -459,39 +460,43 @@ public class PPIAdaptor implements Adaptor {
 		    node = buildNode(geneID, NodeType.GENE);
 		    node.addProperty("interaction_protein_id",""+interactionProteinID);
 		    graph.addVertex(node);
+		    nodesInComplexG.add(node);
 		}
 		if ((edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) ||
 		    (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER))) {
 		    node = buildNode(geneID, NodeType.PROTEIN);
 		    node.addProperty("interaction_protein_id",""+interactionProteinID);
 		    graph.addVertex(node);
-		}
-		if (edgeTypes.contains(EdgeType.GENE_GENE)) {
-		    connectAll(nodesInComplexG,
-			       graph,
-			       dataset);
-		}
-		if (edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) {
-		    connectAll(nodesInComplexP,
-			       graph,
-			       dataset);
-		}
-		if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
-		    connectAll(nodesInComplexG,
-			       lastComplexNode,
-			       graph,
-			       dataset);
-		}
-		if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
-		    connectAll(nodesInComplexP,
-			       lastComplexNode,
-			       graph,
-			       dataset);
+		    nodesInComplexP.add(node);
 		}
 	    }
+
 	    rs.close();
 	    stmt.close();
-	    
+
+	    // connect last complex
+	    if (edgeTypes.contains(EdgeType.GENE_GENE)) {
+		connectAll(nodesInComplexG,
+			   graph,
+			   dataset);
+	    }
+	    if (edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) {
+		connectAll(nodesInComplexP,
+			   graph,
+			   dataset);
+	    }
+	    if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
+		connectAll(nodesInComplexG,
+			   lastComplexNode,
+			   graph,
+			   dataset);
+	    }
+	    if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
+		connectAll(nodesInComplexP,
+			   lastComplexNode,
+			   graph,
+			   dataset);
+	    }
 	}
 	catch (Exception e) {
 	    throw new AdaptorException(e.getMessage());
@@ -710,11 +715,12 @@ public class PPIAdaptor implements Adaptor {
 			    Graph<Node, Edge> g,
 			    Dataset d)
 	throws AdaptorException {
+
 	int n = nodes.size();
 	for (int i=0; i<n; i++) {
 	    Node n1 = nodes.get(i);
 	    int interactionProteinID =
-		    StringUtil.atoi(n1.getProperty("interaction_protein_id"));
+		StringUtil.atoi(n1.getProperty("interaction_protein_id"));
 
 	    // dummy edge, in order to find out node properties:
 	    Edge e = buildEdge(n1,
