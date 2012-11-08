@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="KBaseNetworksRPC" basedir="../" default="build">
+    <property name="src.dir" value="src" />
+    <property name="web.dir" value="WebContent" />
+    <property name="build.dir" value="${basedir}/build" />
+    <property name="dist.dir" value="${basedir}/dist" />
+    <property name="server.lib" value="lib" />
+    <property name="name" value="KBaseNetworksRPC" />
+
+    <path id="project-classpath">
+
+    	<!--  here give path for jar repository -->
+    	<fileset dir="${server.lib}">
+    		<include name="servlet*.jar" />
+    	</fileset>
+    	<fileset dir="${basedir}/lib">
+    		<include name="*.jar" />
+    	</fileset>
+    	<pathelement path="${build.dir}" />
+    </path>
+
+    <target name="build" depends="compile" description="build project, but first compile it">
+         <war destfile="${dist.dir}/${name}.war"
+             webxml="${web.dir}/WEB-INF/web.xml">
+             <lib dir="${basedir}/lib"/>
+             <classes dir="${build.dir}/classes" />
+            <fileset dir="${web.dir}">
+                <include name="**/*.*"/>
+            </fileset>
+        </war>
+        <copy todir="${web.dir}/WEB-INF/classes" >
+            <fileset dir="${src.dir}" excludes="*/.java"/>
+        </copy>
+        <!-- <exec executable="cp ${basedir}/${src.dir}/us/kbase/networks/core/ecoli_correspondence ${basedir}/${web.dir}/WEB-INF/classes/us/kbase/networks/core/" /> -->
+    </target>
+
+    <target name="compile" description="Compile java files and place them webContents/web-inf/">
+    	<mkdir dir="${build.dir}/classes"/>
+        <javac destdir="${build.dir}/classes" failonerror="true" includeantruntime="false">
+            <src path="${src.dir}"/>
+            <classpath refid="project-classpath"/>
+        </javac>
+    </target>
+
+    <target name="clean">
+    	 <delete dir="${build.dir}" failonerror="true"/>
+    </target>
+</project>
