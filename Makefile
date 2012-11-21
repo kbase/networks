@@ -1,3 +1,9 @@
+# configurable variables 
+# SERVICE is the git module name
+SERVICE = kbase_network
+# SERVICE_NAME is the name of the language libs
+SERVICE_NAME = KBaseNetwork
+
 #
 #Makefile for Build and setup MogoDBService
 #make sure that these two variables was set:
@@ -7,8 +13,21 @@
 #Apache ANT compiler
 ANT=ant
 
-all:
+all: compile-typespec
 	cd ./conf; $(ANT) build 
+
+compile-typespec:
+        mkdir -p lib/biokbase/$(SERVICE_NAME)
+        mkdir -p lib/javascript/$(SERVICE_NAME)
+        mkdir -p scripts
+        compile_typespec \
+                --impl Bio::KBase::$(SERVICE_NAME)::Impl \
+                --service Bio::KBase::$(SERVICE_NAME)::Service \
+                --client Bio::KBase::$(SERVICE_NAME)::Client \
+                --py biokbase/$(SERVICE_NAME)/Client \
+                --js javascript/$(SERVICE_NAME)/Client \
+                --scripts scripts \
+                $(SERVICE).spec lib
 
 deploy: stop_domain1 start_domain1 deploy_war generate_script
 	
