@@ -17,10 +17,10 @@ all: compile-typespec
 	cd ./conf; $(ANT) build 
 
 compile-typespec:
-        mkdir -p lib/biokbase/$(SERVICE_NAME)
-        mkdir -p lib/javascript/$(SERVICE_NAME)
-        mkdir -p scripts
-        compile_typespec \
+	mkdir -p lib/biokbase/$(SERVICE_NAME)
+	mkdir -p lib/javascript/$(SERVICE_NAME)
+	mkdir -p scripts
+	compile_typespec \
                 --impl Bio::KBase::$(SERVICE_NAME)::Impl \
                 --service Bio::KBase::$(SERVICE_NAME)::Service \
                 --client Bio::KBase::$(SERVICE_NAME)::Client \
@@ -30,14 +30,14 @@ compile-typespec:
                 $(SERVICE).spec lib
 
 deploy: stop_domain1 start_domain1 deploy_war generate_script
-	
+
 stop_domain1:
 	$(GLASSFISH_HOME)/bin/asadmin stop-domain 
 
 start_domain1:
 	@START_RESULT='$(shell $(GLASSFISH_HOME)/bin/asadmin start-domain | grep successfully)'
 	@if ["$(START_RESULT)" != ""]; then exit; fi
-		
+
 deploy_config:
 	cp domain.xml $(GLASSFISH_HOME)/glassfish/domains/domain1/config/
 	@VERIFY_RESULT='$(shell $(GLASSFISH_HOME)/bin/asadmin verify-domain-xml domain1 | grep valid)'
