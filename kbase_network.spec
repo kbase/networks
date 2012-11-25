@@ -9,25 +9,12 @@ module KBaseNetwork : KBaseNetwork
   typedef string Taxon;
   typedef string Boolean; 
   
-/*  
-  typedef string Type;
-  typedef string Value;
-  typedef string JungEdgeType;
-  typedef structure {
-    Type type;
-    Value value;
-  } Parameter;
-
-  typedef list<Parameter> ParameterList;
-*/  
-  
-  
   typedef structure {
     string id;
     string name;
-	DatasetSourceRef reference;    
+    DatasetSourceRef reference;    
     string description;
-	string resourceURL;
+    string resourceURL;
   } DatasetSource;  
   
   typedef structure {
@@ -93,18 +80,13 @@ module KBaseNetwork : KBaseNetwork
  /*  Buid network methods */
  
   funcdef buildFirstNeighborNetwork(list<string> datasetIds, string geneId, list<EdgeType> edgeTypes) returns(Network network);
+  funcdef buildFirstNeighborNetworkLimtedByStrength(list<string> datasetIds, string geneId, list<EdgeType> edgeTypes, float cutOff) returns(Network network);
   funcdef buildInternalNetwork(list<string> datasetIds, list<string> geneIds, list<EdgeType> edgeTypes) returns(Network network);
+  funcdef buildInternalNetworkLimitedByStrength(list<string> datasetIds, list<string> geneIds, list<EdgeType> edgeTypes, float cutOff) returns(Network network);
 
 /* not ready yet
   
   funcdef buildNetwork(string datasetId) returns(Network network);
 */ 
 
-
-/*  
-  funcdef getDatasets(ParameterList) returns(DatasetList datasetList);
-  funcdef buildNetwork(ParameterList) returns(Network network);  
-  funcdef buildFirstNeighborNetwork(ParameterList) returns(Network network);
-  funcdef buildInternalNetwork(ParameterList) returns(Network network);
-*/  
 };

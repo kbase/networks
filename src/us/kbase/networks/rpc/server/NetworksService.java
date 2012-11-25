@@ -8,6 +8,8 @@ import java.util.List;
 
 import us.kbase.networks.NetworksAPI;
 import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.core.Node;
+import us.kbase.networks.core.Edge;
 import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.EntityType;
@@ -23,6 +25,9 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.util.Pair;
 
 
 public class NetworksService {
@@ -127,7 +132,18 @@ public class NetworksService {
     	return toClientNetwork(network);
     }
 
+    public Network buildFirstNeighborNetworkLimtedByStrength(List<String> datasetIds, String geneId, List<String> edgeTypeRefs, float cutOff) throws Exception
+    {
+    	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
+    	List<us.kbase.networks.core.Dataset> datasets = getDatasets(datasetIds);
+    	
+    	us.kbase.networks.core.Network network = api.buildFirstNeighborNetwork(datasets, geneId, edgeTypes);
+    	cutOffNetwork(network, cutOff);
+    	
+    	return toClientNetwork(network);
+    }
 
+    
 	public Network buildInternalNetwork(List<String> datasetIds, List<String> geneIds, List<String> edgeTypeRefs) throws Exception
     {
     	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
@@ -138,6 +154,18 @@ public class NetworksService {
     	return toClientNetwork(network);
     }
 
+	public Network buildInternalNetworkLimitedByStrength(List<String> datasetIds, List<String> geneIds, List<String> edgeTypeRefs, float cutOff) throws Exception
+    {
+    	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
+    	List<us.kbase.networks.core.Dataset> datasets = getDatasets(datasetIds);
+    	
+    	us.kbase.networks.core.Network network = api.buildInternalNetwork(datasets, geneIds, edgeTypes);
+    	cutOffNetwork(network,cutOff);
+    	
+    	return toClientNetwork(network);
+    }
+	
+	
     public Network buildNetwork(String datasetId) throws Exception
     {
     	us.kbase.networks.core.Dataset dataset =  getDatasets(Arrays.asList(datasetId)).get(0);
@@ -212,7 +240,28 @@ public class NetworksService {
     	}
     	
 		return edgeTypes;
-	}    
+	}  
+    
+    private void cutOffNetwork(us.kbase.networks.core.Network network, float cutOff) {
+    	Graph<Node,Edge> graph = network.getGraph();
+    	List<Edge> deletedEdges = new ArrayList<Edge>();
+    	for( Edge e : network.getGraph().getEdges()) {
+    		if( e.getConfidence() < cutOff) {
+    			deletedEdges.add(e);
+    		}
+    	}
+    	for( Edge e : deletedEdges) {
+    		Pair<Node> p = graph.getEndpoints(e);
+    		graph.removeEdge(e);
+    		if(graph.degree(p.getFirst()) < 1) {
+    			graph.removeVertex(p.getFirst());
+    		}
+    		if(graph.degree(p.getSecond()) < 1) {
+    			graph.removeVertex(p.getSecond());
+    		}
+    	}
+
+    }
     
 /*
  * Unfortunately does not work... 

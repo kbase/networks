@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.uci.ics.jung.graph.Graph;
 
+// TODO: Warning : The current deserializer code is broken
 public final class NetworkDeserializer extends JsonDeserializer<Network> {
 	
 	DatasetDeserializer datasetDeserializer = new DatasetDeserializer();

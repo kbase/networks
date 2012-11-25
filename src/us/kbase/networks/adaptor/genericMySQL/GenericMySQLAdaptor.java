@@ -41,7 +41,7 @@ public class GenericMySQLAdaptor implements Adaptor{
 	public static final String NODE_ID_PREFIX = "kb|netnode.";
 	public static final String EDGE_ID_PREFIX = "kb|netedge.";
 
-	
+	// TODO: upgrade code to use connection pool management library
 	private static class ConnectionManager {
 		private static Connection con = null;
 		public static String host = "localhost";
@@ -83,23 +83,8 @@ public class GenericMySQLAdaptor implements Adaptor{
 		InputStream fr;
 		try {
 			fr = getClass().getResourceAsStream("/"+ rn);
-			/* The content of rn:
-			 * {
-				  "id" : "id",
-				  "name" : "myname",
-				  "description" : "desc",
-				  "networkType" : "PROT_PROT_INTERACTION",
-				  "datasetSource" : "INTACT",
-				  "taxon" : [ "3701", "3702" ],
-				  "properties" : {
-				    "testKey2" : "testValue2",
-				    "testKey1" : "testValue1"
-				  }
-			   }
-			 */
 			return (Dataset) m.readValue(fr, Dataset.class);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			throw new AdaptorException(e.getMessage(), e);
 		}
 	}
@@ -209,6 +194,10 @@ public class GenericMySQLAdaptor implements Adaptor{
 		NodeType nt = Enum.valueOf(NodeType.class, dataset.getProperty("default.nodeType"));
 //		EdgeType et = Enum.valueOf(EdgeType.class, dataset.getProperty("default.edgeType"));
 		int rsIdx = Integer.parseInt(dataset.getProperty("sql.findNeighbor.rsIndex"));
+		int rsConfidenceIdx = 0;
+		if(dataset.getProperty("sql.findNeighbor.rsConfidenceIndex") != null) {
+			rsConfidenceIdx = Integer.parseInt(dataset.getProperty("sql.findNeighbor.rsConfidenceIndex"));
+		}
 		
 		String [] psIdxes = dataset.getProperty("sql.findNeighbor.psIndex").split(":"); 
 		
@@ -230,8 +219,11 @@ public class GenericMySQLAdaptor implements Adaptor{
 				String neighborId = rs.getString(rsIdx);
 				Node neighbor = getNode(this.NODE_ID_PREFIX + neighborId, neighborId, new Entity(neighborId, EntityType.UNKNOWN), nt);
 				graph.addVertex(neighbor);
-				graph.addEdge(new Edge(this.EDGE_ID_PREFIX+geneId+":"+neighborId, geneId+":"+neighborId, dataset), 
-						query, neighbor);
+				Edge edge = new Edge(this.EDGE_ID_PREFIX+geneId+":"+neighborId, geneId+":"+neighborId, dataset);
+				if(rsConfidenceIdx > 0) {
+					edge.setConfidence(rs.getFloat(rsConfidenceIdx));
+				}
+				graph.addEdge(edge, query, neighbor);
 			}
 		} catch (Exception e ) {
 			throw new AdaptorException(e.getMessage(), e);

@@ -103,11 +103,7 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 						jg.writeStringField("nodeId1", nodePair.getFirst().getId());
 						jg.writeStringField("nodeId2", nodePair.getSecond().getId());
 					}
-/*
- * PSN: it is either directed or not. We can keep it in "directed" property. It is more user-friendly...
- * 					
-					jg.writeStringField("jungEdgeType",graph.getEdgeType(edge).toString());
-*/					
+
 					jg.writeStringField("directed", "" +(graph.getEdgeType(edge) == edu.uci.ics.jung.graph.util.EdgeType.DIRECTED));
 					
 					jg.writeNumberField("strength", edge.getStrength());
