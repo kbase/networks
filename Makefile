@@ -1,24 +1,7 @@
-#make sure that these two variables was set:
-#	JAVA_HOME
-#	GLASSFISH_HOME
-TOP_DIR = ../..
-DEPLOY_RUNTIME = /kb/runtime
-TARGET = /kb/deployment
-SERVICE_SPEC = kbase_network.spec
-SERVICE_NAME = KBaseNetworksService
-SERVICE_DIR = $(TARGET)/services/$(SERVICE_NAME)
-SERVICE_PORT = 7064
-#Apache ANT compiler
-ANT=ant
-
-
-#include $(TOP_DIR)/tools/Makefile.common
-
 # to wrap scripts and deploy them to $(TARGET)/bin using tools in
 # the dev_container. right now, these vars are defined in
 # Makefile.common, so it's redundant here.
 TOOLS_DIR = $(TOP_DIR)/tools
-#Makefile for Build and setup MogoDBService
 #make sure that these two variables was set:
 #	JAVA_HOME
 #	GLASSFISH_HOME
