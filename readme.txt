@@ -1,2 +1,4 @@
-  created repo for networks on Mon Sep 17 09:57:11 CDT 2012
+#make sure that these two variables was set:
+#	JAVA_HOME=/kb/runtime/java
+#	GLASSFISH_HOME=/kb/runtime/glassfish3
 

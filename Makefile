@@ -1,4 +1,3 @@
-#Makefile for Build and setup MogoDBService
 #make sure that these two variables was set:
 #	JAVA_HOME
 #	GLASSFISH_HOME
