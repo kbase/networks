@@ -3,8 +3,8 @@
 	This module provides access to various types of network-related datasets accross all domains of KBase in the unified format.
 
 	All methods in this module can be classified into two types: 
-	i. getting general information about datasets currently available via KBaseNetowrks API
-	ii. building various types of Network object
+	i. getting general information about datasets currently available via KBaseNetworks API
+	ii. building various types of Network objects
 	
 	Some definition of a KBase network would be desirable here.... 
 */
@@ -16,16 +16,16 @@ module KBaseNetworks : KBaseNetworks
 		A reference to a DatasetSource. The value can be one of the following:
 		
 			REGPRECISE - Curated database of transcriptional regulons reconstructed by the comparative genomic approach in a wide variety of prokaryotic genomes (http://regprecise.lbl.gov) 
-			REGTRANSBASE - Curated database of regulatory interactions in prokaryotes captured the knowledge in published scientific literature (http://regtransbase.lbl.gov)
+			REGTRANSBASE - Curated database of regulatory interactions in prokaryotes capturing the knowledge in published scientific literature (http://regtransbase.lbl.gov)
 			CMONKEY - Integrated biclustering of heterogeneous genome-wide datasets for the inference of global regulatory networks (http://baliga.systemsbiology.net/drupal/content/cmonkey)
 			MAK_BI_CLUSTER - Massive associative k-biclustering
-			INTACT - Plants PPI (http://www.ebi.ac.uk/intact)
+			INTACT - Plants Protein-Protein Interactions (http://www.ebi.ac.uk/intact)
 			AGRIS - Arabidopsis gene regulatory information (http://Arabidopsis.med.ohio-state.edu) 
 			PLANET - Combined Sequence and Expression Comparisons across Plant Networks Derived from Seven Species (http://aranet.mpimp-golm.mpg.de)
-			MODELSEED - Metabolic models (http://www.theseed.org/models)
+			MODELSEED - Metabolic subsystems and models (http://www.theseed.org/models)
 			MO - A resource for browsing and comparing microbial genomes (http://www.microbesonline.org)
 			ECOCYC - EcoCyc is a scientific database for the bacterium Escherichia coli K-12 MG1655 (http://www.ecocyc.org)
-			PPI - Other PPI datasets
+			PPI - Other Protein-Protein Interaction datasets
 	*/		
 	typedef string DatasetSourceRef;
 	
@@ -34,7 +34,7 @@ module KBaseNetworks : KBaseNetworks
 		
 			REGULATORY_NETWORK - an edge in a network represents a regulatory interaction
 			PROT_PROT_INTERACTION - an edge in a network represents a protein-protein interaction
-			METABOLIC_SUBSYSTEM - an edge in a network indicates that two genes are associated on the metabolic map
+			METABOLIC_SUBSYSTEM - an edge in a network indicates that two genes are associated in a metabolic subsystem
 			FUNCTIONAL_ASSOCIATION - an edge in a network indicates that two genes are functionally associated. Functional association is calculated by integrating various data types.	
 	*/
 	typedef string NetworkType;
@@ -44,7 +44,7 @@ module KBaseNetworks : KBaseNetworks
 		
 			GENE - a node represents gene 
 			PROTEIN - a node represents protein
-			CLUSTER - anode represents a cluster of genes or proteins
+			CLUSTER - a node represents a cluster of genes or proteins
 	*/	
 	typedef string NodeType;
 	
@@ -72,7 +72,7 @@ module KBaseNetworks : KBaseNetworks
  
   
 	/*
-		Provides a detailed information about the source of a dataset.
+		Provides detailed information about the source of a dataset.
 		
 		string id		
 		A unique KBase identifier of a dataset source
@@ -118,7 +118,7 @@ module KBaseNetworks : KBaseNetworks
     	Reference to a dataset source
     	    	
     	list<Taxon> taxons
-    	A list of NCBI taxonomy ids of all organisms which genomic features (genes, proteins, etc) are used in a given dataset 
+    	A list of NCBI taxonomy ids of all organisms for which genomic features (genes, proteins, etc) are used in a given dataset 
     	
     	mapping<string,string> properties    	
     	Other properties  		  		
@@ -142,7 +142,7 @@ module KBaseNetworks : KBaseNetworks
     	A unique KBase identifier of a node 
    		
     	string name
-    	String representation of o node. It should be a concise but informative representation that is easy for a person to read.
+    	String representation of a node. It should be a concise but informative representation that is easy for a person to read.
     	
     	string entityId
     	The identifier of a KBase entity (gene, protein, molecule. genome, etc) represented by a given node 
