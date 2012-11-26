@@ -1,5 +1,6 @@
 package us.kbase.networks;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -9,6 +10,7 @@ import java.util.Vector;
 
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
+import edu.uci.ics.jung.graph.util.Pair;
 
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
@@ -236,6 +238,40 @@ public class NetworksAPI {
 
 		return entityId2NodeHash;
 	}
+
+	public Network buildFirstNeighborNetwork(List<Dataset> datasets,
+			String geneId, List<EdgeType> edgeTypes, float cutOff) {
+		Network network = buildFirstNeighborNetwork(datasets, geneId, edgeTypes, cutOff);
+    	cutOffNetwork(network, cutOff);
+		return network;
+	}
 	
+
+	public Network buildInternalNetwork(List<Dataset> datasets,
+			List<String> geneIds, List<EdgeType> edgeTypes, float cutOff) {
+		Network network = buildInternalNetwork(datasets, geneIds, edgeTypes, cutOff);
+    	cutOffNetwork(network, cutOff);
+		return network;
+	}	
+	
+    private void cutOffNetwork(us.kbase.networks.core.Network network, float cutOff) {
+    	Graph<Node,Edge> graph = network.getGraph();
+    	List<Edge> deletedEdges = new ArrayList<Edge>();
+    	for( Edge e : network.getGraph().getEdges()) {
+    		if( e.getConfidence() < cutOff) {
+    			deletedEdges.add(e);
+    		}
+    	}
+    	for( Edge e : deletedEdges) {
+    		Pair<Node> p = graph.getEndpoints(e);
+    		graph.removeEdge(e);
+    		if(graph.degree(p.getFirst()) < 1) {
+    			graph.removeVertex(p.getFirst());
+    		}
+    		if(graph.degree(p.getSecond()) < 1) {
+    			graph.removeVertex(p.getSecond());
+    		}
+    	}
+    }
 	
 }
