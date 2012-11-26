@@ -137,8 +137,7 @@ public class NetworksService {
     	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
     	List<us.kbase.networks.core.Dataset> datasets = getDatasets(datasetIds);
     	
-    	us.kbase.networks.core.Network network = api.buildFirstNeighborNetwork(datasets, geneId, edgeTypes);
-    	cutOffNetwork(network, cutOff);
+    	us.kbase.networks.core.Network network = api.buildFirstNeighborNetwork(datasets, geneId, edgeTypes, cutOff);
     	
     	return toClientNetwork(network);
     }
@@ -159,8 +158,7 @@ public class NetworksService {
     	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
     	List<us.kbase.networks.core.Dataset> datasets = getDatasets(datasetIds);
     	
-    	us.kbase.networks.core.Network network = api.buildInternalNetwork(datasets, geneIds, edgeTypes);
-    	cutOffNetwork(network,cutOff);
+    	us.kbase.networks.core.Network network = api.buildInternalNetwork(datasets, geneIds, edgeTypes, cutOff);
     	
     	return toClientNetwork(network);
     }
@@ -242,26 +240,7 @@ public class NetworksService {
 		return edgeTypes;
 	}  
     
-    private void cutOffNetwork(us.kbase.networks.core.Network network, float cutOff) {
-    	Graph<Node,Edge> graph = network.getGraph();
-    	List<Edge> deletedEdges = new ArrayList<Edge>();
-    	for( Edge e : network.getGraph().getEdges()) {
-    		if( e.getConfidence() < cutOff) {
-    			deletedEdges.add(e);
-    		}
-    	}
-    	for( Edge e : deletedEdges) {
-    		Pair<Node> p = graph.getEndpoints(e);
-    		graph.removeEdge(e);
-    		if(graph.degree(p.getFirst()) < 1) {
-    			graph.removeVertex(p.getFirst());
-    		}
-    		if(graph.degree(p.getSecond()) < 1) {
-    			graph.removeVertex(p.getSecond());
-    		}
-    	}
 
-    }
     
 /*
  * Unfortunately does not work... 
