@@ -61,7 +61,7 @@ SERVER_TESTS = $(wildcard server-tests/*.t)
 # A smiliar naming convention is used for tests. 
 
 
-default:
+default: all
 
 # Test Section
 
