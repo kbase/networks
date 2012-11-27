@@ -3,15 +3,18 @@ package us.kbase.networks.adaptor.ppi.local;
 import java.sql.*;
 import java.io.*;
 import java.util.*;
-    
+
+import com.mchange.v2.c3p0.*;
+
 /**
   Class to access local PPI SQL database.
   
   <pre>
+  Version 2.0, 11/27/12 - updated to use c3p0
   Version 1.0, 10/3/12 - adapted from gov.lbl.scop.LocalSQL
   </pre>
 
-  @version 1.0, 10/3/12
+  @version 2.0, 11/27/12
   @author JMC
   */
 public class PPI {
@@ -19,11 +22,6 @@ public class PPI {
        Connection to the db
     */
     private static Connection con = null;
-
-    /**
-       statement to access the db
-    */
-    private static Statement stmt = null;
 
     /**
        database URLs for RO access, separated by ;
@@ -59,20 +57,22 @@ public class PPI {
        connect to db using a particular URL or set of URLs separated by ;
     */
     final public static void connect(String urls) {
-	if ((con==null) || (stmt==null)) {
+	if (con==null) {
 	    try {
-		Class.forName("org.gjt.mm.mysql.Driver").newInstance();
+		ComboPooledDataSource cpds = new ComboPooledDataSource();
+		cpds.setDriverClass("org.gjt.mm.mysql.Driver");
+
 		String[] url = urls.split(";");
 		for (int i=0; i<url.length; i++) {
 		    try {
-			con = DriverManager.getConnection(url[i]);
+			cpds.setJdbcUrl(url[i]);
+			con = cpds.getConnection();
 		    }
 		    catch (Exception e2) {
 			con = null;
 		    }
 		    if (con != null) i=url.length;
 		}
-		stmt = con.createStatement();
 	    }
 	    catch (Exception e) {
 		System.err.println(e.getMessage());

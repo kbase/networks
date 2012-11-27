@@ -15,6 +15,7 @@ SERVICE_PORT = 7064
 #Apache ANT compiler
 ANT=ant
 
+GLASSFISH_HOME = $(DEPLOY_RUNTIME)/glassfish3
 
 #include $(TOP_DIR)/tools/Makefile.common
 
