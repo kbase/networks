@@ -239,11 +239,11 @@ build-libs:
 		--client Bio::KBase::$(SERVICE_NAME)::Client \
 		--py biokbase/$(SERVICE_NAME)/Client \
 		--js javascript/$(SERVICE_NAME)/Client \
-		--scripts scripts \
 		$(SERVICE_SPEC) clib
 	# we only need client libraries
 	rm clib/Bio/KBase/$(SERVICE_NAME)/Service*;
 	rm clib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)Impl*;
+#		--scripts scripts \ # automatically generated scripts not working
 
 all: build-libs
 	cd ./conf; $(ANT) build 
