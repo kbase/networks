@@ -15,7 +15,7 @@ SERVICE_PORT = 7064
 #Apache ANT compiler
 ANT=ant
 
-GLASSFISH_HOME = $(DEPLOY_RUNTIME)/glassfish3
+#GLASSFISH_HOME = $(DEPLOY_RUNTIME)/glassfish3 # it's in dev_container/bootstrap script, please `source /kb/dev_container/user-env.sh`
 
 #include $(TOP_DIR)/tools/Makefile.common
 
