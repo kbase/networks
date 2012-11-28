@@ -191,7 +191,7 @@ deploy-scripts:
 	for src in $(SRC_PERL) ; do \
 		basefile=`basename $$src`; \
 		base=`basename $$src .pl`; \
-		@echo install $$src $$base ; \
+		echo install $$src $$base ; \
 		cp $$src $(TARGET)/plbin ; \
 		$(WRAP_PERL_SCRIPT) "$(TARGET)/plbin/$$basefile" $(TARGET)/bin/$$base ; \
 	done
