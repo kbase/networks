@@ -196,8 +196,12 @@ deploy-scripts:
 
 
 deploy-libs:
-	rsync -arv clib/. $(TARGET)/lib/.
-#	rsync -arv lib/. $(TARGET)/lib/. #TODO: Not sure yet
+	mkdir -p $(TARGET)/lib/Bio
+	mkdir -p $(TARGET)/lib/javascript
+	mkdir -p $(TARGET)/lib/biokbase
+	rsync -arv lib/Bio/. $(TARGET)/lib/Bio/.
+	rsync -arv lib/javascript/. $(TARGET)/lib/javascript/.
+	rsync -arv lib/biokbase/. $(TARGET)/lib/biokbase/.
 
 deploy-dir:
 	mkdir -p $(SERVICE_DIR) 
@@ -216,7 +220,7 @@ deploy-docs: build-docs
 # that is provided to the compile_typespec command. The
 # compile_typespec command is called in the build-libs target.
 build-docs: compile-docs
-	mkdir -p docs; pod2html --infile=clib/Bio/KBase/$(SERVICE_NAME)/Client.pm --outfile=docs/$(SERVICE_NAME).html
+	mkdir -p docs; pod2html --infile=lib/Bio/KBase/$(SERVICE_NAME)/Client.pm --outfile=docs/$(SERVICE_NAME).html
 
 # Use this if you want to unlink the generation of the docs from
 # the generation of the libs. Not recommended, but could be a
@@ -240,10 +244,10 @@ build-libs:
 		--client Bio::KBase::$(SERVICE_NAME)::Client \
 		--py biokbase/$(SERVICE_NAME)/Client \
 		--js javascript/$(SERVICE_NAME)/Client \
-		$(SERVICE_SPEC) clib
+		$(SERVICE_SPEC) lib
 	# we only need client libraries
-	rm clib/Bio/KBase/$(SERVICE_NAME)/Service*;
-	rm clib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)Impl*;
+	rm lib/Bio/KBase/$(SERVICE_NAME)/Service*;
+	rm lib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)Impl*;
 #		--scripts scripts \ # automatically generated scripts not working
 
 all: build-libs
