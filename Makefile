@@ -203,7 +203,7 @@ deploy-libs:
 
 deploy-dir:
 	mkdir -p $(SERVICE_DIR) 
-	if [ ! -d $(SERVICE_DIR)/webroot ] ; then \
+	if [ ! -L $(SERVICE_DIR)/webroot ] ; then \
 		ln -s $(GLASSFISH_HOME)/glassfish/domains/domain1 $(SERVICE_DIR)/webroot; \
 	fi;
 
