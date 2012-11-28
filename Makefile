@@ -14,7 +14,6 @@ SERVICE_DIR = $(TARGET)/services/$(SERVICE_NAME)
 SERVICE_PORT = 7064
 #Apache ANT compiler
 ANT=ant
-export PERL5LIB=`pwd`/clib:$PERL5LIB;
 
 # it's in dev_container/bootstrap script, please `source /kb/dev_container/user-env.sh`
 #GLASSFISH_HOME = $(DEPLOY_RUNTIME)/glassfish3 
