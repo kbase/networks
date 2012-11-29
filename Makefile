@@ -204,10 +204,12 @@ deploy-libs:
 	rsync -arv lib/javascript/. $(TARGET)/lib/javascript/.
 	rsync -arv lib/biokbase/. $(TARGET)/lib/biokbase/.
 
+# what is actually the correct directory to deploy docs?
 deploy-dir:
 	mkdir -p $(SERVICE_DIR) 
-	if [ ! -L $(SERVICE_DIR)/webroot ] ; then \
-		ln -s $(GLASSFISH_HOME)/glassfish/domains/domain1 $(SERVICE_DIR)/webroot; \
+	mkdir -p $(SERVICE_DIR)/webroot/docroot 
+	if [ ! -L $(SERVICE_DIR)/webroot/webroot ] ; then \
+		ln -s $(GLASSFISH_HOME)/glassfish/domains/domain1 $(SERVICE_DIR)/webroot/webroot; \
 	fi;
 
 # Deploying docs here refers to the deployment of documentation
@@ -215,8 +217,8 @@ deploy-dir:
 # of command line interface scripts when we have a better understanding of
 # how to standardize and automate CLI documentation.
 deploy-docs: build-docs
-	mkdir -p $(TARGET)/services/$(SERVICE_NAME)/webroot/docroot
-	cp docs/*.html $(TARGET)/services/$(SERVICE_NAME)/webroot/docroot/
+	#mkdir -p $(TARGET)/services/$(SERVICE_NAME)/webroot/docroot
+	#cp docs/*.html $(TARGET)/services/$(SERVICE_NAME)/webroot/docroot/
 
 # The location of the Client.pm file depends on the --client param
 # that is provided to the compile_typespec command. The
