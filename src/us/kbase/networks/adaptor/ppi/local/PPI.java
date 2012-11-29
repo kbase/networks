@@ -10,6 +10,7 @@ import com.mchange.v2.c3p0.*;
   Class to access local PPI SQL database.
   
   <pre>
+  Version 2.0.1, 11/29/12 - checks for bad db url
   Version 2.0, 11/27/12 - updated to use c3p0
   Version 1.0, 10/3/12 - adapted from gov.lbl.scop.LocalSQL
   </pre>
@@ -59,23 +60,27 @@ public class PPI {
     final public static void connect(String urls) {
 	if (cpds==null) {
 	    try {
-		cpds = new ComboPooledDataSource();
-		cpds.setDriverClass("org.gjt.mm.mysql.Driver");
-
 		String[] url = urls.split(";");
 		for (int i=0; i<url.length; i++) {
 		    try {
+			cpds = new ComboPooledDataSource();
+			cpds.setDriverClass("org.gjt.mm.mysql.Driver");
 			cpds.setJdbcUrl(url[i]);
+			
+			// try to get a connection to see if it's valid
+			Connection con = cpds.getConnection();
+			if (con != null)
+			    con.close();
 		    }
 		    catch (Exception e2) {
-			System.err.println("failed to open "+url[i]);
+			// System.err.println("failed to open "+url[i]);
 			cpds = null;
 		    }
 		    if (cpds != null) i=url.length;
 		}
 	    }
 	    catch (Exception e) {
-		System.err.println(e.getMessage());
+		System.err.println("PPI: connect"+e.getMessage());
 	    }
 	}
     }
@@ -111,7 +116,7 @@ public class PPI {
 	    return cpds.getConnection();
 	}
 	catch (Exception e) {
-	    System.err.println(e.getMessage());
+	    System.err.println("PPI.getConnection: "+e.getMessage());
 	}
 	return null;
     }
@@ -125,7 +130,7 @@ public class PPI {
 	    return con.createStatement();
 	}
 	catch (Exception e) {
-	    System.err.println(e.getMessage());
+	    System.err.println("PPI.createStatement: "+e.getMessage());
 	}
 	return null;
     }
