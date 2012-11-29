@@ -215,6 +215,7 @@ deploy-dir:
 # of command line interface scripts when we have a better understanding of
 # how to standardize and automate CLI documentation.
 deploy-docs: build-docs
+	mkdir -p $(TARGET)/services/$(SERVICE_NAME)/webroot/docroot
 	cp docs/*.html $(TARGET)/services/$(SERVICE_NAME)/webroot/docroot/
 
 # The location of the Client.pm file depends on the --client param
