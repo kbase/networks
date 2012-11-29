@@ -33,7 +33,7 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
       interaction_dataset.data_source.  We only dump kb: ontology
       rather than using the psi-mi: ontology.
 
-  @version 1.1, 10/25/12
+  @version 2.0, 11/29/12
   @author JMC
 */
 public class ExportPSIMI {
@@ -52,7 +52,10 @@ public class ExportPSIMI {
 	    rv += "dataseturl:\""+datasetURL+"\"|";
 	if (url != null)
 	    rv += "url:\""+url+"\"|";
-	Statement stmt = PPI.createStatement();
+
+	PPI.connect();
+	Connection con = PPI.getConnection();
+	Statement stmt = PPI.createStatement(con);
 	ResultSet rs = stmt.executeQuery("select description, data from interaction_data where interaction_protein_id="+interactionProteinID);
 	while (rs.next()) {
 	    String key = rs.getString(1);
@@ -61,6 +64,7 @@ public class ExportPSIMI {
 	}
 	rs.close();
 	stmt.close();
+	con.close();
 	if (rv.length() == 0)
 	    return "-";
 	else
@@ -70,9 +74,10 @@ public class ExportPSIMI {
     final public static void main(String argv[]) {
 	try {
 	    PPI.connect();
-	    Statement stmt = PPI.createStatement();
-	    Statement stmt2 = PPI.createStatement();
-	    Statement stmt3 = PPI.createStatement();
+	    Connection con = PPI.getConnection();
+	    Statement stmt = PPI.createStatement(con);
+	    Statement stmt2 = PPI.createStatement(con);
+	    Statement stmt3 = PPI.createStatement(con);
 	    ResultSet rs, rs2, rs3;
 
 	    // dump out all datasets
@@ -191,6 +196,10 @@ public class ExportPSIMI {
 		rs2.close();
 	    }
 	    rs3.close();
+	    stmt3.close();
+	    stmt2.close();
+	    stmt.close();
+	    con.close();
 	}
 	catch (Exception e) {
 	    System.out.println("Exception: "+e.getMessage());

@@ -35,7 +35,7 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-  @version 1.1, 10/25/12
+  @version 2.0, 11/29/12
   @author JMC
 */
 public class ImportPSIMI {
@@ -47,7 +47,9 @@ public class ImportPSIMI {
        with the real publications in the CS.
     */
     final public static String lookupOrCreatePublication(int pubmedID) throws Exception {
-	Statement stmt = PPI.createStatement();
+	PPI.connectRW();
+	Connection con = PPI.getConnection();
+	Statement stmt = PPI.createStatement(con);
 	ResultSet rs = stmt.executeQuery("select id from tmp_publication where link=\"pubmed:"+pubmedID+"\"");
 	if (rs.next()) {
 	    String rv = rs.getString(1);
@@ -58,6 +60,7 @@ public class ImportPSIMI {
 	rs.close();
 	stmt.executeUpdate("insert into tmp_publication values (\"jmc|pub."+pubmedID+"\", null, \"pubmed:"+pubmedID+"\")");
 	stmt.close();
+	con.close();
 	return ("jmc|pub."+pubmedID);
     }
 
@@ -66,7 +69,9 @@ public class ImportPSIMI {
        one if it doesn't already exist
     */
     final public static int lookupOrCreateDataset(String description) throws Exception {
-	PreparedStatement stmt = PPI.prepareStatement("select id from interaction_dataset where description=?");
+	PPI.connectRW();
+	Connection con = PPI.getConnection();
+	PreparedStatement stmt = PPI.prepareStatement(con,"select id from interaction_dataset where description=?");
 	stmt.setString(1,description);
 	ResultSet rs = stmt.executeQuery();
 	if (rs.next()) {
@@ -77,7 +82,7 @@ public class ImportPSIMI {
 	}
 	rs.close();
 	stmt.close();
-	stmt = PPI.prepareStatement("insert into interaction_dataset values (null, ?, null, null)",
+	stmt = PPI.prepareStatement(con, "insert into interaction_dataset values (null, ?, null, null)",
 				    Statement.RETURN_GENERATED_KEYS);
 	stmt.setString(1,description);
 	stmt.executeUpdate();
@@ -86,6 +91,7 @@ public class ImportPSIMI {
 	int rv = rs.getInt(1);
 	rs.close();
 	stmt.close();
+	con.close();
 	return rv;
     }
 
@@ -97,17 +103,21 @@ public class ImportPSIMI {
 	if (description==null)
 	    return 0;
 	
-	PreparedStatement stmt = PPI.prepareStatement("select id from interaction_detection_type where description=?");
+	PPI.connectRW();
+	Connection con = PPI.getConnection();
+	PreparedStatement stmt = PPI.prepareStatement(con, "select id from interaction_detection_type where description=?");
 	stmt.setString(1,description);
 	ResultSet rs = stmt.executeQuery();
 	if (rs.next()) {
 	    int rv = rs.getInt(1);
 	    rs.close();
 	    stmt.close();
+	    con.close();
 	    return rv;
 	}
 	rs.close();
 	stmt.close();
+	con.close();
 	return 0;
     }
     
@@ -116,7 +126,9 @@ public class ImportPSIMI {
        return its id.
     */
     final public static int createMethod(String description) throws Exception {
-	PreparedStatement stmt = PPI.prepareStatement("insert into interaction_detection_type values (null, ?)",
+	PPI.connectRW();
+	Connection con = PPI.getConnection();
+	PreparedStatement stmt = PPI.prepareStatement(con, "insert into interaction_detection_type values (null, ?)",
 						      Statement.RETURN_GENERATED_KEYS);
 	stmt.setString(1,description);
 	stmt.executeUpdate();
@@ -125,6 +137,7 @@ public class ImportPSIMI {
 	int rv = rs.getInt(1);
 	rs.close();
 	stmt.close();
+	con.close();
 	return rv;
     }
 
@@ -134,7 +147,9 @@ public class ImportPSIMI {
     */
     final public static int lookupOrCreateInteraction(int datasetID,
 						      String description) throws Exception {
-	PreparedStatement stmt = PPI.prepareStatement("select id from interaction where interaction_dataset_id=? and description=?");
+	PPI.connectRW();
+	Connection con = PPI.getConnection();
+	PreparedStatement stmt = PPI.prepareStatement(con, "select id from interaction where interaction_dataset_id=? and description=?");
 	stmt.setInt(1,datasetID);
 	stmt.setString(2,description);
 	ResultSet rs = stmt.executeQuery();
@@ -142,11 +157,12 @@ public class ImportPSIMI {
 	    int rv = rs.getInt(1);
 	    rs.close();
 	    stmt.close();
+	    con.close();
 	    return rv;
 	}
 	rs.close();
 	stmt.close();
-	stmt = PPI.prepareStatement("insert into interaction values (null, ?, ?, false, null, null, null, null)",
+	stmt = PPI.prepareStatement(con, "insert into interaction values (null, ?, ?, false, null, null, null, null)",
 				    Statement.RETURN_GENERATED_KEYS);
 	stmt.setInt(1,datasetID);
 	stmt.setString(2,description);
@@ -156,6 +172,7 @@ public class ImportPSIMI {
 	int rv = rs.getInt(1);
 	rs.close();
 	stmt.close();
+	con.close();
 	return rv;
     }
 
@@ -218,7 +235,8 @@ public class ImportPSIMI {
     final public static void main(String argv[]) {
 	try {
 	    PPI.connectRW();
-	    Statement stmt = PPI.createStatement();
+	    Connection con = PPI.getConnection();
+	    Statement stmt = PPI.createStatement(con);
 	    PreparedStatement stmt2;
 
 	    // keep track of what datasets we've seen in this file
@@ -379,7 +397,7 @@ public class ImportPSIMI {
 		if ((datasetURL != null) &&
 		    (!datasetURL.equals(datasetURLMap.get(datasetName)))) {
 		    datasetURLMap.put(datasetName, datasetURL);
-		    stmt2 = PPI.prepareStatement("update interaction_dataset set data_url=? where id=?");
+		    stmt2 = PPI.prepareStatement(con, "update interaction_dataset set data_url=? where id=?");
 		    stmt2.setString(1,datasetURL);
 		    stmt2.setInt(2,datasetID);
 		    stmt2.executeUpdate();
@@ -388,7 +406,7 @@ public class ImportPSIMI {
 		if ((sourceDB != null) &&
 		    (!sourceDB.equals(datasetSourceMap.get(datasetName)))) {
 		    datasetSourceMap.put(datasetName, sourceDB);
-		    stmt2 = PPI.prepareStatement("update interaction_dataset set data_source=? where id=?");
+		    stmt2 = PPI.prepareStatement(con, "update interaction_dataset set data_source=? where id=?");
 		    stmt2.setString(1,sourceDB);
 		    stmt2.setInt(2,datasetID);
 		    stmt2.executeUpdate();
@@ -426,7 +444,7 @@ public class ImportPSIMI {
 		if ((url != null) &&
 		    (!url.equals(interactionURL.get(interactionKey)))) {
 		    interactionURL.put(interactionKey,url);
-		    stmt2 = PPI.prepareStatement("update interaction set data_url=? where id=?");
+		    stmt2 = PPI.prepareStatement(con, "update interaction set data_url=? where id=?");
 		    stmt2.setString(1,url);
 		    stmt2.setInt(2,interactionID);
 		    stmt2.executeUpdate();
@@ -435,7 +453,7 @@ public class ImportPSIMI {
 		if ((publicationID != null) &&
 		    (!publicationID.equals(interactionPublication.get(interactionKey)))) {
 		    interactionPublication.put(interactionKey,publicationID);
-		    stmt2 = PPI.prepareStatement("update interaction set citation_id=? where id=?");
+		    stmt2 = PPI.prepareStatement(con, "update interaction set citation_id=? where id=?");
 		    stmt2.setString(1,publicationID);
 		    stmt2.setInt(2,interactionID);
 		    stmt2.executeUpdate();
@@ -458,9 +476,9 @@ public class ImportPSIMI {
 		}
 
 		// add 1st protein
-		stmt2 = PPI.prepareStatement("insert into interaction_protein values (null, ?, ?, ?, null, ?)",
+		stmt2 = PPI.prepareStatement(con, "insert into interaction_protein values (null, ?, ?, ?, null, ?)",
 					     Statement.RETURN_GENERATED_KEYS);
-		PreparedStatement stmt3 = PPI.prepareStatement("insert into interaction_data values (null, ?, ?, ?)");
+		PreparedStatement stmt3 = PPI.prepareStatement(con, "insert into interaction_data values (null, ?, ?, ?)");
 		stmt2.setInt(1,interactionID);
 		stmt2.setString(2,proteinID1);
 		if (stoich1 > 0)
@@ -508,6 +526,8 @@ public class ImportPSIMI {
 		stmt3.close();
 		stmt2.close();
 	    }
+	    stmt.close();
+	    con.close();
 	}
 	catch (Exception e) {
 	    System.out.println("Exception: "+e.getMessage());
