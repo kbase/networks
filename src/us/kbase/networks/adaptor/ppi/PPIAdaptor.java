@@ -57,7 +57,8 @@ public class PPIAdaptor implements Adaptor {
 	List<Dataset> rv = new Vector<Dataset>();
 	try{
 	    PPI.connect();
-	    Statement stmt = PPI.createStatement();
+	    Connection con = PPI.getConnection();
+	    Statement stmt = PPI.createStatement(con);
 	    ResultSet rs;
 
 	    rs = stmt.executeQuery("select id from interaction_dataset");
@@ -68,6 +69,7 @@ public class PPIAdaptor implements Adaptor {
 	    }
 	    rs.close();
 	    stmt.close();
+	    con.close();
 	}
 	catch (Exception e) {
 	    throw new AdaptorException(e.getMessage());
@@ -116,7 +118,8 @@ public class PPIAdaptor implements Adaptor {
 	List<Dataset> rv = new Vector<Dataset>();
 	try{
 	    PPI.connect();
-	    PreparedStatement stmt = PPI.prepareStatement("select distinct(i.interaction_dataset_id) from interaction i, interaction_protein f where f.interaction_id=i.id and f.protein_id like ?");
+	    Connection con = PPI.getConnection();
+	    PreparedStatement stmt = PPI.prepareStatement(con, "select distinct(i.interaction_dataset_id) from interaction i, interaction_protein f where f.interaction_id=i.id and f.protein_id like ?");
 
 	    String genomeID = taxon.getGenomeId();
 	    stmt.setString(1,genomeID+".%");
@@ -129,6 +132,7 @@ public class PPIAdaptor implements Adaptor {
 	    }
 	    rs.close();
 	    stmt.close();
+	    con.close();
 	}
 	catch (Exception e) {
 	    throw new AdaptorException(e.getMessage());
@@ -144,7 +148,8 @@ public class PPIAdaptor implements Adaptor {
 	List<Dataset> rv = new Vector<Dataset>();
 	try{
 	    PPI.connect();
-	    PreparedStatement stmt = PPI.prepareStatement("select distinct(i.interaction_dataset_id) from interaction i, interaction_protein f where f.interaction_id=i.id and f.protein_id=?");
+	    Connection con = PPI.getConnection();
+	    PreparedStatement stmt = PPI.prepareStatement(con, "select distinct(i.interaction_dataset_id) from interaction i, interaction_protein f where f.interaction_id=i.id and f.protein_id=?");
 
 	    String proteinID = entity.getId();
 	    stmt.setString(1,proteinID);
@@ -157,6 +162,7 @@ public class PPIAdaptor implements Adaptor {
 	    }
 	    rs.close();
 	    stmt.close();
+	    con.close();
 	}
 	catch (Exception e) {
 	    throw new AdaptorException(e.getMessage());
@@ -227,11 +233,12 @@ public class PPIAdaptor implements Adaptor {
 
 	try {
 	    PPI.connect();
+	    Connection con = PPI.getConnection();
 
 	    // for CLUSTER edges, just need complex that gene is in
 	    if (edgeTypes.contains(EdgeType.GENE_CLUSTER) ||
 		edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
-		PreparedStatement stmt = PPI.prepareStatement("select i.id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and f.protein_id=?");
+		PreparedStatement stmt = PPI.prepareStatement(con, "select i.id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and f.protein_id=?");
 
 		stmt.setInt(1,datasetID);
 		stmt.setString(2,geneID);
@@ -279,11 +286,12 @@ public class PPIAdaptor implements Adaptor {
 		}
 		rs.close();
 		stmt.close();
+		con.close();
 	    }
 	    if (edgeTypes.contains(EdgeType.GENE_GENE) ||
 		edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) {
 		// get all proteins in same complex as query
-		PreparedStatement stmt = PPI.prepareStatement("select i.id, f1.protein_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.protein_id=? order by i.id asc, f1.rank asc");
+		PreparedStatement stmt = PPI.prepareStatement(con, "select i.id, f1.protein_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.protein_id=? order by i.id asc, f1.rank asc");
 		stmt.setInt(1,datasetID);
 		stmt.setString(2,geneID);
 
@@ -327,6 +335,7 @@ public class PPIAdaptor implements Adaptor {
 		}
 		rs.close();
 		stmt.close();
+		con.close();
 		connectAll(nodesInComplexG,
 			   graph,
 			   dataset);
@@ -401,9 +410,10 @@ public class PPIAdaptor implements Adaptor {
 
 	try {
 	    PPI.connect();
+	    Connection con = PPI.getConnection();
 
 	    // get all complexes / proteins in this dataset
-	    PreparedStatement stmt = PPI.prepareStatement("select i.id, i.description, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id order by i.id asc, f.rank asc");
+	    PreparedStatement stmt = PPI.prepareStatement(con, "select i.id, i.description, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id order by i.id asc, f.rank asc");
 	    stmt.setInt(1,datasetID);
 
 	    Vector<Node> nodesInComplexG = new Vector<Node>(); // gene
@@ -473,6 +483,7 @@ public class PPIAdaptor implements Adaptor {
 
 	    rs.close();
 	    stmt.close();
+	    con.close();
 
 	    // connect last complex
 	    if (edgeTypes.contains(EdgeType.GENE_GENE)) {
@@ -512,13 +523,15 @@ public class PPIAdaptor implements Adaptor {
 	Dataset rv = null;
 	try{
 	    PPI.connect();
-	    Statement stmt = PPI.createStatement();
+	    Connection con = PPI.getConnection();
+	    Statement stmt = PPI.createStatement(con);
 	    ResultSet rs;
 
 	    rs = stmt.executeQuery("select description, data_source, data_url from interaction_dataset where id="+datasetID);
 	    if (!rs.next()) {
 		rs.close();
 		stmt.close();
+		con.close();
 		throw new Exception("PPI dataset not found: "+datasetID);
 	    }
 	    String datasetName = rs.getString(1);
@@ -539,6 +552,7 @@ public class PPIAdaptor implements Adaptor {
 		taxons.add(new Taxon(rs.getString(1)));
 	    rs.close();
 	    stmt.close();
+	    con.close();
 
 	    rv = new Dataset(DATASET_PPI_ID_PREFIX+datasetID,
 			     datasetName,
@@ -565,12 +579,15 @@ public class PPIAdaptor implements Adaptor {
     private Node buildComplexNode(int interactionID) throws AdaptorException {
 	Node rv = null;
 	try {
-	    Statement stmt = PPI.createStatement();
+	    PPI.connect();
+	    Connection con = PPI.getConnection();
+	    Statement stmt = PPI.createStatement(con);
 	    ResultSet rs;
 
 	    rs = stmt.executeQuery("select i.interaction_dataset_id, i.description, i.is_directional, i.confidence, m.description, i.data_url, i.citation_id from interaction i left join interaction_detection_type m on m.id=i.detection_method_id where i.id="+interactionID);
 	    if (!rs.next()) {
 		stmt.close();
+		con.close();
 		throw new Exception("Interaction not found: "+interactionID);
 	    }
 	    int datasetID = rs.getInt(1);
@@ -584,6 +601,7 @@ public class PPIAdaptor implements Adaptor {
 	    String citationID = rs.getString(7);
 	    rs.close();
 	    stmt.close();
+	    con.close();
 	
 	    rv = Node.buildClusterNode(getNodeID(),
 				       "complex "+interactionName,
@@ -642,12 +660,15 @@ public class PPIAdaptor implements Adaptor {
 	throws AdaptorException {
 	Edge rv = null;
 	try {
-	    Statement stmt = PPI.createStatement();
+	    PPI.connect();
+	    Connection con = PPI.getConnection();
+	    Statement stmt = PPI.createStatement(con);
 	    ResultSet rs;
 
 	    rs = stmt.executeQuery("select i.interaction_dataset_id, i.description, i.is_directional, i.confidence, m.description, i.data_url, i.citation_id, f.stoichiometry, f.strength, f.rank, i.id from interaction_protein f, interaction i left join interaction_detection_type m on m.id=i.detection_method_id where f.interaction_id=i.id and f.id="+interactionProteinID);
 	    if (!rs.next()) {
 		stmt.close();
+		con.close();
 		throw new Exception("Interaction_protein not found: "+interactionProteinID);
 	    }
 	    int datasetID = rs.getInt(1);
@@ -701,6 +722,7 @@ public class PPIAdaptor implements Adaptor {
 		rv.addProperty("data_"+rs.getString(1),rs.getString(2));
 	    rs.close();
 	    stmt.close();
+	    con.close();
 	}
 	catch (Exception e) {
 	    throw new AdaptorException(e.getMessage());
