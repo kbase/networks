@@ -9,20 +9,20 @@ import org.junit.Test;
 
 import us.kbase.networks.rpc.client.Dataset;
 import us.kbase.networks.rpc.client.DatasetSource;
-import us.kbase.networks.rpc.client.KBaseNetwork;
-import us.kbase.networks.rpc.client.Networks;
+import us.kbase.networks.rpc.client.KBaseNetworks;
+import us.kbase.networks.rpc.client.Network;
 
 public class KBaseNetworkTest {
 
 //	String url = "http://127.0.0.1:8080/KBaseNetworksRPC/networks";
 //	String url = "http://140.221.92.147:8080/KBaseNetworksRPC/networks";
 	String url = "http://127.0.0.1:7064/KBaseNetworksRPC/networks";
-	KBaseNetwork networksAPI;
+	KBaseNetworks networksAPI;
 		
 	
 	@Before
 	public void setUp() throws Exception {
-		networksAPI = new KBaseNetwork(url);
+		networksAPI = new KBaseNetworks(url);
 	}
 
 	@After
