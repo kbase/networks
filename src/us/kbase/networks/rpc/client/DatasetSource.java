@@ -10,15 +10,22 @@ import org.codehaus.jackson.*;
 
 
 /**
-typedef string Type;
-typedef string Value;
-typedef string JungEdgeType;
-typedef structure {
-  Type type;
-  Value value;
-} Parameter;
+Provides detailed information about the source of a dataset.
 
-typedef list<Parameter> ParameterList;
+string id                
+A unique KBase identifier of a dataset source
+
+            string name            
+            A convenient name of a dataset source
+            
+            DatasetSourceRef reference                
+            Reference to a dataset source type
+            
+            string description            
+            General description of a dataset source
+            
+            string resourceURL                
+URL of the public web resource hosting the data represented by this dataset source
 **/
 
 public class DatasetSource
