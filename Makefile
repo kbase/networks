@@ -15,7 +15,8 @@ SERVICE_PORT = 7064
 #Apache ANT compiler
 ANT=ant
 
-#GLASSFISH_HOME = $(DEPLOY_RUNTIME)/glassfish3 # it's in dev_container/bootstrap script, please `source /kb/dev_container/user-env.sh`
+# it's in dev_container/bootstrap script, please `source /kb/dev_container/user-env.sh`
+#GLASSFISH_HOME = $(DEPLOY_RUNTIME)/glassfish3 
 
 #include $(TOP_DIR)/tools/Makefile.common
 
@@ -29,9 +30,9 @@ SRC_PERL = $(wildcard scripts/*.pl)
 
 # You can change these if you are putting your tests somewhere
 # else or if you are not using the standard .t suffix
-CLIENT_TESTS = $(wildcard client-tests/*.t)
-SCRIPTS_TESTS = $(wildcard script-tests/*.t)
-SERVER_TESTS = $(wildcard server-tests/*.t)
+CLIENT_TESTS = $(wildcard client-tests/*.j)
+SCRIPTS_TESTS = $(wildcard script-tests/*.j)
+SERVER_TESTS = $(wildcard server-tests/*.j)
 
 # This is a very client centric view of release engineering.
 # We assume our primary product for the community is the client
@@ -41,7 +42,7 @@ SERVER_TESTS = $(wildcard server-tests/*.t)
 # A service is composed of a client and a server, each of which
 # should be independently deployable. Clients are composed of
 # an application programming interface and a command line
-# interface. In our make targets, the deploy-server deploys
+# interface. In our make targets, the deploy-service deploys
 # the server, the deploy-client deploys the application
 # programming interface libraries, and the deploy-scripts deploys
 # the command line interface (usually scripts written in a
@@ -53,10 +54,10 @@ SERVER_TESTS = $(wildcard server-tests/*.t)
 # specific software module being deployed, the strategy needs
 # to be one that leaves this decision to the module developer.
 # This is done by having the deploy target depend on the
-# deploy-server target. The module developer who chooses for
+# deploy-service target. The module developer who chooses for
 # good reason not to deploy the server with the client simply
 # manages this dependancy accordingly. One option is to have
-# a deploy-server target that does nothing, the other is to
+# a deploy-service target that does nothing, the other is to
 # remove the dependancy from the deploy target.
 #
 # A smiliar naming convention is used for tests. 
@@ -66,23 +67,23 @@ default: all
 
 # Test Section
 
-test: test-client test-scripts test-server
-	echo "runnint client and script tests"
+test: test-client test-scripts test-service
+	@echo "running client and script tests"
 
 # test-all is deprecated. 
-# test-all: test-client test-scripts test-server
+# test-all: test-client test-scripts test-service
 #
 # What does it mean to test a client. This is a test of a client
 # library. If it is a client-server module, then it should be
 # run against a running server. You can say that this also tests
-# the server, and I agree. You can add a test-server dependancy
+# the server, and I agree. You can add a test-service dependancy
 # to the test-client target if it makes sense to you. This test
 # example assumes there is already a tested running server.
 test-client:
 	# run each test
 	for t in $(CLIENT_TESTS) ; do \
 		if [ -f $$t ] ; then \
-			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
+			$$t ; \
 			if [ $$? -ne 0 ] ; then \
 				exit 1 ; \
 			fi \
@@ -92,9 +93,9 @@ test-client:
 # What does it mean to test a script? A script test should test
 # the command line scripts. If the script is a client in a client-
 # server architecture, then there should be tests against a 
-# running server. You can add a test-server dependancy to the
-# test-client target. You could also add a deploy-server and
-# start-server dependancy to the test-scripts target if it makes
+# running server. You can add a test-service dependancy to the
+# test-client target. You could also add a deploy-service and
+# start-service dependancy to the test-scripts target if it makes
 # sense to you. Future versions of the make files for services
 # will move in this direction.
 test-scripts:
@@ -110,14 +111,14 @@ test-scripts:
 
 # What does it mean to test a server. A server test should not
 # rely on the client libraries or scripts in so far as you should
-# not have a test-server target that depends on the test-client
+# not have a test-service target that depends on the test-client
 # or test-scripts targets. Otherwise, a circular dependency
 # graph could result.
-test-server:
+test-service:
 	# run each test
 	for t in $(SERVER_TESTS) ; do \
 		if [ -f $$t ] ; then \
-			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
+			$$t ; \
 			if [ $$? -ne 0 ] ; then \
 				exit 1 ; \
 			fi \
@@ -131,7 +132,7 @@ test-server:
 # artifacts should not be dependent on deployment of a server,
 # although we recommend deploying the server code with the
 # client code if it is useful. We will assume it is useful
-# in this target, just delete the dependancy on deploy-server
+# in this target, just delete the dependancy on deploy-service
 # if you don't want the server code deployed with the client
 # code.
 #
@@ -143,10 +144,10 @@ test-server:
 # of the server and it's related architecture. For illustrative
 # purposes, we include the dependency in the deploy target as we
 # prefer this when it is reasonable."
-deploy: deploy-client deploy-scripts deploy-server
+deploy: deploy-client
 
-# deploy-all is deprecated
-# deploy-all: deploy-client deploy-scripts deploy-server
+deploy-all: deploy-client deploy-service
+
 #
 # Deploy client should deploy the client artifacts, mainly
 # the application programming interface libraries, command
@@ -196,13 +197,19 @@ deploy-scripts:
 
 
 deploy-libs:
-	rsync -arv clib/. $(TARGET)/lib/.
-#	rsync -arv lib/. $(TARGET)/lib/. #TODO: Not sure yet
+	mkdir -p $(TARGET)/lib/Bio
+	mkdir -p $(TARGET)/lib/javascript
+	mkdir -p $(TARGET)/lib/biokbase
+	rsync -arv lib/Bio/. $(TARGET)/lib/Bio/.
+	rsync -arv lib/javascript/. $(TARGET)/lib/javascript/.
+	rsync -arv lib/biokbase/. $(TARGET)/lib/biokbase/.
 
+# what is actually the correct directory to deploy docs?
 deploy-dir:
 	mkdir -p $(SERVICE_DIR) 
-	if [ ! -d $(SERVICE_DIR)/webroot ] ; then \
-		ln -s $(GLASSFISH_HOME)/glassfish/domains/domain1 $(SERVICE_DIR)/webroot; \
+	mkdir -p $(SERVICE_DIR)/webroot/docroot 
+	if [ ! -L $(SERVICE_DIR)/webroot/webroot ] ; then \
+		ln -s $(GLASSFISH_HOME)/glassfish/domains/domain1 $(SERVICE_DIR)/webroot/webroot; \
 	fi;
 
 # Deploying docs here refers to the deployment of documentation
@@ -216,7 +223,7 @@ deploy-docs: build-docs
 # that is provided to the compile_typespec command. The
 # compile_typespec command is called in the build-libs target.
 build-docs: compile-docs
-	mkdir -p docs; pod2html --infile=clib/Bio/KBase/$(SERVICE_NAME)/Client.pm --outfile=docs/$(SERVICE_NAME).html
+	mkdir -p docs; pod2html --infile=lib/Bio/KBase/$(SERVICE_NAME)/Client.pm --outfile=docs/$(SERVICE_NAME).html
 
 # Use this if you want to unlink the generation of the docs from
 # the generation of the libs. Not recommended, but could be a
@@ -240,17 +247,17 @@ build-libs:
 		--client Bio::KBase::$(SERVICE_NAME)::Client \
 		--py biokbase/$(SERVICE_NAME)/Client \
 		--js javascript/$(SERVICE_NAME)/Client \
-		$(SERVICE_SPEC) clib
+		$(SERVICE_SPEC) lib
 	# we only need client libraries
-	rm clib/Bio/KBase/$(SERVICE_NAME)/Service*;
-	rm clib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)Impl*;
+	rm lib/Bio/KBase/$(SERVICE_NAME)/Service*;
+	rm lib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)Impl*;
 #		--scripts scripts \ # automatically generated scripts not working
 
 all: build-libs
 	cd ./conf; $(ANT) build 
 
 # Deploying a server refers to the deployment of ...{TODO}
-deploy-server: deploy-dir stop_domain1 start_domain1 deploy_config deploy_war generate_script deploy-scripts deploy-libs deploy-docs
+deploy-service: deploy-dir stop_domain1 start_domain1 deploy_config deploy_war generate_script deploy-scripts deploy-libs deploy-docs
 
 stop_domain1:
 	$(GLASSFISH_HOME)/bin/asadmin stop-domain 
