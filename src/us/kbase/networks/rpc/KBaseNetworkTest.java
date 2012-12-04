@@ -10,7 +10,7 @@ import org.junit.Test;
 import us.kbase.networks.rpc.client.Dataset;
 import us.kbase.networks.rpc.client.DatasetSource;
 import us.kbase.networks.rpc.client.KBaseNetwork;
-import us.kbase.networks.rpc.client.Network;
+import us.kbase.networks.rpc.client.Networks;
 
 public class KBaseNetworkTest {
 
