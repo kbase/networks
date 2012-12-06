@@ -36,8 +36,7 @@ public class PPI {
 
     /**
        get local property, or null if not defined.
-       These are stored in ppi.properties, which is a local
-       file not under version control.
+       These are stored in ppi.properties
     */
     public static String getProperty(String key) {
 	Properties prop = new Properties();
@@ -47,8 +46,10 @@ public class PPI {
 	    prop.load(myClass.getResourceAsStream("ppi.properties"));
 	}
 	catch (IOException e) {
+	    System.err.println("IO Exception getting properties file");
 	}
 	catch (SecurityException e) {
+	    System.err.println("Security Exception getting properties file");
 	}
 	String value = prop.getProperty(key, null);
 	return value;
@@ -73,14 +74,14 @@ public class PPI {
 			    con.close();
 		    }
 		    catch (Exception e2) {
-			// System.err.println("failed to open "+url[i]);
+			System.err.println("failed to open "+url[i]);
 			cpds = null;
 		    }
 		    if (cpds != null) i=url.length;
 		}
 	    }
 	    catch (Exception e) {
-		System.err.println("PPI: connect"+e.getMessage());
+		System.err.println("PPI.connect: "+e.getMessage());
 	    }
 	}
     }

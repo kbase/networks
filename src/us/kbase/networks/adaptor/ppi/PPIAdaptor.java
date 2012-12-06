@@ -72,6 +72,8 @@ public class PPIAdaptor implements Adaptor {
 	    con.close();
 	}
 	catch (Exception e) {
+	    System.err.println(e.getMessage());
+	    e.printStackTrace();
 	    throw new AdaptorException(e.getMessage());
 	}
 	return rv;

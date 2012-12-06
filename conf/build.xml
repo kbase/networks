@@ -23,10 +23,10 @@
          <war destfile="${dist.dir}/${name}.war"
              webxml="${web.dir}/WEB-INF/web.xml">
              <lib dir="${basedir}/lib"/>
-             <classes dir="${build.dir}/classes" />
-            <fileset dir="${web.dir}">
-                <include name="**/*.*"/>
-            </fileset>
+             <classes dir="${build.dir}/classes" includes="**/*.properties" />
+	     <fileset dir="${web.dir}">
+	       <include name="**/*.*"/>
+	     </fileset>
         </war>
         <copy todir="${web.dir}/WEB-INF/classes" >
             <fileset dir="${src.dir}" excludes="*/.java"/>
@@ -40,6 +40,9 @@
             <src path="${src.dir}"/>
             <classpath refid="project-classpath"/>
         </javac>
+	<copy todir="${build.dir}/classes">
+	  <fileset dir="${src.dir}" includes="**/*.properties"/>
+	</copy>
     </target>
 
     <target name="clean">
