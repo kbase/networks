@@ -13,7 +13,7 @@ import org.strbio.util.*;
 import edu.uci.ics.jung.graph.*;
 
 public class PPITest {
-    Adaptor adaptor;
+    Adaptor adaptor = null;
     
     final String ecoliID = "kb|g.21765";
 
@@ -23,6 +23,11 @@ public class PPITest {
     @Before
 	public void setup() throws Exception {
 	adaptor = new PPIAdaptorFactory().buildAdaptor();
+    }
+
+    @Test
+	public void hasAdaptor() throws Exception {
+	assertNotNull(adaptor);
     }
 
     @Test
