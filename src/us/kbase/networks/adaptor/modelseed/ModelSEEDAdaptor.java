@@ -23,6 +23,7 @@ import us.kbase.CDMI.CDMI_EntityAPI;
 import us.kbase.CDMI.fields_Model;
 import us.kbase.CDMI.fields_Subsystem;
 import us.kbase.CDMI.tuple_118;
+import us.kbase.CDMI.tuple_131;
 import us.kbase.CDMI.tuple_132;
 import us.kbase.CDMI.tuple_136;
 import us.kbase.CDMI.tuple_51;
@@ -95,13 +96,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 			}
 			if (genomeIds.size() == 1) {
 				Taxon et = new Taxon(genomeIds.get(0).e_3.id);
-				for (Dataset ds : getDatasets()) {
-					for (Taxon t : ds.getTaxons()) {
-						if (t.equals(et)) {
-							datasets.add(ds);
-						}
-					}
-				}	
+				datasets.addAll(getDatasets(et));
 			}
 		}
 		
@@ -132,12 +127,17 @@ public class ModelSEEDAdaptor implements Adaptor {
 	public List<Dataset> getDatasets(Taxon taxon) throws AdaptorException {
 		List<Dataset> datasets = new ArrayList<Dataset>();
 
-		for (Dataset ds : getDatasets()) {
-			for (Taxon t : ds.getTaxons()) {
-				if (t.equals(taxon)) {
-					datasets.add(ds);
-				}
-			}
+		List<tuple_131> modelId;
+		try {
+			modelId = cdmi.get_relationship_IsModeledBy(Arrays.asList(taxon.getGenomeId()), new ArrayList<String>(), 
+					new ArrayList<String>(), Arrays.asList("id", "name"));
+		} catch (Exception e) {
+			throw new AdaptorException("Error while accessing CDMI", e);
+		}
+		if (modelId.size() == 1) {
+			String name = modelId.get(0).e_3.name;
+			datasets.add(new Dataset(getDatasetId(taxon.getGenomeId()), name, "Subsystems for " + name + " genome.", NetworkType.METABOLIC_SUBSYSTEM, 
+					DatasetSource.MODELSEED, Arrays.asList(taxon)));
 		}
 
 		return datasets;
@@ -158,7 +158,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 
 	@Override
 	public boolean hasDataset(Dataset dataset) throws AdaptorException {
-		return getDatasets().contains(dataset);
+		return dataset.getDatasetSource() == DatasetSource.MODELSEED;
 	}
 
 	@Override

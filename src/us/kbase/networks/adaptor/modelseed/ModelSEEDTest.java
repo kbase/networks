@@ -41,11 +41,6 @@ public class ModelSEEDTest {
 	public void setUp() throws Exception {
 		adaptor = new ModelSEEDAdaptorFactory().buildAdaptor();
 	}
-
-	@Test
-	public void shouldReturnListOfDatasets() throws AdaptorException {
-		assertNotNull("should return a list of Datasets", adaptor.getDatasets());
-	}
 	
 	@Test
 	public void shouldReturnDataSetForEcoli() throws AdaptorException {
