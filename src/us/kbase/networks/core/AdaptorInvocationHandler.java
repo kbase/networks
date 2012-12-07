@@ -115,7 +115,9 @@ public class AdaptorInvocationHandler implements InvocationHandler{
 		{
 		    Class<?> c = taxon.getClass();
 		    Field fGenomeId = c.getDeclaredField("genomeId");
+		    fGenomeId.setAccessible(true);
 		    fGenomeId.set(taxon, genomeId2);				
+		    fGenomeId.setAccessible(false);
 		    modifiedTaxons.add(taxon);
 		}
 		return taxon;
@@ -199,7 +201,9 @@ public class AdaptorInvocationHandler implements InvocationHandler{
 			{
 			    Class<?> c = entity.getClass();
 			    Field fId = c.getDeclaredField("id");
+			    fId.setAccessible(true);
 			    fId.set(entity, sourceGeneId);
+			    fId.setAccessible(false);
 			}
 			
 			//Process node name
@@ -208,11 +212,10 @@ public class AdaptorInvocationHandler implements InvocationHandler{
 			{
 			    Class<?> c = node.getClass();
 			    Field fName = c.getDeclaredField("name");
+			    fName.setAccessible(true);
 			    fName.set(node, sourceGeneId);
-			}
-			
-			
+			    fName.setAccessible(false);
+			}			
 		}
-	}
-	
+	}	
 }

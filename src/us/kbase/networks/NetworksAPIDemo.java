@@ -23,6 +23,7 @@ public class NetworksAPIDemo {
 		api = NetworksAPI.getNetworksAPI();
 		
 		// Shewnalla: two adapters work together (RegPrecise, MAK)
+		
 //		testAdaptor_buildFirstNeighborNetwork(new RegPreciseAdaptorFactory().buildAdaptor(), 
 //				"kb|g.20848", "kb|g.20848.CDS.1671", Arrays.asList(EdgeType.GENE_GENE));
 		
@@ -37,11 +38,11 @@ public class NetworksAPIDemo {
 		test_buildInternalNetwork("kb|g.21765",
 				Arrays.asList("kb|g.21765.CDS.543", "kb|g.21765.CDS.544", "kb|g.21765.CDS.545"),
 				Arrays.asList(EdgeType.GENE_GENE));
-*/				
 		
 		test_buildInternalNetwork("kb|g.20848",
 				Arrays.asList("kb|g.20848.CDS.1671", "kb|g.20848.CDS.1454", "kb|g.20848.CDS.2811"),
 				Arrays.asList(EdgeType.GENE_GENE));
+*/				
 		
 		
 		

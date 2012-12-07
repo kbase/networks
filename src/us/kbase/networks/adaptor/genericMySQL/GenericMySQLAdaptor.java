@@ -1,9 +1,9 @@
 package us.kbase.networks.adaptor.genericMySQL;
 
-import java.beans.PropertyVetoException;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,7 +30,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
@@ -50,20 +49,10 @@ public class GenericMySQLAdaptor implements Adaptor{
 		public static String dbName = "mysql";
 		public static String user = "root";
 		public static String passwd = "";
-		private static ComboPooledDataSource cpds = new ComboPooledDataSource();
 		public static Connection getConnection() throws ClassNotFoundException, SQLException {
-
 			if(con == null) {
-				try {
-					cpds.setDriverClass("com.mysql.jdbc.Driver");
-				} catch (PropertyVetoException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				cpds.setJdbcUrl("jdbc:mysql://"+host+":" + port +"/" + dbName);
-				cpds.setUser(user);
-				cpds.setPassword(passwd);
-				con = cpds.getConnection();
+				Class.forName("com.mysql.jdbc.Driver");
+				con = DriverManager.getConnection("jdbc:mysql://"+host+":" + port +"/" + dbName, user, passwd);
 			}
 			return con;
 		}

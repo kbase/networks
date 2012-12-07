@@ -71,7 +71,7 @@ public class MAKAdaptor implements Adaptor{
 	@Override
 	public List<Dataset> getDatasets(DatasetSource datasetSource) throws AdaptorException {
 		List<Dataset> datasets = new Vector<Dataset>();
-		if(datasetSource == DatasetSource.MAK_BI_CLUSTER)
+		if(datasetSource == DatasetSource.MAK_BICLUSTER)
 		{
 			datasets.addAll(getDatasets());
 		}		
@@ -102,7 +102,7 @@ public class MAKAdaptor implements Adaptor{
 		List<Dataset> datasets = new Vector<Dataset>();
 
 		if(networkType == NetworkType.REGULATORY_NETWORK)		
-			if(datasetSource == DatasetSource.MAK_BI_CLUSTER)
+			if(datasetSource == DatasetSource.MAK_BICLUSTER)
 			{
 				datasets.addAll(getDatasets(taxon));
 			}		
@@ -211,7 +211,7 @@ public class MAKAdaptor implements Adaptor{
 				makDataset.getName(),
 				makDataset.getDescription(),
 				NetworkType.REGULATORY_NETWORK,
-				DatasetSource.MAK_BI_CLUSTER,
+				DatasetSource.MAK_BICLUSTER,
 				taxons
 			);		
 	}

@@ -39,6 +39,8 @@ import com.googlecode.jsonrpc4j.ErrorResolver.JsonError;
 /**
  * A JSON-RPC request server reads JSON-RPC requests from an
  * input stream and writes responses to an output stream.
+ * @author psnovichkov
+ * @version 1.0
  */
 public class KBase_JsonRpcServer {
 

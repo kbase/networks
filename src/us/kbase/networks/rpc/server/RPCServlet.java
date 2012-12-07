@@ -22,20 +22,22 @@ public class RPCServlet extends HttpServlet {
 	
 	public RPCServlet() throws AdaptorException
 	{
+		System.out.println("from RPCServlet");
 		NetworksService service = new NetworksService();
 		
 		jsonRpcServer = new KBase_JsonRpcServer(service, NetworksService.class );			
-		jsonRpcServer.setBackwardsComaptible(true);  
+		jsonRpcServer.setBackwardsComaptible(true);	  
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		System.out.println("From doGet!");
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("From doPost!");
 		jsonRpcServer.handle(request, response);
 	}
 }
