@@ -3,6 +3,8 @@ package us.kbase.networks.adaptor.mak;
 import edu.uci.ics.jung.graph.Graph;
 import org.junit.Before;
 import org.junit.Test;
+
+import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.adaptor.modelseed.ModelSEEDAdaptorFactory;
@@ -82,7 +84,7 @@ public class MAKTest {
         for (Dataset dataset : datasets) {
             assertTrue("dataset taxons should contain " + genomeId, dataset.getTaxons().contains(taxid));
         }
-
+        NetworksUtil.printDatasets("", datasets);
     }
 
     @Test
