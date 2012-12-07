@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
@@ -40,7 +41,7 @@ public class GenericMySQLAdaptorTest {
 	private Configuration config = null;
 	private Adaptor adaptor = null;
 	
-	@BeforeClass
+	//@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 
 		// Prepare test data set & configuration file
@@ -68,6 +69,7 @@ public class GenericMySQLAdaptorTest {
 		JsonGenerator jg = jf.createJsonGenerator(fw);
         jg.useDefaultPrettyPrinter();
         m.writeValue(jg, dataset);
+        fw.close();
 
 		Configuration config = new PropertiesConfiguration(); 
 		config.addProperty("dataset.list", testDataset);
@@ -96,8 +98,9 @@ public class GenericMySQLAdaptorTest {
 	public void setUp() throws Exception {
 		config = new PropertiesConfiguration(testConfig);
 		adaptor = new GenericMySQLAdaptor(config);
-		FileReader fr = new FileReader(this.testDataset);
-		dataset = (Dataset) m.readValue(fr, Dataset.class);
+		dataset = adaptor.getDatasets().get(0);
+//		FileReader fr = new FileReader(this.testDataset);
+//		dataset = (Dataset) m.readValue(fr, Dataset.class);
 
 //		config = new PropertiesConfiguration("plant-ppi.config");
 //		adaptor = new GenericMySQLAdaptor(config);
@@ -130,6 +133,7 @@ public class GenericMySQLAdaptorTest {
 			assertEquals("Return one dataset?", dl.size(), 1);
 			assertEquals("The same dataset?", dl.get(0), dataset); 
 			assertEquals("Just id same?", dl.get(0).getId(), dataset.getId());
+			NetworksUtil.printDatasets("", dl);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
@@ -179,7 +183,7 @@ public class GenericMySQLAdaptorTest {
 
 		// at least one result
 		Network n2 = adaptor.buildFirstNeighborNetwork(dataset, "AT5G22340");
-		assertTrue("Returned results", n2.getGraph().getVertexCount() > 1);
+		assertTrue("Returned results", n2.getGraph().getVertexCount() > 1);	
 	}
 
 	@Test
