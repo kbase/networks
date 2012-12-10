@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AbstractAdaptor;
 import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.adaptor.IdGenerator;
 import us.kbase.networks.adaptor.mak.dao.ent.MAKBicluster;
 import us.kbase.networks.adaptor.mak.dao.ent.MAKDataset;
 import us.kbase.networks.adaptor.mak.dao.ent.MAKGene;
@@ -25,21 +26,20 @@ import us.kbase.networks.core.Taxon;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 
-public class MAKAdaptor implements Adaptor{
+public class MAKAdaptor extends AbstractAdaptor{
 
-	public static final String DATASET_ID_PREFIX = "kb|netdataset.";
-	public static final String NETWORK_ID_PREFIX = "kb|net.";
-	public static final String NODE_ID_PREFIX = "kb|netnode.";
-	public static final String EDGE_ID_PREFIX = "kb|netedge.";
 	
-	public static final String EDGE_MEMBER_OF_BICLUSTER = "Member of bicluster";	
-	
-	
+	public static final String EDGE_MEMBER_OF_BICLUSTER = "Member of bicluster";		
 	public static final List<EdgeType> DEFAULT_EDGE_TYPES = Arrays.asList(EdgeType.GENE_CLUSTER);
-	private int uniqueIndex = 0;	
+	
+	public static final String ADAPTOR_PREFIX = "mak";
+	
+	public MAKAdaptor() throws AdaptorException{
+		super(null);
+	}
 	
 	@Override
-	public List<Dataset> getDatasets() throws AdaptorException {
+	protected List<Dataset> loadDatasets() throws AdaptorException {
 		List<Dataset> datasets = new Vector<Dataset>();
 		DataProvider dataProvider = new DataProvider();
 		try{
@@ -57,6 +57,7 @@ public class MAKAdaptor implements Adaptor{
 	}
 
 
+	/*
 	@Override
 	public List<Dataset> getDatasets(NetworkType networkType) throws AdaptorException {
 		
@@ -67,7 +68,10 @@ public class MAKAdaptor implements Adaptor{
 		}		
 		return datasets;
 	}
+	*/
 
+
+	/*
 	@Override
 	public List<Dataset> getDatasets(DatasetSource datasetSource) throws AdaptorException {
 		List<Dataset> datasets = new Vector<Dataset>();
@@ -77,7 +81,9 @@ public class MAKAdaptor implements Adaptor{
 		}		
 		return datasets;	
 	}
+	*/
 
+	/*
 	@Override
 	public List<Dataset> getDatasets(Taxon taxon) throws AdaptorException {
 		List<Dataset> datasets = new Vector<Dataset>();
@@ -95,7 +101,9 @@ public class MAKAdaptor implements Adaptor{
 		}
 		return datasets;
 	}
+	*/
 
+	/*
 	@Override
 	public List<Dataset> getDatasets(NetworkType networkType,
 			DatasetSource datasetSource, Taxon taxon) throws AdaptorException {
@@ -108,40 +116,28 @@ public class MAKAdaptor implements Adaptor{
 			}		
 		return datasets;	
 	}
-
-	@Override
-	public boolean hasDataset(Dataset dataset) throws AdaptorException {
-		
-		boolean hasDataset = false;
-		DataProvider dataProvider = new DataProvider();
-		try{
-			hasDataset = dataProvider.hasDataset(dataset.getId());
-		}
-		finally{
-			dataProvider.close();
-		}
-		
-		return hasDataset;
-	}	
+	*/
 	
 	@Override
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId)
+	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity)
 			throws AdaptorException {
-		return buildFirstNeighborNetwork(dataset, geneId, DEFAULT_EDGE_TYPES);
+		return buildFirstNeighborNetwork(dataset, entity, DEFAULT_EDGE_TYPES);
 	}
 
 	@Override
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId,
+	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity,
 			List<EdgeType> edgeTypes) throws AdaptorException {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
-		Network network = new Network(getNetworkId(), "", graph);			
+		Network network = new Network(IdGenerator.Network.nextId(), "", graph);			
+		
+		int datasetId = Integer.parseInt( IdGenerator.toLocalId(dataset.getId()) );
 		
 		// Build network
 		DataProvider dataProvider = new DataProvider();
 		try{			
 			
 			//1. Build query node
-			MAKGene queryGene = dataProvider.getGene(dataset.getId(), geneId);
+			MAKGene queryGene = dataProvider.getGene(datasetId, entity.getId());
 			if(queryGene == null)
 			{
 				return network;
@@ -154,7 +150,7 @@ public class MAKAdaptor implements Adaptor{
 			if(edgeTypesSet.contains(EdgeType.GENE_CLUSTER))
 			{
 				// Collect first-neighbor clusters (regulons)
-				List<MAKBicluster> biclusters = dataProvider.getBiclusters(dataset.getId(),queryGene.getKbaseId());
+				List<MAKBicluster> biclusters = dataProvider.getBiclusters(datasetId,queryGene.getKbaseId());
 								
 				// Add cluster nodes and edges
 				for(MAKBicluster bicluster: biclusters)
@@ -176,13 +172,13 @@ public class MAKAdaptor implements Adaptor{
 
 
 	@Override
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds)
+	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities)
 			throws AdaptorException {
-		return buildInternalNetwork(dataset, geneIds, DEFAULT_EDGE_TYPES);
+		return buildInternalNetwork(dataset, entities, DEFAULT_EDGE_TYPES);
 	}
 
 	@Override
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds,
+	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities,
 			List<EdgeType> edgeTypes) throws AdaptorException {
 		// TODO Auto-generated method stub
 		return null;
@@ -205,9 +201,11 @@ public class MAKAdaptor implements Adaptor{
 	
 	private Dataset buildDataset(MAKDataset makDataset) {
 		List<Taxon> taxons = Arrays.asList(new Taxon(makDataset.getGenomeKBaseId()));
+		
+		
 		return 
 			new Dataset(
-				makDataset.getKbaseId(),
+				IdGenerator.Dataset.toKBaseId(ADAPTOR_PREFIX, "" + makDataset.getId()) ,
 				makDataset.getName(),
 				makDataset.getDescription(),
 				NetworkType.REGULATORY_NETWORK,
@@ -218,14 +216,14 @@ public class MAKAdaptor implements Adaptor{
 
 	private Edge buildGeneBiclusterEdge(Node clusterNode, MAKGene queryGene,
 			Dataset dataset) {
-		Edge edge =  new Edge(getEdgeId(), EDGE_MEMBER_OF_BICLUSTER, dataset);
+		Edge edge =  new Edge(IdGenerator.Edge.nextId(), EDGE_MEMBER_OF_BICLUSTER, dataset);
 		return edge;
 	}
 
 
 	private Node buildClusterNode(MAKBicluster bicluster) {
 		 Node node = Node.buildClusterNode(
-				 getNodeId(), 
+				 IdGenerator.Node.nextId(), 
 				 bicluster.getName() + " bicluster" , 
 				 new Entity(bicluster.getKbaseId(), EntityType.BICLUSTER));
 		 
@@ -235,7 +233,7 @@ public class MAKAdaptor implements Adaptor{
 
 	private Node buildGeneNode(MAKGene gene) {
 		Node node = Node.buildGeneNode(
-				getNodeId(), 
+				IdGenerator.Node.nextId(), 
 				gene.getKbaseId(), 
 				new Entity(gene.getKbaseId(), EntityType.GENE));
 
@@ -248,24 +246,11 @@ public class MAKAdaptor implements Adaptor{
 		return edgeTypesSet;
 	}
 	
-	
-	private String getNodeId() {
-		return NODE_ID_PREFIX + (uniqueIndex ++);
-	}
-	
-	private String getEdgeId() {
-		return EDGE_ID_PREFIX + (uniqueIndex++);
-	}
-	
-	private String getNetworkId() {
-		return NETWORK_ID_PREFIX + (uniqueIndex++);
-	}
-
 
 	@Override
 	public List<Dataset> getDatasets(Entity entity) throws AdaptorException {
 		// TODO Auto-generated method stub
 		return null;
-	}	
+	}
 
 }

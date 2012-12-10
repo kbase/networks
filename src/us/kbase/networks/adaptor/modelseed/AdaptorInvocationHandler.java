@@ -1,4 +1,4 @@
-package us.kbase.networks.core;
+package us.kbase.networks.adaptor.modelseed;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +14,11 @@ import java.util.Map;
 import java.util.Set;
 
 import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.core.Dataset;
+import us.kbase.networks.core.Entity;
+import us.kbase.networks.core.Network;
+import us.kbase.networks.core.Node;
+import us.kbase.networks.core.Taxon;
 
 public class AdaptorInvocationHandler implements InvocationHandler{
 	private final String SOURCE_GENOME_ID = "kb|g.21765";
@@ -136,6 +141,7 @@ public class AdaptorInvocationHandler implements InvocationHandler{
 		return dataset;
 	}
 
+	@SuppressWarnings("unchecked")
 	private Object processSourceList(List<?> list) {
 				
 		for(int i = 0 ; i < list.size(); i++)
@@ -144,6 +150,11 @@ public class AdaptorInvocationHandler implements InvocationHandler{
 			if(obj instanceof String)
 			{
 				((List<String>) list).set(i, (String) processSourceGeneId((String)obj));
+			}else if(obj instanceof Entity)
+			{
+				((List<Entity>) list).set(i, 
+						new Entity(processSourceGeneId(((Entity) obj).getId()), ((Entity) obj).getType())
+				);
 			}
 			
 		}

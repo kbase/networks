@@ -1,6 +1,7 @@
 package us.kbase.networks.adaptor.ppi;
 
 import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.adaptor.AdaptorFactory;
 
 /**
@@ -10,7 +11,9 @@ import us.kbase.networks.adaptor.AdaptorFactory;
   @author JMC
 */
 public class PPIAdaptorFactory implements AdaptorFactory {
-    @Override public Adaptor buildAdaptor() {
-	return new PPIAdaptor();
+	
+    @Override 
+    public Adaptor buildAdaptor() throws AdaptorException {
+    	return new PPIAdaptor();
     }
 }

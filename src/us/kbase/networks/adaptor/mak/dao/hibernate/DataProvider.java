@@ -29,16 +29,6 @@ public class DataProvider {
 		session.close();
 	}
 	
-	public boolean hasDataset(String kbaseId) {
-		List<MAKDataset> datasets = 
-				session.createCriteria(MAKDataset.class)
-				.add(Restrictions.eq("kbaseId", kbaseId))
-				.list();
-		
-		return datasets.size() > 0;
-	}
-	
-	
 	@SuppressWarnings("unchecked")
 	public List<MAKDataset> getDatasets() {
 		return session.createCriteria(MAKDataset.class).list();		
@@ -53,34 +43,36 @@ public class DataProvider {
 	}	
 	
 	@SuppressWarnings("unchecked")
-	public List<MAKGene> getGenes(String datasetKBaseId, List<String> kbaseGeneIds){
+	public List<MAKGene> getGenes(int datasetId, List<String> kbaseGeneIds){
 		return 
 			session.createCriteria(MAKGene.class)
 			.add( Restrictions.in("kbaseId", kbaseGeneIds) )
 			.createAlias("dataset", "ds")
-			.add( Restrictions.eq("ds.kbaseId", datasetKBaseId) )
+			.add( Restrictions.eq("ds.id", datasetId) )
 			.list();	
 	}
 
 	
-	public MAKGene getGene(String datasetKBaseId, String geneKBaseId) {
+	@SuppressWarnings("unchecked")
+	public MAKGene getGene(int datasetId, String geneKBaseId) {
 		List<MAKGene> genes = 
 			session.createCriteria(MAKGene.class)
 				.add( Restrictions.eq("kbaseId", geneKBaseId) )
 				.createAlias("dataset", "ds")
-				.add( Restrictions.eq("ds.kbaseId", datasetKBaseId) )
+				.add( Restrictions.eq("ds.id", datasetId) )
 				.list();
 		
 		return genes.size() > 0 ? genes.get(0) : null;
 	}
 
 
-	public List<MAKBicluster> getBiclusters(String datasetKBaseId, String geneKBaseId) {
+	@SuppressWarnings("unchecked")
+	public List<MAKBicluster> getBiclusters(int datasetId, String geneKBaseId) {
 		List<MAKGene> genes = 
 			session.createCriteria(MAKGene.class)
 				.add( Restrictions.eq("kbaseId", geneKBaseId) )
 				.createAlias("dataset", "ds")
-				.add( Restrictions.eq("ds.kbaseId", datasetKBaseId) )
+				.add( Restrictions.eq("ds.id", datasetId) )
 				.list();
 		
 		List<MAKBicluster> clusters = new Vector<MAKBicluster>();

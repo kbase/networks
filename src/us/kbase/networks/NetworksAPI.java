@@ -111,7 +111,7 @@ public class NetworksAPI {
 	{
 		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
 		{					
-			if(adaptor.hasDataset(dataset) )
+			if(adaptor.hasDataset(dataset.getId()) )
 			{
 				return adaptor.buildNetwork(dataset);
 			}
@@ -120,18 +120,17 @@ public class NetworksAPI {
 	}
 	
 	
-	public Network buildFirstNeighborNetwork(List<Dataset> datasets, String geneId,
+	public Network buildFirstNeighborNetwork(List<Dataset> datasets, Entity entity,
 			List<EdgeType> edgeTypes) throws AdaptorException 
 	{		
 		List<Network> networks = new Vector<Network>();
-		
 		for(Dataset dataset: datasets)
 		{
 			for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
 			{
-				if(adaptor.hasDataset(dataset) )
+				if(adaptor.hasDataset(dataset.getId()) )
 				{
-					Network network = adaptor.buildFirstNeighborNetwork(dataset, geneId, edgeTypes);
+					Network network = adaptor.buildFirstNeighborNetwork(dataset, entity, edgeTypes);
 					if(network != null)
 					{
 						networks.add(network);
@@ -143,7 +142,7 @@ public class NetworksAPI {
 		return buildUnionNetwork(networks);		
 	}
 
-	public Network buildInternalNetwork(List<Dataset> datasets, List<String> geneIds,
+	public Network buildInternalNetwork(List<Dataset> datasets, List<Entity> entities,
 			List<EdgeType> edgeTypes) throws AdaptorException 
 	{		
 		List<Network> networks = new Vector<Network>();
@@ -152,9 +151,9 @@ public class NetworksAPI {
 		{
 			for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
 			{
-				if(adaptor.hasDataset(dataset) )
+				if(adaptor.hasDataset(dataset.getId()) )
 				{
-					Network network = adaptor.buildInternalNetwork(dataset, geneIds, edgeTypes);
+					Network network = adaptor.buildInternalNetwork(dataset, entities, edgeTypes);
 					if(network != null)
 					{
 						networks.add(network);

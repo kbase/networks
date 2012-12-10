@@ -1,6 +1,5 @@
-package us.kbase.networks.adaptor.genericMySQL;
+ package us.kbase.networks.adaptor.genericMySQL;
 
-import java.io.FileReader;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,34 +11,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import us.kbase.networks.adaptor.Adaptor;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+
+import us.kbase.networks.adaptor.AbstractAdaptor;
 import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.adaptor.IdGenerator;
 import us.kbase.networks.core.Dataset;
-import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
 import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
-import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
 import us.kbase.networks.core.NodeType;
-import us.kbase.networks.core.Taxon;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 
-public class GenericMySQLAdaptor implements Adaptor{
+public class GenericMySQLAdaptor extends AbstractAdaptor{
 	
-	public static final String DATASET_ID_PREFIX = "kb|netdataset.";
-	public static final String NETWORK_ID_PREFIX = "kb|net.";
-	public static final String NODE_ID_PREFIX = "kb|netnode.";
-	public static final String EDGE_ID_PREFIX = "kb|netedge.";
+
 
 	// TODO: upgrade code to use connection pool management library
 	private static class ConnectionManager {
@@ -49,7 +43,7 @@ public class GenericMySQLAdaptor implements Adaptor{
 		public static String dbName = "mysql";
 		public static String user = "root";
 		public static String passwd = "";
-		public static Connection getConnection() throws ClassNotFoundException, SQLException {
+		public static Connection getConnection() throws ClassNotFoundException, SQLException {			
 			if(con == null) {
 				Class.forName("com.mysql.jdbc.Driver");
 				con = DriverManager.getConnection("jdbc:mysql://"+host+":" + port +"/" + dbName, user, passwd);
@@ -57,11 +51,7 @@ public class GenericMySQLAdaptor implements Adaptor{
 			return con;
 		}
 	}
-	
-	
-	
-	private Configuration ac;
-	private List<Dataset> dsl;
+			
     private static ObjectMapper m = new ObjectMapper();
 
     // TODO: prepared stmt will be set for each Dataset & Edgetype
@@ -69,14 +59,16 @@ public class GenericMySQLAdaptor implements Adaptor{
     private PreparedStatement pstFindIntNetwork;
 	
 	// TODO: be prepared for mysql connections & sql stmt (prepared)
-	private void loadDatasets() throws AdaptorException {
+    @Override
+	protected List<Dataset> loadDatasets() throws AdaptorException {
 		
-		dsl = new ArrayList<Dataset>();
-		String [] datasetProps  = ac.getStringArray("dataset.list");
+    	List<Dataset> dsl = new ArrayList<Dataset>();
+		String [] datasetProps  = config.getStringArray("dataset.list");
 		
 		for(int i = 0; i < datasetProps.length; i++) {
 			dsl.add(loadDataset(datasetProps[i]));
 		}
+		return dsl;
 	}
 	
 	private Dataset loadDataset(String rn) throws AdaptorException {
@@ -89,26 +81,27 @@ public class GenericMySQLAdaptor implements Adaptor{
 		}
 	}
 
-	public GenericMySQLAdaptor(Configuration ac) throws Exception{
-		this.ac = ac;
-		loadDatasets();
-		ConnectionManager.host   = ac.getString("host", "localhost");
-		ConnectionManager.port   = ac.getInt   ("port", 3306);
-		ConnectionManager.dbName = ac.getString("db", "mysql");
-		ConnectionManager.user   = ac.getString("user", "root");
-		ConnectionManager.passwd   = ac.getString("passwd", "");
+	public GenericMySQLAdaptor(Configuration config) throws Exception{
+		super(config);
+		ConnectionManager.host   = config.getString("host", "localhost");
+		ConnectionManager.port   = config.getInt   ("port", 3306);
+		ConnectionManager.dbName = config.getString("db", "mysql");
+		ConnectionManager.user   = config.getString("user", "root");
+		ConnectionManager.passwd   = config.getString("passwd", "");
 		
 		// TODO: the following will be generalized for each dataset & nodeType & edgeType
-		this.pstFindNeighbor   = ConnectionManager.getConnection().prepareStatement(ac.getString("sql.findNeighbor"));
-		this.pstFindIntNetwork = ConnectionManager.getConnection().prepareStatement(ac.getString("sql.findIntNetwork"));
+		this.pstFindNeighbor   = ConnectionManager.getConnection().prepareStatement(config.getString("sql.findNeighbor"));
+		this.pstFindIntNetwork = ConnectionManager.getConnection().prepareStatement(config.getString("sql.findIntNetwork"));
 	}
 
+	/*
 	@Override
-	public List<Dataset> getDatasets() throws AdaptorException {
+	public List<Dataset> loadDatasets() throws AdaptorException {
 		// TODO: make deep copy later
 		return dsl; 
 	}	
-	
+	*/
+	/*
 	@Override
 	public List<Dataset> getDatasets(NetworkType networkType)
 			throws AdaptorException {
@@ -120,7 +113,10 @@ public class GenericMySQLAdaptor implements Adaptor{
 		}
 		return result;
 	}
+	*/
+	
 
+	/*
 	@Override
 	public List<Dataset> getDatasets(DatasetSource datasetSource)
 			throws AdaptorException {
@@ -132,7 +128,10 @@ public class GenericMySQLAdaptor implements Adaptor{
 		}
 		return result;
 	}
+	*/
+	
 
+	/*
 	@Override
 	public List<Dataset> getDatasets(Taxon taxon) throws AdaptorException {
 		List<Dataset> result = new ArrayList<Dataset>();
@@ -143,7 +142,9 @@ public class GenericMySQLAdaptor implements Adaptor{
 		}
 		return result;
 	}
+	*/
 
+	/*
 	@Override
 	public List<Dataset> getDatasets(NetworkType networkType,
 			DatasetSource datasetSource, Taxon taxon) throws AdaptorException {
@@ -156,11 +157,7 @@ public class GenericMySQLAdaptor implements Adaptor{
 		}
 		return result;
 	}
-
-	@Override
-	public boolean hasDataset(Dataset dataset) throws AdaptorException {
-		return this.dsl.contains(dataset);
-	}
+	*/
 
 	@Override
 	public Network buildNetwork(Dataset dataset) throws AdaptorException {
@@ -184,12 +181,16 @@ public class GenericMySQLAdaptor implements Adaptor{
 	}
 	
 	@Override
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId)
+	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity)
 			throws AdaptorException {
-		if(!this.dsl.contains(dataset)) return null;
+		//if(!this.dsl.contains(dataset)) return null;
+		if( !hasDataset(dataset.getId())) return null;
 		
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
-		Network network = new Network(this.NETWORK_ID_PREFIX+dataset.getId()+"."+ geneId+".firstNeighbor", "name", graph);
+		Network network = new Network(
+				IdGenerator.Network.nextId(),
+				"netowrk" + dataset.getId()+"."+ entity.getId()+".firstNeighbor", 
+				graph);
 		
 		NodeType nt = Enum.valueOf(NodeType.class, dataset.getProperty("default.nodeType"));
 //		EdgeType et = Enum.valueOf(EdgeType.class, dataset.getProperty("default.edgeType"));
@@ -201,25 +202,25 @@ public class GenericMySQLAdaptor implements Adaptor{
 		
 		String [] psIdxes = dataset.getProperty("sql.findNeighbor.psIndex").split(":"); 
 		
-		Node query = getNode(this.NODE_ID_PREFIX + geneId, geneId, new Entity(geneId, EntityType.GENE), nt);
+		Node query = getNode(IdGenerator.Node.nextId(), entity.getId(), new Entity(entity.getId(), EntityType.GENE), nt);
 		graph.addVertex(query);
 		
 		
 		try {
 			for(String psIdx : psIdxes) {
 				if(dataset.getProperty("sql.findNeighbor.like").equals("yes")) {
-					this.pstFindNeighbor.setString(Integer.parseInt(psIdx), geneId + '%');					
+					this.pstFindNeighbor.setString(Integer.parseInt(psIdx), entity.getId() + '%');					
 				}
 				else {
-					this.pstFindNeighbor.setString(Integer.parseInt(psIdx), geneId);
+					this.pstFindNeighbor.setString(Integer.parseInt(psIdx), entity.getId());
 				}
 			}
 			ResultSet rs = this.pstFindNeighbor.executeQuery();
 			while(rs.next()) {
 				String neighborId = rs.getString(rsIdx);
-				Node neighbor = getNode(this.NODE_ID_PREFIX + neighborId, neighborId, new Entity(neighborId, EntityType.UNKNOWN), nt);
+				Node neighbor = getNode(IdGenerator.Node.nextId(), neighborId, new Entity(neighborId, EntityType.UNKNOWN), nt);
 				graph.addVertex(neighbor);
-				Edge edge = new Edge(this.EDGE_ID_PREFIX+geneId+":"+neighborId, geneId+":"+neighborId, dataset);
+				Edge edge = new Edge(IdGenerator.Edge.nextId(), entity.getId()+":"+neighborId, dataset);
 				if(rsConfidenceIdx > 0) {
 					edge.setConfidence(rs.getFloat(rsConfidenceIdx));
 				}
@@ -232,26 +233,30 @@ public class GenericMySQLAdaptor implements Adaptor{
 	}
 
 	@Override
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId,
+	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity,
 		List<EdgeType> edgeTypes) throws AdaptorException {
 		EdgeType et = Enum.valueOf(EdgeType.class, dataset.getProperty("default.edgeType"));
 		if(!edgeTypes.contains(et)) return null;
-		return buildFirstNeighborNetwork(dataset, geneId);
+		return buildFirstNeighborNetwork(dataset, entity);
 	}
 
 	@Override
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds)
+	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities)
 			throws AdaptorException {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
 		NodeType nt = Enum.valueOf(NodeType.class, dataset.getProperty("default.nodeType"));
-		for(String geneId : geneIds) {
-			Node node = getNode(this.NODE_ID_PREFIX + geneId, geneId, new Entity(geneId, EntityType.GENE), nt);
+		for(Entity entity : entities) {
+			String geneId = entity.getId();
+			Node node = getNode(IdGenerator.Node.nextId(), geneId, new Entity(geneId, EntityType.GENE), nt);
 			graph.addVertex(node);
 		}
 		Set<Node> intCollection = new HashSet<Node>(graph.getVertices());
-		Network network = new Network(this.NETWORK_ID_PREFIX+dataset.getId()+"."+ StringUtils.join(geneIds, "-")+".intNetwork", dataset.getName()+"."+ StringUtils.join(geneIds, "-")+".intNetwork", graph);
-		for(String geneId : geneIds) {
-			Network subnet = this.buildFirstNeighborNetwork(dataset, geneId);
+		Network network = new Network(
+				IdGenerator.Network.nextId()
+				, dataset.getName()+"."+ Entity.toIdsString(entities, "-")+".intNetwork"
+				, graph);
+		for(Entity entity : entities) {
+			Network subnet = this.buildFirstNeighborNetwork(dataset, entity);
 			Graph<Node,Edge> subGraph = subnet.getGraph();
 			Set<Node> nodeCollection = new HashSet<Node>(subGraph.getVertices());
 			nodeCollection.removeAll(intCollection);
@@ -266,11 +271,11 @@ public class GenericMySQLAdaptor implements Adaptor{
 	}
 
 	@Override
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds,
+	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities,
 			List<EdgeType> edgeTypes) throws AdaptorException {
 		EdgeType et = Enum.valueOf(EdgeType.class, dataset.getProperty("default.edgeType"));
 		if(!edgeTypes.contains(et)) return null;
-		return buildInternalNetwork(dataset, geneIds);
+		return buildInternalNetwork(dataset, entities);
 	}
 
 	@Override
