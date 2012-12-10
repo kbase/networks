@@ -1,9 +1,5 @@
 package us.kbase.networks.adaptor.modelseed;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,24 +9,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.SparseMultigraph;
-
-import us.kbase.CDMI.CDMI_API;
 import us.kbase.CDMI.CDMI_EntityAPI;
 import us.kbase.CDMI.fields_Model;
 import us.kbase.CDMI.fields_Subsystem;
 import us.kbase.CDMI.tuple_118;
-import us.kbase.CDMI.tuple_131;
 import us.kbase.CDMI.tuple_132;
 import us.kbase.CDMI.tuple_136;
-import us.kbase.CDMI.tuple_51;
 import us.kbase.CDMI.tuple_83;
-import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AbstractAdaptor;
 import us.kbase.networks.adaptor.AdaptorException;
-import us.kbase.networks.adaptor.regprecise.RegPreciseAdaptor;
+import us.kbase.networks.adaptor.IdGenerator;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
@@ -41,30 +30,45 @@ import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
 import us.kbase.networks.core.Taxon;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.SparseMultigraph;
 
-public class ModelSEEDAdaptor implements Adaptor {
+public class ModelSEEDAdaptor extends AbstractAdaptor {
 
 	private CDMI_EntityAPI cdmi;
-	private int uniqueIndex = 0;
+	public static final String ADAPTOR_PREFIX = "modelseed";
 
-
+	
 	public ModelSEEDAdaptor() throws AdaptorException {
-		super();
+		super(null);
+	}
+	
+	@Override
+	protected void init() throws AdaptorException{
 		try {
 			this.cdmi = new CDMI_EntityAPI("http://bio-data-1.mcs.anl.gov/services/cdmi_api");
 		} catch (MalformedURLException e) {
 			throw new AdaptorException("Unable to initialize CDMI_EntityAPI", e);
 		}
+		super.init();
 	}
-
+	
 	@Override
-	public List<Dataset> getDatasets() throws AdaptorException {
+	protected List<Dataset> loadDatasets() throws AdaptorException {
 		List<Dataset> datasets = new ArrayList<Dataset>();
 
 		try {
 			Map<String, fields_Model> models = cdmi.all_entities_Model(0, Integer.MAX_VALUE, Arrays.asList("id", "name"));
 
 			for (String id : models.keySet()) {
+				
+				//TODO remove after optimization. To avoid 5000 server calls.
+				//{
+				if(datasets.size() > 10) break;
+				//}
+				
+				
+				
 				String name = models.get(id).name;
 				List<tuple_132> genomeIds = cdmi.get_relationship_Models(Arrays.asList(id), new ArrayList<String>(), 
 						new ArrayList<String>(), Arrays.asList("id"));
@@ -72,9 +76,28 @@ public class ModelSEEDAdaptor implements Adaptor {
 				for (tuple_132 tuple : genomeIds) {
 					taxons.add(new Taxon(tuple.e_3.id));
 				}
-				datasets.add(new Dataset(getDatasetId(id), name, "Subsystems for " + name + " genome.", NetworkType.METABOLIC_SUBSYSTEM, 
+				
+				String localId = IdGenerator.toLocalId(id);
+				datasets.add(new Dataset(
+						IdGenerator.Dataset.toKBaseId(ADAPTOR_PREFIX, localId),
+						name, 
+						"Subsystems for " + name + " genome.", 
+						NetworkType.METABOLIC_SUBSYSTEM, 
 						DatasetSource.MODELSEED, taxons));
 			}
+			
+			//TODO remove after optimization. E.coli dataset is added "manually" because not all models are considered
+			//{
+			datasets.add(new Dataset(
+					IdGenerator.Dataset.toKBaseId(ADAPTOR_PREFIX, "0"),
+					"E.coli", 
+					"Subsystems for " + "E.coli" + " genome.", 
+					NetworkType.METABOLIC_SUBSYSTEM, 
+					DatasetSource.MODELSEED, Arrays.asList(new Taxon("kb|g.0"))));
+			//}
+			
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 			throw new AdaptorException("Error while getting models", e);
@@ -103,6 +126,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 		return datasets;
 	}
 
+	/*
 	@Override
 	public List<Dataset> getDatasets(NetworkType networkType) throws AdaptorException {
 		List<Dataset> datasets = new ArrayList<Dataset>();
@@ -112,7 +136,9 @@ public class ModelSEEDAdaptor implements Adaptor {
 		}		
 		return datasets;
 	}
+	*/
 
+	/*
 	@Override
 	public List<Dataset> getDatasets(DatasetSource datasetSource) throws AdaptorException {
 		List<Dataset> datasets = new ArrayList<Dataset>();
@@ -122,7 +148,9 @@ public class ModelSEEDAdaptor implements Adaptor {
 		}		
 		return datasets;
 	}
+	*/
 
+	/*
 	@Override
 	public List<Dataset> getDatasets(Taxon taxon) throws AdaptorException {
 		List<Dataset> datasets = new ArrayList<Dataset>();
@@ -136,13 +164,21 @@ public class ModelSEEDAdaptor implements Adaptor {
 		}
 		if (modelId.size() == 1) {
 			String name = modelId.get(0).e_3.name;
-			datasets.add(new Dataset(getDatasetId(taxon.getGenomeId()), name, "Subsystems for " + name + " genome.", NetworkType.METABOLIC_SUBSYSTEM, 
+			
+			String datasetLocalId = IdGenerator.toLocalId(taxon.getGenomeId());
+			datasets.add(new Dataset(
+					IdGenerator.Dataset.toKBaseId(ADAPTOR_PREFIX, datasetLocalId),
+					name, 
+					"Subsystems for " + name + " genome.", 
+					NetworkType.METABOLIC_SUBSYSTEM, 
 					DatasetSource.MODELSEED, Arrays.asList(taxon)));
 		}
 
 		return datasets;
 	}
+	*/
 
+	/*
 	@Override
 	public List<Dataset> getDatasets(NetworkType networkType,
 			DatasetSource datasetSource, Taxon taxon) throws AdaptorException {
@@ -155,12 +191,8 @@ public class ModelSEEDAdaptor implements Adaptor {
 			}		
 		return datasets;	
 	}
-
-	@Override
-	public boolean hasDataset(Dataset dataset) throws AdaptorException {
-		return dataset.getDatasetSource() == DatasetSource.MODELSEED;
-	}
-
+	*/
+	
 	@Override
 	public Network buildNetwork(Dataset dataset) {
 		// TODO Auto-generated method stub
@@ -174,25 +206,25 @@ public class ModelSEEDAdaptor implements Adaptor {
 	}
 
 	@Override
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId) throws AdaptorException {
-		return buildFirstNeighborNetwork(dataset, geneId, Arrays.asList(EdgeType.GENE_CLUSTER));
+	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity) throws AdaptorException {
+		return buildFirstNeighborNetwork(dataset, entity, Arrays.asList(EdgeType.GENE_CLUSTER));
 	}
 
 	@Override
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId, List<EdgeType> edgeTypes) throws AdaptorException {
+	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity, List<EdgeType> edgeTypes) throws AdaptorException {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
-		Network network = new Network(getNetworkId(), "", graph);	
-		Node geneNode = Node.buildGeneNode(getNodeId(), geneId, new Entity(geneId, EntityType.GENE));
+		Network network = new Network(IdGenerator.Network.nextId(), "", graph);	
+		Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), entity.getId(), new Entity(entity.getId(), EntityType.GENE));
 		graph.addVertex(geneNode);
 		if( !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
 		{
 			return network;
 		}
 
-		for (fields_Subsystem fs : getSubsystemFieldsForGene(geneId)) {
-			Node ssNode = Node.buildClusterNode(getNodeId(), fs.id, new Entity(fs.id, EntityType.SUBSYSTEM));
+		for (fields_Subsystem fs : getSubsystemFieldsForGene(entity.getId())) {
+			Node ssNode = Node.buildClusterNode(IdGenerator.Node.nextId(), fs.id, new Entity(fs.id, EntityType.SUBSYSTEM));
 			graph.addVertex(ssNode);
-			Edge edge = new Edge(getEdgeId(), "Member of subsystem", dataset);
+			Edge edge = new Edge(IdGenerator.Edge.nextId(), "Member of subsystem", dataset);
 			graph.addEdge(edge, ssNode, geneNode, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
 		}
 
@@ -218,15 +250,15 @@ public class ModelSEEDAdaptor implements Adaptor {
 	}
 
 	@Override
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds) throws AdaptorException {
-		return buildInternalNetwork(dataset, geneIds, Arrays.asList(EdgeType.GENE_CLUSTER));
+	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities) throws AdaptorException {
+		return buildInternalNetwork(dataset, entities, Arrays.asList(EdgeType.GENE_CLUSTER));
 	}
 
 	@Override
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds,
+	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities,
 			List<EdgeType> edgeTypes) throws AdaptorException {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
-		Network network = new Network(getNetworkId(), "", graph);	
+		Network network = new Network(IdGenerator.Network.nextId(), "", graph);	
 		if( !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
 		{
 			return network;
@@ -235,8 +267,9 @@ public class ModelSEEDAdaptor implements Adaptor {
 		// find out what subsystems genes are in
 		Map<String,List<Node>> ssToGeneNodes = new HashMap<String,List<Node>>();
 
-		for (String geneId : geneIds) {
-			Node geneNode = Node.buildGeneNode(getNodeId(), geneId, new Entity(geneId, EntityType.GENE));
+		for (Entity entity: entities) {
+			String geneId = entity.getId();
+			Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), geneId, new Entity(geneId, EntityType.GENE));
 			graph.addVertex(geneNode);
 
 			for (fields_Subsystem fs : getSubsystemFieldsForGene(geneId)) {
@@ -259,7 +292,7 @@ public class ModelSEEDAdaptor implements Adaptor {
 					if (! genePairs.containsKey(node2)) {genePairs.put(node2, new HashSet<Node>());}
 					if (node1 == node2) {continue;}
 					if (genePairs.get(node1).contains(node2) || genePairs.get(node2).contains(node1)) {continue;}
-					Edge edge = new Edge(getEdgeId(), "Member of same subsystem", dataset);
+					Edge edge = new Edge(IdGenerator.Edge.nextId(), "Member of same subsystem", dataset);
 					graph.addEdge(edge, node1, node2, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);
 					genePairs.get(node1).add(node2);
 				}
@@ -267,20 +300,4 @@ public class ModelSEEDAdaptor implements Adaptor {
 		}
 		return network;
 	}
-
-	private String getDatasetId(String id) {
-		return RegPreciseAdaptor.DATASET_ID_PREFIX + id;
-	}		
-
-	private String getNodeId() {
-		return RegPreciseAdaptor.NODE_ID_PREFIX + (uniqueIndex ++);
-	}
-
-	private String getEdgeId() {
-		return RegPreciseAdaptor.EDGE_ID_PREFIX + (uniqueIndex++);
-	}
-
-	private String getNetworkId() {
-		return RegPreciseAdaptor.NETWORK_ID_PREFIX + (uniqueIndex++);
-	}	
 }

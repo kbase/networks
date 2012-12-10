@@ -8,23 +8,26 @@ import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.EdgeType;
+import us.kbase.networks.core.Entity;
+import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.Taxon;
 
 public class MAKAdaptorDemo {
 
-	Adaptor adaptor = new MAKAdaptorFactory().buildAdaptor();
-	String geneId = "kb|g.20848.CDS.2811";
+	Adaptor adaptor;
+	Entity gene = new Entity("kb|g.20848.CDS.2811", EntityType.GENE);
 	Dataset goodDataset = new Dataset("kb|dataset.mak1", "", "", null, null, (Taxon) null);
 	
 	private void run() throws AdaptorException {
+		adaptor = new MAKAdaptorFactory().buildAdaptor();
 		test_getDatasets1();
 		test_buildFirstNeighborNetwork1();
 	}
 
 	
 	private void test_buildFirstNeighborNetwork1() throws AdaptorException {
-		Network network = adaptor.buildFirstNeighborNetwork(goodDataset, geneId, Arrays.asList(EdgeType.GENE_CLUSTER));
+		Network network = adaptor.buildFirstNeighborNetwork(goodDataset, gene, Arrays.asList(EdgeType.GENE_CLUSTER));
 		
 		NetworksUtil.printNetwork(network);
 		NetworksUtil.visualizeNetwork(network.getGraph());		

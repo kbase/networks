@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AbstractAdaptor;
 import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.adaptor.IdGenerator;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
@@ -28,13 +29,12 @@ import com.lbl.regprecise.dto.KBaseGeneDTO;
 import com.lbl.regprecise.dto.KBaseRegulatorDTO;
 import com.lbl.regprecise.dto.KBaseRegulonDTO;
 import com.lbl.regprecise.dto.RegulomeStatDTO;
-import com.lbl.regprecise.ent.Regulome;
 import com.lbl.regprecise.ent.Term;
 
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 
-public class RegPreciseAdaptor implements Adaptor{
+public class RegPreciseAdaptor extends AbstractAdaptor{
 
 	public static final String NODE_PROPERTY_REGULATION_TYPE = "Regulation type";
 	public static final String NODE_PROPERTY_LOCUS_TAG = "LocusTag";
@@ -44,17 +44,19 @@ public class RegPreciseAdaptor implements Adaptor{
 	public static final String EDGE_REGULATED_BY = "Regulated by";
 	public static final String EDGE_CO_REGUALTED = "Co-regualted";	
 	
-	public static final String DATASET_ID_PREFIX = "kb|netdataset.";
-	public static final String NETWORK_ID_PREFIX = "kb|net.";
-	public static final String NODE_ID_PREFIX = "kb|netnode.";
-	public static final String EDGE_ID_PREFIX = "kb|netedge.";
+	public static final String ADAPTOR_PREFIX = "regprecise";
 	
-	public static final List<EdgeType> DEFAULT_EDGE_TYPES = Arrays.asList(EdgeType.GENE_CLUSTER);
-	
-	private int uniqueIndex = 0;
+	public static final List<EdgeType> DEFAULT_EDGE_TYPES = Arrays.asList(EdgeType.GENE_CLUSTER);	
 
+	
+	public RegPreciseAdaptor() throws AdaptorException
+	{
+		super(null);
+	}
+	
+	
 	@Override
-	public List<Dataset> getDatasets() {
+	protected List<Dataset> loadDatasets() {
 		List<Dataset> datasets = new Vector<Dataset>();
 		ConstrainedDataProvider dataProvider = getDataProvider();
 		try{
@@ -71,82 +73,17 @@ public class RegPreciseAdaptor implements Adaptor{
 		return datasets;
 	}
 
+
 	@Override
-	public List<Dataset> getDatasets(NetworkType networkType) {
-		List<Dataset> datasets = new Vector<Dataset>();
-		if(networkType == NetworkType.REGULATORY_NETWORK)
-		{
-			datasets.addAll(getDatasets());
-		}		
-		return datasets;
+	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity) {
+		return buildFirstNeighborNetwork(dataset, entity, DEFAULT_EDGE_TYPES);
 	}
 
 	@Override
-	public List<Dataset> getDatasets(DatasetSource datasetSource) {
-		List<Dataset> datasets = new Vector<Dataset>();
-		if(datasetSource == DatasetSource.REGPRECISE)
-		{
-			datasets.addAll(getDatasets());
-		}		
-		return datasets;
-	}
-
-	@Override
-	public List<Dataset> getDatasets(Taxon taxon) {
-		List<Dataset> datasets = new Vector<Dataset>();
-		ConstrainedDataProvider dataProvider = getDataProvider();
-		try{
-			Regulome regulome = dataProvider.getRegulomeByGenomeKbaseId(taxon.getGenomeId());
-			if(regulome != null)
-			{
-				Dataset dataset = buildDataset(regulome);
-				datasets.add(dataset);
-			}
-		}
-		finally{
-			dataProvider.close();
-		}
-		return datasets;
-	}
-
-	@Override
-	public List<Dataset> getDatasets(NetworkType networkType,
-			DatasetSource datasetSource, Taxon taxon) {
-		List<Dataset> datasets = new Vector<Dataset>();
-		
-		if(networkType == NetworkType.REGULATORY_NETWORK)		
-		if(datasetSource == DatasetSource.REGPRECISE)
-		{
-			datasets.addAll(getDatasets(taxon));
-		}		
-		return datasets;		
-	}
-
-	@Override
-	public boolean hasDataset(Dataset dataset) {
-		
-		Regulome regulome;
-		ConstrainedDataProvider dataProvider = getDataProvider();
-		try{
-			regulome = getRegulome(dataProvider, dataset);
-		}
-		finally{
-			dataProvider.close();
-		}
-		
-		return regulome != null;
-	}	
-
-	@Override
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId) {
-		return buildFirstNeighborNetwork(dataset, geneId, DEFAULT_EDGE_TYPES);
-	}
-
-	@Override
-	public Network buildFirstNeighborNetwork(Dataset dataset, String geneId,
+	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity,
 			List<EdgeType> edgeTypes) {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
-		Network network = new Network(getNetworkId(), "", graph);	
+		Network network = new Network(IdGenerator.Network.nextId(), "", graph);	
 		
 		// Check if either GENE_GENE or GENE_CLUSTER edge type was requested 
 		Set<EdgeType> edgeTypesSet = getEdgeTypesSet(edgeTypes);
@@ -160,7 +97,7 @@ public class RegPreciseAdaptor implements Adaptor{
 		try{			
 			
 			//1. Build query node
-			KBaseGeneDTO queryGene = getQueryGene(dataProvider, geneId);
+			KBaseGeneDTO queryGene = getQueryGene(dataProvider, entity.getId());
 			if(queryGene == null)
 			{
 				return network;
@@ -223,16 +160,16 @@ public class RegPreciseAdaptor implements Adaptor{
 	}
 
 	@Override
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds) {
-		return buildInternalNetwork(dataset, geneIds, DEFAULT_EDGE_TYPES);
+	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities) {
+		return buildInternalNetwork(dataset, entities, DEFAULT_EDGE_TYPES);
 	}
 
 	@Override
-	public Network buildInternalNetwork(Dataset dataset, List<String> geneIds,
+	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities,
 			List<EdgeType> edgeTypes) {
 		
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
-		Network network = new Network(getNetworkId(), "", graph);	
+		Network network = new Network(IdGenerator.Network.nextId(), "", graph);	
 		
 		// Check if either GENE_GENE or GENE_CLUSTER edge type was requested 
 		Set<EdgeType> edgeTypesSet = getEdgeTypesSet(edgeTypes);
@@ -244,6 +181,8 @@ public class RegPreciseAdaptor implements Adaptor{
 		// Build network
 		ConstrainedDataProvider dataProvider = getDataProvider();
 		try{			
+			
+			List<String> geneIds = Entity.toEntityIds(entities);
 			
 			//1. Build query nodes
 			List<KBaseGeneDTO> queryGenes = dataProvider.getRegulatedGenes(geneIds);
@@ -295,7 +234,7 @@ public class RegPreciseAdaptor implements Adaptor{
 		List<Taxon> taxons = Arrays.asList(new Taxon(regulome.getGenomeKBaseId()));
 		return 
 			new Dataset(
-				getDatasetId(regulome.getRegulomeKBaseId()),
+				getDatasetId(regulome.getRegulomeId()),
 				regulome.getGenomeName(),
 				"Regulome for " + regulome.getGenomeName() + " genome.",
 				NetworkType.REGULATORY_NETWORK,
@@ -304,11 +243,12 @@ public class RegPreciseAdaptor implements Adaptor{
 			);		
 	}
 	
+	/*
 	private Dataset buildDataset(Regulome regulome) {
 		List<Taxon> taxons = Arrays.asList(new Taxon(regulome.getGenome().getKbaseId()));		
 		return 
 			new Dataset(
-					getDatasetId(regulome.getKbaseId()),
+					getDatasetId(regulome.getId()),
 					regulome.getGenome().getName(),
 					"Regulome for " + regulome.getGenome().getName() + " genome.",
 					NetworkType.REGULATORY_NETWORK,
@@ -316,6 +256,7 @@ public class RegPreciseAdaptor implements Adaptor{
 					taxons
 		);		
 	}
+	*/
 	
 	private ConstrainedDataProvider getDataProvider()
 	{
@@ -326,31 +267,18 @@ public class RegPreciseAdaptor implements Adaptor{
 		return dataProvider; 
 	}
 
-	private String getRegulomeId(String datasetId) {
-		return datasetId.substring(DATASET_ID_PREFIX.length());
-	}
 		
-	private String getDatasetId(String regulomeId) {
-		return DATASET_ID_PREFIX + regulomeId;
+	private String getDatasetId(int regulomeId) {
+		return IdGenerator.Dataset.toKBaseId(ADAPTOR_PREFIX, "" + regulomeId);
 	}		
-	
-	private String getNodeId() {
-		return NODE_ID_PREFIX + (uniqueIndex ++);
-	}
-	
-	private String getEdgeId() {
-		return EDGE_ID_PREFIX + (uniqueIndex++);
-	}
 
-	private String getNetworkId() {
-		return NETWORK_ID_PREFIX + (uniqueIndex++);
-	}	
-	
+	/*
 	private Regulome getRegulome(ConstrainedDataProvider dataProvider, Dataset dataset)
 	{
 		String regulomeId = getRegulomeId(dataset.getId());		
 		return dataProvider.getRegulomeByKbaseId(regulomeId);
 	}
+	*/
 
 	
 	private Set<EdgeType> getEdgeTypesSet(List<EdgeType> edgeTypes) {
@@ -362,7 +290,7 @@ public class RegPreciseAdaptor implements Adaptor{
 	private Node buildGeneNode(KBaseGeneDTO gene) {
 		
 		Node node = Node.buildGeneNode(
-				getNodeId(), 
+				IdGenerator.Node.nextId(), 
 				gene.getName(), 
 				new Entity(gene.getKbaseId(), EntityType.GENE));
 		if(gene.getLocusTag() != null)
@@ -374,7 +302,7 @@ public class RegPreciseAdaptor implements Adaptor{
 	
 	private Node buildRegulonNode(KBaseRegulonDTO regulon) {
 		 Node node = Node.buildClusterNode(
-				 getNodeId(), 
+				 IdGenerator.Node.nextId(), 
 				 regulon.getRegulatorName() + " regulon" , 
 				 new Entity(regulon.getKbaseId(), EntityType.REGULON));
 		 
@@ -384,7 +312,7 @@ public class RegPreciseAdaptor implements Adaptor{
 
 	private Node buildRegulatorNode(KBaseRegulatorDTO regulator) {
 		Node node = Node.buildGeneNode(
-				getNodeId(), 
+				IdGenerator.Node.nextId(), 
 				regulator.getName(),
 				new Entity(regulator.getKbaseId(), EntityType.GENE));
 		
@@ -399,26 +327,26 @@ public class RegPreciseAdaptor implements Adaptor{
 
 	private Edge buildGeneRegulonEdge(KBaseRegulonDTO regulon, KBaseGeneDTO queryGene,
 			Dataset dataset) {
-		Edge edge =  new Edge(getEdgeId(), EDGE_MEMBER_OF_REGULON, dataset);
+		Edge edge =  new Edge(IdGenerator.Edge.nextId(), EDGE_MEMBER_OF_REGULON, dataset);
 		//TODO add edge properties
 		return edge;
 	}	
 	
 	private Edge buildGeneRegulatorEdge(KBaseRegulatorDTO regulator, KBaseGeneDTO queryGene,
 			Dataset dataset) {
-		Edge edge =  new Edge(getEdgeId(), EDGE_REGULATED_BY, dataset);
+		Edge edge =  new Edge(IdGenerator.Edge.nextId(), EDGE_REGULATED_BY, dataset);
 		//TODO add edge properties		
 		return edge;
 	}
 	
 	private Edge buildGeneGeneEdge(KBaseGeneDTO targetGene, KBaseGeneDTO queryGene, Dataset dataset) {
-		Edge edge =  new Edge(getEdgeId(), EDGE_CO_REGUALTED, dataset);
+		Edge edge =  new Edge(IdGenerator.Edge.nextId(), EDGE_CO_REGUALTED, dataset);
 		//TODO add edge properties		
 		return edge;
 	}
 	
 	private Edge buildGeneGeneEdge(KBaseGene2GeneDTO genePair, Dataset dataset) {
-		Edge edge =  new Edge(getEdgeId(), EDGE_CO_REGUALTED + ": " + genePair.getRegulatorName(), dataset);
+		Edge edge =  new Edge(IdGenerator.Edge.nextId(), EDGE_CO_REGUALTED + ": " + genePair.getRegulatorName(), dataset);
 		//TODO add edge properties		
 		return edge;
 	}

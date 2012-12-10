@@ -4,6 +4,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.adaptor.AdaptorFactory;
 import us.kbase.networks.adaptor.genericMySQL.GenericMySQLAdaptor;
 
@@ -21,5 +22,4 @@ public  class PlantRNAdaptorFactory implements AdaptorFactory {
     	} 
     	return null;
 	}
-
 }

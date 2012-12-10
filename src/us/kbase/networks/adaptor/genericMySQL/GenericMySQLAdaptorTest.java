@@ -1,10 +1,11 @@
 package us.kbase.networks.adaptor.genericMySQL;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStream;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
@@ -13,23 +14,23 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.EdgeType;
+import us.kbase.networks.core.Entity;
+import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.NodeType;
 import us.kbase.networks.core.Taxon;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GenericMySQLAdaptorTest {
 
@@ -133,7 +134,6 @@ public class GenericMySQLAdaptorTest {
 			assertEquals("Return one dataset?", dl.size(), 1);
 			assertEquals("The same dataset?", dl.get(0), dataset); 
 			assertEquals("Just id same?", dl.get(0).getId(), dataset.getId());
-			NetworksUtil.printDatasets("", dl);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
@@ -178,11 +178,11 @@ public class GenericMySQLAdaptorTest {
 	public void testBuildFirstNeighborNetworkDatasetString() throws AdaptorException {
 
 		// empty result test
-		Network n1 = adaptor.buildFirstNeighborNetwork(dataset, "AT5G03240");
+		Network n1 = adaptor.buildFirstNeighborNetwork(dataset, new Entity("AT5G03240", EntityType.GENE));
 		assertTrue("Returned results", n1.getGraph().getVertexCount() == 1);
 
 		// at least one result
-		Network n2 = adaptor.buildFirstNeighborNetwork(dataset, "AT5G22340");
+		Network n2 = adaptor.buildFirstNeighborNetwork(dataset, new Entity("AT5G22340", EntityType.GENE));
 		assertTrue("Returned results", n2.getGraph().getVertexCount() > 1);	
 	}
 

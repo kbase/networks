@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import us.kbase.networks.adaptor.Adaptor;
@@ -30,17 +29,22 @@ public class ModelSEEDTest {
 	final String genomeId = "kb|g.21765";
 	
 //	final String queryGeneId = "kb|g.0.peg.10";
-	final String queryGeneId = "kb|g.21765.CDS.967"; 
+	final Entity queryGene = new Entity("kb|g.21765.CDS.967", EntityType.GENE); 
 	
 //	final List<String> queryGeneIds = Arrays.asList("kb|g.0.peg.10",      "kb|g.0.peg.1032",     "kb|g.0.peg.1002",     "kb|g.0.peg.880", "kb|g.0.peg.847",      "kb|g.0.peg.843",      "kb|g.0.peg.1247");
-	final List<String> queryGeneIds = Arrays.asList("kb|g.21765.CDS.967", "kb|g.21765.CDS.2797", "kb|g.21765.CDS.2666",                   "kb|g.21765.CDS.1814", "kb|g.21765.CDS.2426", "kb|g.21765.CDS.2043"); 
+	final List<Entity> queryGenes = Arrays.asList(
+			new Entity("kb|g.21765.CDS.967", EntityType.GENE), 
+			new Entity("kb|g.21765.CDS.2797", EntityType.GENE), 
+			new Entity("kb|g.21765.CDS.2666", EntityType.GENE),                   
+			new Entity("kb|g.21765.CDS.1814", EntityType.GENE), 
+			new Entity("kb|g.21765.CDS.2426", EntityType.GENE), 
+			new Entity("kb|g.21765.CDS.2043", EntityType.GENE)); 
 	
 	
-	
-	@Before
-	public void setUp() throws Exception {
+	public ModelSEEDTest() throws Exception {
 		adaptor = new ModelSEEDAdaptorFactory().buildAdaptor();
 	}
+	
 	
 	@Test
 	public void shouldReturnDataSetForEcoli() throws AdaptorException {
@@ -56,7 +60,7 @@ public class ModelSEEDTest {
 	
 	@Test
 	public void shouldReturnDataSetForEcoliGene() throws AdaptorException {
-		List<Dataset> datasets = adaptor.getDatasets(new Entity(queryGeneId, EntityType.GENE));
+		List<Dataset> datasets = adaptor.getDatasets(queryGene);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
 		for (Dataset dataset : datasets) {
@@ -71,7 +75,7 @@ public class ModelSEEDTest {
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
-		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), queryGeneId);
+		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), queryGene);
 		assertNotNull("Should get a network back", network);
 		Graph<Node,Edge> g = network.getGraph();
 		assertNotNull("Network should have graph", g);
@@ -81,15 +85,15 @@ public class ModelSEEDTest {
 	
 	@Test
 	public void shouldReturnNetworkForEcoliGenes() throws AdaptorException {
-		Taxon ecoli = new Taxon("kb|g.0");
+		Taxon ecoli = new Taxon(genomeId);
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
-		Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGeneIds);
+		Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
 		assertNotNull("Should get a network back", network);
 		Graph<Node,Edge> g = network.getGraph();
 		assertNotNull("Network should have graph", g);
 		assertEquals("Graph should have 11 edges", g.getEdgeCount(), 11);
-		assertEquals("Graph should have " + queryGeneIds.size() + " nodes", g.getVertexCount(), queryGeneIds.size());
+		assertEquals("Graph should have " + queryGenes.size() + " nodes", g.getVertexCount(), queryGenes.size());
 	}
 }

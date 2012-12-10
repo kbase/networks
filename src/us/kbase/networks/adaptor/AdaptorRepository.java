@@ -22,15 +22,13 @@ public class AdaptorRepository {
 		// Register all adaptors; property file in the future
 		
 		registerAdaptor(new RegPreciseAdaptorFactory());
-		
 		registerAdaptor(new ModelSEEDAdaptorFactory());
-/*		
 		registerAdaptor(new PPIAdaptorFactory());	
 		registerAdaptor(new MAKAdaptorFactory());
 		registerAdaptor(new PlantPPIAdaptorFactory());		
 		registerAdaptor(new PlantFAAdaptorFactory());		
 		registerAdaptor(new PlantRNAdaptorFactory());
-*/				
+				
 	}
 	
 	public static AdaptorRepository getAdaptorRepository() throws AdaptorException

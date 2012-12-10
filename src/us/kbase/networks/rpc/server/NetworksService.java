@@ -127,7 +127,8 @@ public class NetworksService {
     	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
     	List<us.kbase.networks.core.Dataset> datasets = getDatasets(datasetIds);
     	
-    	us.kbase.networks.core.Network network = api.buildFirstNeighborNetwork(datasets, geneId, edgeTypes);
+    	Entity entity = new Entity(geneId, EntityType.GENE);    	
+    	us.kbase.networks.core.Network network = api.buildFirstNeighborNetwork(datasets, entity, edgeTypes);
     	
     	return toClientNetwork(network);
     }
@@ -147,8 +148,9 @@ public class NetworksService {
     {
     	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
     	List<us.kbase.networks.core.Dataset> datasets = getDatasets(datasetIds);
-    	
-    	us.kbase.networks.core.Network network = api.buildInternalNetwork(datasets, geneIds, edgeTypes);
+    	List<Entity> entities = Entity.toEntities(geneIds, EntityType.GENE);    	
+
+    	us.kbase.networks.core.Network network = api.buildInternalNetwork(datasets, entities, edgeTypes);
     	
     	return toClientNetwork(network);
     }

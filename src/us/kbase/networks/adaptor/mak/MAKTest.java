@@ -1,21 +1,28 @@
 package us.kbase.networks.adaptor.mak;
 
-import edu.uci.ics.jung.graph.Graph;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
-import us.kbase.networks.adaptor.modelseed.ModelSEEDAdaptorFactory;
-import us.kbase.networks.core.*;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import us.kbase.networks.core.Dataset;
+import us.kbase.networks.core.DatasetSource;
+import us.kbase.networks.core.Edge;
+import us.kbase.networks.core.Entity;
+import us.kbase.networks.core.EntityType;
+import us.kbase.networks.core.Network;
+import us.kbase.networks.core.NetworkType;
+import us.kbase.networks.core.Node;
+import us.kbase.networks.core.Taxon;
+import edu.uci.ics.jung.graph.Graph;
 
 /**
  * Created by Marcin Joachimiak
@@ -31,37 +38,37 @@ public class MAKTest {
     final String genomeId = "kb|g.20848";//g.21765";
 
 //	final String queryGeneId = "kb|g.0.peg.10";
-    final String queryGeneId = "kb|g.20848.CDS.578 ";
+    final Entity queryGene = new Entity("kb|g.20848.CDS.578", EntityType.GENE);
 
 //	final List<String> queryGeneIds = Arrays.asList("kb|g.0.peg.10",      "kb|g.0.peg.1032",     "kb|g.0.peg.1002",
 // "kb|g.0.peg.880", "kb|g.0.peg.847",      "kb|g.0.peg.843",      "kb|g.0.peg.1247");
-    final List<String> queryGeneIds = Arrays.asList(
-            "kb|g.20848.CDS.578 ",
-            "kb|g.20848.CDS.47  ",
-            "kb|g.20848.CDS.769 ",
-            "kb|g.20848.CDS.669 ",
-            "kb|g.20848.CDS.406 ",
-            "kb|g.20848.CDS.1347",
-            "kb|g.20848.CDS.1304",
-            "kb|g.20848.CDS.1130",
-            "kb|g.20848.CDS.1303",
-            "kb|g.20848.CDS.1995",
-            "kb|g.20848.CDS.1083",
-            "kb|g.20848.CDS.1127",
-            "kb|g.20848.CDS.1030",
-            "kb|g.20848.CDS.1732",
-            "kb|g.20848.CDS.2281",
-            "kb|g.20848.CDS.2680",
-            "kb|g.20848.CDS.2473",
-            "kb|g.20848.CDS.2290",
-            "kb|g.20848.CDS.2498",
-            "kb|g.20848.CDS.2369",
-            "kb|g.20848.CDS.2176",
-            "kb|g.20848.CDS.2914",
-            "kb|g.20848.CDS.3647",
-            "kb|g.20848.CDS.3564",
-            "kb|g.20848.CDS.3769",
-            "kb|g.20848.CDS.3862"
+    final List<Entity> queryGenes = Arrays.asList(
+    		new Entity("kb|g.20848.CDS.578 ", EntityType.GENE),
+    		new Entity("kb|g.20848.CDS.47  ", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.769 ", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.669 ", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.406 ", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.1347", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.1304", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.1130", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.1303", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.1995", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.1083", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.1127", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.1030", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.1732", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.2281", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.2680", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.2473", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.2290", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.2498", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.2369", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.2176", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.2914", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.3647", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.3564", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.3769", EntityType.GENE),
+    	    new Entity("kb|g.20848.CDS.3862", EntityType.GENE)
     );
 
 
@@ -89,7 +96,7 @@ public class MAKTest {
 
     @Test
     public void shouldReturnDataSetForSOMR1Gene() throws AdaptorException {
-        List<Dataset> datasets = adaptor.getDatasets(new Entity(queryGeneId, EntityType.GENE));
+        List<Dataset> datasets = adaptor.getDatasets(queryGene);
         assertNotNull("should return a list of Datasets", datasets);
         assertTrue("list should contain at least one dataset", datasets.size() > 0);
         for (Dataset dataset : datasets) {
@@ -106,7 +113,7 @@ public class MAKTest {
         List<Dataset> datasets = adaptor.getDatasets(NetworkType.REGULATORY_NETWORK, DatasetSource.MAK_BICLUSTER, taxid);
         assertNotNull("should return a list of Datasets", datasets);
         assertTrue("list should contain at least one dataset", datasets.size() > 0);
-        Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), queryGeneId);
+        Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), queryGene);
         assertNotNull("Should get a network back", network);
         Graph<Node, Edge> g = network.getGraph();
         assertNotNull("Network should have graph", g);
@@ -121,11 +128,11 @@ public class MAKTest {
         assertNotNull("should return a list of Datasets for "+genomeId, datasets);
         assertTrue("list should contain at least one dataset for "+genomeId, datasets.size() > 0);
 
-        Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGeneIds);
+        Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
         assertNotNull("Should get a network back", network);
         Graph<Node, Edge> g = network.getGraph();
         assertNotNull("Network should have graph", g);
         assertEquals("Graph should have X edges", g.getEdgeCount(), 11);
-        assertEquals("Graph should have " + queryGeneIds.size() + " nodes", g.getVertexCount(), queryGeneIds.size());
+        assertEquals("Graph should have " + queryGenes.size() + " nodes", g.getVertexCount(), queryGenes.size());
     }
 }
