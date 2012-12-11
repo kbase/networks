@@ -138,13 +138,11 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 			jg.writeFieldName("datasets");
 			jg.writeStartArray();
 			
-/*
- * PSN: We will provide it once we can load new instances of datasets; otherwise only "id" property is not null 
- * 			
+		
 			for(Dataset dataset : datasetList) {
 				dser.serialize(dataset, jg, sp);
 			}
-*/			
+			
 			jg.writeEndArray();
 
 	

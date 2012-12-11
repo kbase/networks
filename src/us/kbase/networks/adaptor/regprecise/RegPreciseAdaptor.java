@@ -110,7 +110,10 @@ public class RegPreciseAdaptor extends AbstractAdaptor{
 			{
 				// Collect first-neighbor clusters (regulons)
 				List<KBaseRegulonDTO> regulons = getRegulons(dataProvider, queryGene);
-								
+					
+				System.out.println("Query gene: " + queryGene.getKbaseId() 
+						+ " has regulons " + (regulons != null? "" + regulons.size() : regulons) 
+						+ " in the dataset " + dataset.getId());
 				// Add cluster nodes and edges
 				for(KBaseRegulonDTO regulon: regulons)
 				{
