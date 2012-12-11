@@ -23,7 +23,7 @@
          <war destfile="${dist.dir}/${name}.war"
              webxml="${web.dir}/WEB-INF/web.xml">
              <lib dir="${basedir}/lib"/>
-             <classes dir="${build.dir}/classes" includes="**/*.properties" />
+             <classes dir="${build.dir}/classes" />
 	     <fileset dir="${web.dir}">
 	       <include name="**/*.*"/>
 	     </fileset>
