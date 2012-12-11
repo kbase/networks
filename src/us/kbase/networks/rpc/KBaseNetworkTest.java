@@ -14,45 +14,42 @@ import us.kbase.networks.rpc.client.Network;
 
 public class KBaseNetworkTest {
 
-	String url = "http://127.0.0.1:8080/KBaseNetworksRPC/networks";
-//	String url = "http://140.221.92.147:8080/KBaseNetworksRPC/networks";
+//	String url = "http://127.0.0.1:8080/KBaseNetworksRPC/networks";
+	String url = "http://140.221.92.181:7064/KBaseNetworksRPC/networks";
 //	String url = "http://127.0.0.1:7064/KBaseNetworksRPC/networks";
 	KBaseNetworks networksAPI;
 		
 	
 	@Before
 	public void setUp() throws Exception {
-		System.out.println("Building Networks API...");
 		networksAPI = new KBaseNetworks(url);
-		System.out.println("Done!");
 	}
 
 	@After
 	public void tearDown() throws Exception {
 	}
 
-	@Test
+	//@Test
 	public void testAllDatasets() throws Exception {
 		List<Dataset> datasets = networksAPI.allDatasets(); 
 		printDatasets("testAllDatasets", datasets);
 	}
 
-
-	@Test
+	//@Test
 	public void testAllDatasetSources() throws Exception {
 		List<DatasetSource> dsSources = networksAPI.allDatasetSources(); 
 		printDatasetSources("testAllDatasetSources", dsSources);
 	}
 
 
-	@Test
+	//@Test
 	public void testAllNetworkTypes() throws Exception {
 		List<String> networkTypes = networksAPI.allNetworkTypes(); 
 		printStrings("testAllNetworkTypes", networkTypes);
 	}
 
 
-	@Test
+	//@Test
 	public void testDatasetSource2Datasets() throws Exception {
 		List<Dataset> datasets = networksAPI.datasetSource2Datasets("MODELSEED"); 
 		printDatasets("testDatasetSource2Datasets", datasets);
@@ -78,7 +75,20 @@ public class KBaseNetworkTest {
 
 	@Test
 	public void testBuildFirstNeighborNetwork() throws Exception {
-		Network network = networksAPI.buildFirstNeighborNetwork(Arrays.asList("kb|netdataset.kb|fm.0"), "kb|g.21765.CDS.543", Arrays.asList("GENE_CLUSTER")); 
+//		Network network = networksAPI.buildFirstNeighborNetwork(Arrays.asList("kb|netdataset.modelseed.0"), "kb|g.21765.CDS.543", Arrays.asList("GENE_CLUSTER")); 
+//		printNetwork("testBuildFirstNeighborNetwork", network);
+		
+		
+						
+		Network network = networksAPI.buildFirstNeighborNetwork(
+				Arrays.asList(
+						"kb|netdataset.regprecise.301", 
+						"kb|netdataset.modelseed.0",
+						"kb|netdataset.ppi.7"
+				), 
+				"kb|g.21765.CDS.543", 
+				Arrays.asList("GENE_CLUSTER"));
+				
 		printNetwork("testBuildFirstNeighborNetwork", network);
 	}
 
@@ -135,6 +145,7 @@ public class KBaseNetworkTest {
 				+ "\t Nodes count: " + network.nodes.size()
 				+ "\t Edges count: " + network.edges.size()
 				);
+		printDatasets("Network datasets", network.datasets);
 	}
 	
 }

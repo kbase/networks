@@ -26,11 +26,11 @@ public class NetworksAPIDemo {
 		
 		// Shewnalla: two adapters work together (RegPrecise, MAK)
 		
-//		testAdaptor_buildFirstNeighborNetwork(new RegPreciseAdaptorFactory().buildAdaptor(), 
-//				"kb|g.20848", "kb|g.20848.CDS.1671", Arrays.asList(EdgeType.GENE_GENE));
+		testAdaptor_buildFirstNeighborNetwork(new RegPreciseAdaptorFactory().buildAdaptor(), 
+				"kb|g.20848", "kb|g.20848.CDS.1671", Arrays.asList(EdgeType.GENE_GENE));
 		
 		// Ecoli: three adaptors work together (ModelSEED, PPI, RegPrecise)
-		test_buildFirstNeighborNetwork("kb|g.21765", "kb|g.21765.CDS.543", Arrays.asList(EdgeType.GENE_CLUSTER));
+//		test_buildFirstNeighborNetwork("kb|g.21765", "kb|g.21765.CDS.543", Arrays.asList(EdgeType.GENE_CLUSTER));
 		
 		// Shewnalla: two adapters work together (RegPrecise, MAK)
 		//test_buildFirstNeighborNetwork("kb|g.20848", "kb|g.20848.CDS.1671", Arrays.asList(EdgeType.GENE_GENE));
@@ -55,7 +55,7 @@ public class NetworksAPIDemo {
 		
 		List<Dataset> datasets = api.getDatasets(taxon);
 		NetworksUtil.printDatasets("", datasets);
-		Network network = api.buildInternalNetwork(datasets, Entity.toEntities(geneIds, EntityType.GENE) , Arrays.asList(EdgeType.GENE_GENE));
+		Network network = api.buildInternalNetwork(Dataset.toDatasetIds(datasets), Entity.toEntities(geneIds, EntityType.GENE) , Arrays.asList(EdgeType.GENE_GENE));
 		
 		NetworksUtil.printNetwork(network);
 		NetworksUtil.visualizeNetwork(network.getGraph());	
@@ -76,7 +76,7 @@ public class NetworksAPIDemo {
 		NetworksUtil.printDatasets(genomeId, datasets);
 		
 		Network network = 
-			api.buildFirstNeighborNetwork(datasets, new  Entity(geneId, EntityType.GENE), edgeTypes);
+			api.buildFirstNeighborNetwork(Dataset.toDatasetIds(datasets), new  Entity(geneId, EntityType.GENE), edgeTypes);
 		
 		NetworksUtil.printNetwork(network);
 		NetworksUtil.visualizeNetwork(network.getGraph());	

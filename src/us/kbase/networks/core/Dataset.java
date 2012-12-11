@@ -1,5 +1,6 @@
 package us.kbase.networks.core;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,15 @@ public class Dataset {
 	
 	private Map<String,String> properties = new Hashtable<String,String>();
 
+	public static List<String> toDatasetIds(List<Dataset> datasets)
+	{
+		List<String> ids = new ArrayList<String>();
+		for(Dataset ds: datasets)
+		{
+			ids.add(ds.getId());
+		}
+		return ids;
+	}
 
 	public Dataset(String id, String name, String description,
 			NetworkType networkType, DatasetSource datasetSource,

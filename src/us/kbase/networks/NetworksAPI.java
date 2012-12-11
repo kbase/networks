@@ -15,6 +15,7 @@ import edu.uci.ics.jung.graph.util.Pair;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.adaptor.AdaptorRepository;
+import us.kbase.networks.adaptor.IdGenerator;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
@@ -107,12 +108,13 @@ public class NetworksAPI {
 		return datasets;
 	}	
 			
-	public Network buildNetwork(Dataset dataset) throws AdaptorException
+	public Network buildNetwork(String datasetId) throws AdaptorException
 	{
 		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
 		{					
-			if(adaptor.hasDataset(dataset.getId()) )
+			if(adaptor.hasDataset(datasetId) )
 			{
+				Dataset dataset = adaptor.getDataset(datasetId);
 				return adaptor.buildNetwork(dataset);
 			}
 		}	
@@ -120,16 +122,17 @@ public class NetworksAPI {
 	}
 	
 	
-	public Network buildFirstNeighborNetwork(List<Dataset> datasets, Entity entity,
+	public Network buildFirstNeighborNetwork(List<String> datasetIds, Entity entity,
 			List<EdgeType> edgeTypes) throws AdaptorException 
 	{		
 		List<Network> networks = new Vector<Network>();
-		for(Dataset dataset: datasets)
+		for(String datasetId: datasetIds)
 		{
 			for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
 			{
-				if(adaptor.hasDataset(dataset.getId()) )
+				if(adaptor.hasDataset(datasetId) )
 				{
+					Dataset dataset = adaptor.getDataset(datasetId);
 					Network network = adaptor.buildFirstNeighborNetwork(dataset, entity, edgeTypes);
 					if(network != null)
 					{
@@ -139,20 +142,21 @@ public class NetworksAPI {
 			}
 		}			
 		
-		return buildUnionNetwork(networks);		
+		return buildUnionNetwork("First neighbour network", networks);		
 	}
 
-	public Network buildInternalNetwork(List<Dataset> datasets, List<Entity> entities,
+	public Network buildInternalNetwork(List<String> datasetIds, List<Entity> entities,
 			List<EdgeType> edgeTypes) throws AdaptorException 
 	{		
 		List<Network> networks = new Vector<Network>();
 		
-		for(Dataset dataset: datasets)
+		for(String datasetId: datasetIds)
 		{
 			for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
 			{
-				if(adaptor.hasDataset(dataset.getId()) )
+				if(adaptor.hasDataset(datasetId) )
 				{
+					Dataset dataset = adaptor.getDataset(datasetId);
 					Network network = adaptor.buildInternalNetwork(dataset, entities, edgeTypes);
 					if(network != null)
 					{
@@ -162,17 +166,17 @@ public class NetworksAPI {
 			}
 		}			
 		
-		return buildUnionNetwork(networks);		
+		return buildUnionNetwork("Internal network",networks);		
 	}
 	
 	
 	
-	private Network buildUnionNetwork(List<Network> networks) {
+	private Network buildUnionNetwork(String name, List<Network> networks) {
 		Hashtable<String, Node> entityId2NodeHash =
 			getNonredundantEntityId2NodeHash(networks);
 			
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
-		Network network = new Network("kb|network.NNN", "", graph);
+		Network network = new Network(IdGenerator.Network.nextId(), name, graph);
 		
 		// Add all nodes
 		for(Node node: entityId2NodeHash.values())
@@ -238,17 +242,17 @@ public class NetworksAPI {
 		return entityId2NodeHash;
 	}
 
-	public Network buildFirstNeighborNetwork(List<Dataset> datasets,
-			String geneId, List<EdgeType> edgeTypes, float cutOff) {
-		Network network = buildFirstNeighborNetwork(datasets, geneId, edgeTypes, cutOff);
+	public Network buildFirstNeighborNetwork(List<String> datasetIds,
+			Entity entity, List<EdgeType> edgeTypes, float cutOff) throws AdaptorException {
+		Network network = buildFirstNeighborNetwork(datasetIds, entity, edgeTypes);
     	cutOffNetwork(network, cutOff);
 		return network;
 	}
 	
 
-	public Network buildInternalNetwork(List<Dataset> datasets,
-			List<String> geneIds, List<EdgeType> edgeTypes, float cutOff) {
-		Network network = buildInternalNetwork(datasets, geneIds, edgeTypes, cutOff);
+	public Network buildInternalNetwork(List<String> datasetIds,
+			List<Entity> entities, List<EdgeType> edgeTypes, float cutOff) throws AdaptorException {
+		Network network = buildInternalNetwork(datasetIds, entities, edgeTypes);
     	cutOffNetwork(network, cutOff);
 		return network;
 	}	
