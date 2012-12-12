@@ -6,13 +6,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import us.kbase.CDMI.CDMI_API;
 import us.kbase.CDMI.CDMI_EntityAPI;
 import us.kbase.CDMI.fields_Model;
 import us.kbase.CDMI.fields_Subsystem;
+import us.kbase.CDMI.row;
 import us.kbase.CDMI.tuple_118;
 import us.kbase.CDMI.tuple_132;
 import us.kbase.CDMI.tuple_136;
@@ -36,6 +39,7 @@ import edu.uci.ics.jung.graph.SparseMultigraph;
 public class ModelSEEDAdaptor extends AbstractAdaptor {
 
 	private CDMI_EntityAPI cdmi;
+	private CDMI_API cdmiAPI;
 	public static final String ADAPTOR_PREFIX = "modelseed";
 
 	
@@ -50,32 +54,32 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 		} catch (MalformedURLException e) {
 			throw new AdaptorException("Unable to initialize CDMI_EntityAPI", e);
 		}
+		try {
+			this.cdmiAPI = new CDMI_API("http://bio-data-1.mcs.anl.gov/services/cdmi_api");
+		} catch (MalformedURLException e) {
+			throw new AdaptorException("Unable to initialize CDMI_API", e);
+		}
 		super.init();
 	}
 	
 	@Override
 	protected List<Dataset> loadDatasets() throws AdaptorException {
 		List<Dataset> datasets = new ArrayList<Dataset>();
-
 		try {
 			Map<String, fields_Model> models = cdmi.all_entities_Model(0, Integer.MAX_VALUE, Arrays.asList("id", "name"));
+			List<String> modelids = new ArrayList<String>(models.keySet());
+			List<tuple_132> returned = cdmi.get_relationship_Models(modelids, new ArrayList<String>(), 
+					new ArrayList<String>(), Arrays.asList("id"));
+			Iterator<tuple_132> it = returned.iterator();
 
-			for (String id : models.keySet()) {
-				
-				//TODO remove after optimization. To avoid 5000 server calls.
-				//{
-				if(datasets.size() > 10) break;
-				//}
-				
-				
-				
+			for (String id : modelids) {
 				String name = models.get(id).name;
-				List<tuple_132> genomeIds = cdmi.get_relationship_Models(Arrays.asList(id), new ArrayList<String>(), 
-						new ArrayList<String>(), Arrays.asList("id"));
-				List<Taxon> taxons = new ArrayList<Taxon>();
-				for (tuple_132 tuple : genomeIds) {
-					taxons.add(new Taxon(tuple.e_3.id));
+
+				if (! it.hasNext()) {
+					throw new AdaptorException("No genome info for model: " + id);
 				}
+				List<Taxon> taxons = new ArrayList<Taxon>();
+				taxons.add(new Taxon(it.next().e_3.id));
 				
 				String localId = IdGenerator.toLocalId(id);
 				datasets.add(new Dataset(
@@ -84,20 +88,7 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 						"Subsystems for " + name + " genome.", 
 						NetworkType.METABOLIC_SUBSYSTEM, 
 						DatasetSource.MODELSEED, taxons));
-			}
-			
-			//TODO remove after optimization. E.coli dataset is added "manually" because not all models are considered
-			//{
-			datasets.add(new Dataset(
-					IdGenerator.Dataset.toKBaseId(ADAPTOR_PREFIX, "0"),
-					"E.coli", 
-					"Subsystems for " + "E.coli" + " genome.", 
-					NetworkType.METABOLIC_SUBSYSTEM, 
-					DatasetSource.MODELSEED, Arrays.asList(new Taxon("kb|g.0"))));
-			//}
-			
-			
-			
+			}	
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 			throw new AdaptorException("Error while getting models", e);
@@ -214,21 +205,49 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity, List<EdgeType> edgeTypes) throws AdaptorException {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
 		Network network = new Network(IdGenerator.Network.nextId(), "", graph);	
-		Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), entity.getId(), new Entity(entity.getId(), EntityType.GENE));
-		graph.addVertex(geneNode);
-		if( !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
-		{
-			return network;
-		}
 
-		for (fields_Subsystem fs : getSubsystemFieldsForGene(entity.getId())) {
-			Node ssNode = Node.buildClusterNode(IdGenerator.Node.nextId(), fs.id, new Entity(fs.id, EntityType.SUBSYSTEM));
-			graph.addVertex(ssNode);
-			Edge edge = new Edge(IdGenerator.Edge.nextId(), "Member of subsystem", dataset);
-			graph.addEdge(edge, ssNode, geneNode, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+		if(edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
+			if (entity.getType() == EntityType.GENE) {
+				Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), entity.getId(), new Entity(entity.getId(), EntityType.GENE));
+				graph.addVertex(geneNode);
+				for (fields_Subsystem fs : getSubsystemFieldsForGene(entity.getId())) {
+					Node ssNode = Node.buildClusterNode(IdGenerator.Node.nextId(), fs.id, new Entity(fs.id, EntityType.SUBSYSTEM));
+					graph.addVertex(ssNode);
+					Edge edge = new Edge(IdGenerator.Edge.nextId(), "Member of subsystem", dataset);
+					graph.addEdge(edge, ssNode, geneNode, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+				}
+			}
+			else if (entity.getType() == EntityType.SUBSYSTEM) {
+				Node ssNode = Node.buildClusterNode(IdGenerator.Node.nextId(), entity.getId(), entity);
+				graph.addVertex(ssNode);
+				for (String geneId : getGenesForSubsystem(entity.getId(), dataset.getTaxons().get(0).getGenomeId())) {
+					Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), geneId, new Entity(geneId, EntityType.GENE));
+					Edge edge = new Edge(IdGenerator.Edge.nextId(), "Member of subsystem", dataset);
+					graph.addEdge(edge, ssNode, geneNode, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+				}	
+			}
 		}
-
 		return network;
+		
+		// $return = $obj->subsystems_to_fids($subsystems, $genomes)
+	}
+	
+	private Set<String> getGenesForSubsystem(String ssId, String genomeId) throws AdaptorException {
+		Set<String> geneIds = new HashSet<String>();
+		try {
+			Map<String, Map<String, row>> returned = cdmiAPI.subsystems_to_spreadsheets(Arrays.asList(ssId), Arrays.asList(genomeId));
+			for (Map<String, row> rows : returned.values()) {
+				for (row r : rows.values()) {
+					for (List<String> fids : r.e_2.values()) {
+						geneIds.addAll(fids);
+					}
+				}
+			}
+			
+		} catch (Exception e) {
+			throw new AdaptorException("Error getting subsystem genes for " + ssId, e);
+		}
+		return geneIds;
 	}
 
 	private Collection<fields_Subsystem> getSubsystemFieldsForGene(String geneId) throws AdaptorException {

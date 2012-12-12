@@ -30,6 +30,7 @@ public class ModelSEEDTest {
 	
 //	final String queryGeneId = "kb|g.0.peg.10";
 	final Entity queryGene = new Entity("kb|g.21765.CDS.967", EntityType.GENE); 
+	final Entity querySS = new Entity("Nitrate and nitrite ammonification", EntityType.SUBSYSTEM);
 	
 //	final List<String> queryGeneIds = Arrays.asList("kb|g.0.peg.10",      "kb|g.0.peg.1032",     "kb|g.0.peg.1002",     "kb|g.0.peg.880", "kb|g.0.peg.847",      "kb|g.0.peg.843",      "kb|g.0.peg.1247");
 	final List<Entity> queryGenes = Arrays.asList(
@@ -81,6 +82,20 @@ public class ModelSEEDTest {
 		assertNotNull("Network should have graph", g);
 		assertEquals("Graph should have 2 edges", g.getEdgeCount(), 2);
 		assertEquals("Graph should have 3 nodes", g.getVertexCount(), 3);
+	}
+	
+	@Test
+	public void shouldReturnNetworkForEcoliSubsystem() throws AdaptorException {
+		Taxon ecoli = new Taxon(genomeId);
+		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
+		assertNotNull("should return a list of Datasets", datasets);
+		assertTrue("list should contain at least one dataset", datasets.size() > 0);
+		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), querySS);
+		assertNotNull("Should get a network back", network);
+		Graph<Node,Edge> g = network.getGraph();
+		assertNotNull("Network should have graph", g);
+		assertEquals("Graph should have 31 edges", g.getEdgeCount(), 31);
+		assertEquals("Graph should have 32 nodes", g.getVertexCount(), 32);
 	}
 	
 	@Test
