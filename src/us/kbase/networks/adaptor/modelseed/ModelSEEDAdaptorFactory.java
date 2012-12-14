@@ -28,6 +28,7 @@ public class ModelSEEDAdaptorFactory implements AdaptorFactory {
 	    					new Class[]{Adaptor.class}, 
 	    					invHandler); 
 	    } catch (Exception ex) {
+	    	ex.printStackTrace(System.err);
 	    	throw new AdaptorException(ex.getMessage(), ex);
 	    } 	
 	    return proxyAdaptor;

@@ -13,13 +13,13 @@ import java.util.Set;
 
 import us.kbase.CDMI.CDMI_API;
 import us.kbase.CDMI.CDMI_EntityAPI;
+import us.kbase.CDMI.CDMI_EntityAPI_tuple_120;
+import us.kbase.CDMI.CDMI_EntityAPI_tuple_134;
+import us.kbase.CDMI.CDMI_EntityAPI_tuple_138;
+import us.kbase.CDMI.CDMI_EntityAPI_tuple_85;
 import us.kbase.CDMI.fields_Model;
 import us.kbase.CDMI.fields_Subsystem;
 import us.kbase.CDMI.row;
-import us.kbase.CDMI.tuple_118;
-import us.kbase.CDMI.tuple_132;
-import us.kbase.CDMI.tuple_136;
-import us.kbase.CDMI.tuple_83;
 import us.kbase.networks.adaptor.AbstractAdaptor;
 import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.adaptor.IdGenerator;
@@ -68,9 +68,9 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 		try {
 			Map<String, fields_Model> models = cdmi.all_entities_Model(0, Integer.MAX_VALUE, Arrays.asList("id", "name"));
 			List<String> modelids = new ArrayList<String>(models.keySet());
-			List<tuple_132> returned = cdmi.get_relationship_Models(modelids, new ArrayList<String>(), 
+			List<CDMI_EntityAPI_tuple_134> returned = cdmi.get_relationship_Models(modelids, new ArrayList<String>(), 
 					new ArrayList<String>(), Arrays.asList("id"));
-			Iterator<tuple_132> it = returned.iterator();
+			Iterator<CDMI_EntityAPI_tuple_134> it = returned.iterator();
 
 			for (String id : modelids) {
 				String name = models.get(id).name;
@@ -101,7 +101,7 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 		List<Dataset> datasets = new ArrayList<Dataset>();
 		
 		if (entity.getType() == EntityType.GENE) {
-			List<tuple_136> genomeIds;
+			List<CDMI_EntityAPI_tuple_138> genomeIds;
 			try {
 				genomeIds = cdmi.get_relationship_IsOwnedBy(Arrays.asList(entity.getId()), new ArrayList<String>(), 
 						new ArrayList<String>(), Arrays.asList("id"));
@@ -253,12 +253,12 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 	private Collection<fields_Subsystem> getSubsystemFieldsForGene(String geneId) throws AdaptorException {
 		Map<String, fields_Subsystem> fs = new HashMap<String, fields_Subsystem>();
 		try {
-			List<tuple_118> tps = cdmi.get_relationship_HasFunctional(Arrays.asList(geneId), new ArrayList<String>(),
+			List<CDMI_EntityAPI_tuple_120> tps = cdmi.get_relationship_HasFunctional(Arrays.asList(geneId), new ArrayList<String>(),
 					new ArrayList<String>(), Arrays.asList("id"));
-			for (tuple_118 tp : tps) {
-				List<tuple_83> tps2 = cdmi.get_relationship_IsIncludedIn(Arrays.asList(tp.e_3.id), 
+			for (CDMI_EntityAPI_tuple_120 tp : tps) {
+				List<CDMI_EntityAPI_tuple_85> tps2 = cdmi.get_relationship_IsIncludedIn(Arrays.asList(tp.e_3.id), 
 						new ArrayList<String>(), new ArrayList<String>(), Arrays.asList("id")); 
-				for (tuple_83 tp2 : tps2) {
+				for (CDMI_EntityAPI_tuple_85 tp2 : tps2) {
 					fs.put(tp2.e_3.id, tp2.e_3);
 				}
 			}
