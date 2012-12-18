@@ -54,12 +54,14 @@ create table if not exists interaction_protein (
        id integer unsigned not null auto_increment,
        interaction_id integer unsigned not null,
        protein_id varchar(250) not null,
+       feature_id varchar(250) not null,
        stoichiometry integer unsigned comment 'if applicable',
        strength double comment 'optional numeric measure of strength',
        rank integer unsigned comment 'numbered starting with 1 within interaction, if proteins are ordered',
        primary key (id),
        foreign key (interaction_id) references interaction(id) on delete cascade on update cascade
        # foreign key (protein_id) references ProteinSequence(id) on delete cascade on update cascade,
+       # foreign key (feature_id) references Feature(id) on delete cascade on update cascade,
 ) comment='Link betweeen Proteins and Interactions' engine=innodb;
 
 create table if not exists interaction_data (
