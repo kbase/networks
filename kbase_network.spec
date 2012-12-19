@@ -300,31 +300,31 @@ module KBaseNetworks : KBaseNetworks
   
 	/*
   	   	Returns a "first-neighbor" network constructed basing on a given list of datasets. First-neighbor network contains 
-  	   	a "source" node and all other nodes that have at least one interaction with the "source" node. Only interactions of given types are 
+  	   	"source" nodes and all other nodes that have at least one interaction with the "source" nodes. Only interactions of given types are 
   	   	considered.    
   	   	
   	   	list<string> datasetIds
   	   	List of dataset identifiers to be used for building a network
   	   	
-  		string geneId
-  		Identifier of a gene to be used as a source node   	
+  		list<string> entityIds
+  		List of entity identifiers to be used as source nodes (can be genes, regulons, bi-clusters, etc)   	
   	   			
   	   	list<EdgeType> edgeTypes
   	   	List of possible edge types to be considered for building a network
   	   			
 	*/    
-  	funcdef buildFirstNeighborNetwork(list<string> datasetIds, string geneId, list<EdgeType> edgeTypes) returns(Network network);
+  	funcdef buildFirstNeighborNetwork(list<string> datasetIds, list<string> entityIds, list<EdgeType> edgeTypes) returns(Network network);
   	
 	/*
   	   	Returns a "first-neighbor" network constructed basing on a given list of datasets. First-neighbor network contains 
-  	   	a "source" node and all other nodes that have at least one interaction with the "source" node. Only interactions of given types are 
+  	   	"source" nodes and all other nodes that have at least one interaction with the "source" nodes. Only interactions of given types are 
   	   	considered. Additional cutOff parameter allows to set a threshold on the strength of edges to be considered.   
   	   	
   	   	list<string> datasetIds
   	   	List of dataset identifiers to be used for building a network
   	   	
-  		string geneId
-  		Identifier of a gene to be used as a source node   	
+  		list<string> entityIds
+  		List of entity identifiers to be used as source nodes (can be genes, regulons, bi-clusters, etc)   		
   	   			
   	   	list<EdgeType> edgeTypes
   	   	List of possible edge types to be considered for building a network
@@ -333,7 +333,7 @@ module KBaseNetworks : KBaseNetworks
   	   	The threshold on the strength of edges to be considered for building a network
   	   			
 	*/  	  	
-  	funcdef buildFirstNeighborNetworkLimtedByStrength(list<string> datasetIds, string geneId, list<EdgeType> edgeTypes, float cutOff) returns(Network network);
+  	funcdef buildFirstNeighborNetworkLimtedByStrength(list<string> datasetIds, list<string> entityIds, list<EdgeType> edgeTypes, float cutOff) returns(Network network);
   	
   	
 	/*

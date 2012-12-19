@@ -15,7 +15,6 @@ import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
 import us.kbase.networks.core.Entity;
-import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
@@ -29,17 +28,19 @@ public class ModelSEEDTest {
 	final String genomeId = "kb|g.21765";
 	
 //	final String queryGeneId = "kb|g.0.peg.10";
-	final Entity queryGene = new Entity("kb|g.21765.CDS.967", EntityType.GENE); 
-	final Entity querySS = new Entity("Nitrate and nitrite ammonification", EntityType.SUBSYSTEM);
+	final Entity queryGene = Entity.toEntity("kb|g.21765.CDS.967"); 
+	final Entity querySS = Entity.toEntity("kb|subsystem.Nitrate and nitrite ammonification");
 	
 //	final List<String> queryGeneIds = Arrays.asList("kb|g.0.peg.10",      "kb|g.0.peg.1032",     "kb|g.0.peg.1002",     "kb|g.0.peg.880", "kb|g.0.peg.847",      "kb|g.0.peg.843",      "kb|g.0.peg.1247");
-	final List<Entity> queryGenes = Arrays.asList(
-			new Entity("kb|g.21765.CDS.967", EntityType.GENE), 
-			new Entity("kb|g.21765.CDS.2797", EntityType.GENE), 
-			new Entity("kb|g.21765.CDS.2666", EntityType.GENE),                   
-			new Entity("kb|g.21765.CDS.1814", EntityType.GENE), 
-			new Entity("kb|g.21765.CDS.2426", EntityType.GENE), 
-			new Entity("kb|g.21765.CDS.2043", EntityType.GENE)); 
+	final List<Entity> queryGenes = Entity.toEntities( 		
+		Arrays.asList(new String[]{
+			"kb|g.21765.CDS.967", 
+			"kb|g.21765.CDS.2797", 
+			"kb|g.21765.CDS.2666",                   
+			"kb|g.21765.CDS.1814", 
+			"kb|g.21765.CDS.2426", 
+			"kb|g.21765.CDS.2043"
+		})); 
 	
 	
 	public ModelSEEDTest() throws Exception {
@@ -106,9 +107,10 @@ public class ModelSEEDTest {
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
 		Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
 		assertNotNull("Should get a network back", network);
-		Graph<Node,Edge> g = network.getGraph();
+		Graph<Node,Edge> g = network.getGraph();				
 		assertNotNull("Network should have graph", g);
 		assertEquals("Graph should have 11 edges", g.getEdgeCount(), 11);
 		assertEquals("Graph should have " + queryGenes.size() + " nodes", g.getVertexCount(), queryGenes.size());
+		
 	}
 }

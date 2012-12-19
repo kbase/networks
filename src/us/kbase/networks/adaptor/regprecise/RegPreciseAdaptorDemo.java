@@ -19,11 +19,15 @@ public class RegPreciseAdaptorDemo {
 	
 	Adaptor adaptor;
 
-	Entity gene = new Entity("kb|g.20848.CDS.2811", EntityType.GENE);
-	List<Entity> genes = Arrays.asList(
-			new Entity("kb|g.20848.CDS.1671", EntityType.GENE), 
-			new Entity("kb|g.20848.CDS.1454", EntityType.GENE), 
-			new Entity("kb|g.20848.CDS.2811", EntityType.GENE));
+	Entity gene =  Entity.toEntity("kb|g.20848.CDS.2811");
+	List<Entity> genes = Entity.toEntities( 
+		Arrays.asList(
+			new String[]{					
+				"kb|g.20848.CDS.1671", 
+				"kb|g.20848.CDS.1454", 
+				"kb|g.20848.CDS.2811"} ));
+	
+	Entity regulon = Entity.toEntity("kb|g.9677.regulon.0");
 	
 	Dataset goodDataset = new Dataset("kb|netdataset.kb|g.20848.regulome.0", "", "", null, null, (Taxon) null);
 	Dataset badDataset  = new Dataset("kb|netdataset.kb|g.20848.regulome.1", "", "", null, null, (Taxon) null);
@@ -46,8 +50,9 @@ public class RegPreciseAdaptorDemo {
 //		test_buildFirstNeighborNetwork1();
 //		test_buildFirstNeighborNetwork2();
 //		test_buildFirstNeighborNetwork3();
+		test_buildFirstNeighborNetwork4();
 		
-		test_buildInternalNetwork();
+//		test_buildInternalNetwork();
 	}
 
 	private void test_buildInternalNetwork() throws AdaptorException {
@@ -57,6 +62,14 @@ public class RegPreciseAdaptorDemo {
 		NetworksUtil.visualizeNetwork(network.getGraph());	
 	}
 
+	private void test_buildFirstNeighborNetwork4() throws AdaptorException {
+		Network network = adaptor.buildFirstNeighborNetwork(goodDataset, regulon, Arrays.asList(EdgeType.GENE_GENE,EdgeType.GENE_CLUSTER));
+		
+		NetworksUtil.printNetwork(network);
+		NetworksUtil.visualizeNetwork(network.getGraph());		
+	}
+	
+	
 	private void test_buildFirstNeighborNetwork3() throws AdaptorException {
 		Network network = adaptor.buildFirstNeighborNetwork(goodDataset, gene, Arrays.asList(EdgeType.GENE_GENE,EdgeType.GENE_CLUSTER));
 		

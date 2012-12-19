@@ -5,18 +5,9 @@ import java.util.List;
 
 public final class Entity {
 	
-	protected String id;
-	protected EntityType type;
+	private String id;
+	private EntityType type;
 	
-	public static List<Entity> toEntities(List<String> ids, EntityType type)
-	{
-		List<Entity> entities = new ArrayList<Entity>();
-		for(String id : ids)
-		{
-			entities.add(new Entity(id, type));
-		}
-		return entities;
-	}
 	
 	public static List<String> toEntityIds(List<Entity> entities)
 	{
@@ -27,6 +18,20 @@ public final class Entity {
 		}
 		return ids;
 	}
+	
+	public static List<Entity> toEntities(List<String> entityIds) {
+		List<Entity> entities = new ArrayList<Entity>();
+		for(String entityId : entityIds)
+		{
+			entities.add( toEntity(entityId) );
+		}
+		return entities;
+	}			
+
+	public static Entity toEntity(String entityId) {
+		return new Entity(entityId, EntityType.detect(entityId));
+	}			
+	
 	
 	public static String toIdsString(List<Entity> entities, String separator)
 	{
@@ -66,5 +71,6 @@ public final class Entity {
 	public EntityType getType()
 	{
 		return type;
-	}	
+	}
+
 }

@@ -38,38 +38,39 @@ public class MAKTest {
     final String genomeId = "kb|g.20848";//g.21765";
 
 //	final String queryGeneId = "kb|g.0.peg.10";
-    final Entity queryGene = new Entity("kb|g.20848.CDS.578", EntityType.GENE);
+    final Entity queryGene = Entity.toEntity("kb|g.20848.CDS.578");
 
 //	final List<String> queryGeneIds = Arrays.asList("kb|g.0.peg.10",      "kb|g.0.peg.1032",     "kb|g.0.peg.1002",
 // "kb|g.0.peg.880", "kb|g.0.peg.847",      "kb|g.0.peg.843",      "kb|g.0.peg.1247");
-    final List<Entity> queryGenes = Arrays.asList(
-    		new Entity("kb|g.20848.CDS.578 ", EntityType.GENE),
-    		new Entity("kb|g.20848.CDS.47  ", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.769 ", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.669 ", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.406 ", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1347", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1304", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1130", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1303", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1995", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1083", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1127", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1030", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1732", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2281", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2680", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2473", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2290", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2498", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2369", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2176", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2914", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.3647", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.3564", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.3769", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.3862", EntityType.GENE)
-    );
+    
+    final List<Entity> queryGenes = Entity.toEntities(Arrays.asList(
+    		new String[]{
+    		"kb|g.20848.CDS.578 ", 
+    		"kb|g.20848.CDS.47  ", 
+    	    "kb|g.20848.CDS.769 ", 
+    	    "kb|g.20848.CDS.669 ", 
+    	    "kb|g.20848.CDS.406 ", 
+    	    "kb|g.20848.CDS.1347", 
+    	    "kb|g.20848.CDS.1304", 
+    	    "kb|g.20848.CDS.1130", 
+    	    "kb|g.20848.CDS.1303", 
+    	    "kb|g.20848.CDS.1995", 
+    	    "kb|g.20848.CDS.1083", 
+    	    "kb|g.20848.CDS.1127", 
+    	    "kb|g.20848.CDS.1030", 
+    	    "kb|g.20848.CDS.1732", 
+    	    "kb|g.20848.CDS.2281", 
+    	    "kb|g.20848.CDS.2680", 
+    	    "kb|g.20848.CDS.2473", 
+    	    "kb|g.20848.CDS.2290", 
+    	    "kb|g.20848.CDS.2498", 
+    	    "kb|g.20848.CDS.2369", 
+    	    "kb|g.20848.CDS.2176", 
+    	    "kb|g.20848.CDS.2914", 
+    	    "kb|g.20848.CDS.3647", 
+    	    "kb|g.20848.CDS.3564", 
+    	    "kb|g.20848.CDS.3769", 
+    	    "kb|g.20848.CDS.3862"}));
 
 
     @Before

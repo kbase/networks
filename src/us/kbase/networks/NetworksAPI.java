@@ -121,6 +121,33 @@ public class NetworksAPI {
 		return null;
 	}
 	
+	public Network buildFirstNeighborNetwork(List<String> datasetIds, List<Entity> entitis,
+			List<EdgeType> edgeTypes) throws AdaptorException 
+	{		
+		List<Network> networks = new Vector<Network>();
+		for(String datasetId: datasetIds)
+		{
+			for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
+			{
+				if(adaptor.hasDataset(datasetId) )
+				{
+					for(Entity entity: entitis)
+					{
+						Dataset dataset = adaptor.getDataset(datasetId);
+						Network network = adaptor.buildFirstNeighborNetwork(dataset, entity, edgeTypes);
+						if(network != null)
+						{
+							networks.add(network);
+						}
+					}
+				}				
+			}
+		}			
+		
+		return buildUnionNetwork("First neighbour network", networks);			
+	}
+
+	
 	
 	public Network buildFirstNeighborNetwork(List<String> datasetIds, Entity entity,
 			List<EdgeType> edgeTypes) throws AdaptorException 
@@ -249,6 +276,12 @@ public class NetworksAPI {
 		return network;
 	}
 	
+	public Network buildFirstNeighborNetwork(List<String> datasetIds,
+			List<Entity> entities, List<EdgeType> edgeTypes, float cutOff) throws AdaptorException {
+		Network network = buildFirstNeighborNetwork(datasetIds, entities, edgeTypes);
+    	cutOffNetwork(network, cutOff);
+		return network;
+	}	
 
 	public Network buildInternalNetwork(List<String> datasetIds,
 			List<Entity> entities, List<EdgeType> edgeTypes, float cutOff) throws AdaptorException {

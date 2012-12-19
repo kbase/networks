@@ -208,10 +208,13 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 
 		if(edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
 			if (entity.getType() == EntityType.GENE) {
-				Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), entity.getId(), new Entity(entity.getId(), EntityType.GENE));
+				// PSN: Entity is immutable class
+				//Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), entity.getId(), new Entity(entity.getId(), EntityType.GENE));
+				Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), entity.getId(), entity);
+				
 				graph.addVertex(geneNode);
 				for (fields_Subsystem fs : getSubsystemFieldsForGene(entity.getId())) {
-					Node ssNode = Node.buildClusterNode(IdGenerator.Node.nextId(), fs.id, new Entity(fs.id, EntityType.SUBSYSTEM));
+					Node ssNode = Node.buildClusterNode(IdGenerator.Node.nextId(), fs.id, toSubsystemsEntity(fs.id));
 					graph.addVertex(ssNode);
 					Edge edge = new Edge(IdGenerator.Edge.nextId(), "Member of subsystem", dataset);
 					graph.addEdge(edge, ssNode, geneNode, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
@@ -220,8 +223,8 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 			else if (entity.getType() == EntityType.SUBSYSTEM) {
 				Node ssNode = Node.buildClusterNode(IdGenerator.Node.nextId(), entity.getId(), entity);
 				graph.addVertex(ssNode);
-				for (String geneId : getGenesForSubsystem(entity.getId(), dataset.getTaxons().get(0).getGenomeId())) {
-					Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), geneId, new Entity(geneId, EntityType.GENE));
+				for (String geneId : getGenesForSubsystem( toSubsystemsId(entity), dataset.getTaxons().get(0).getGenomeId())) {
+					Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), geneId, toGeneEntity(geneId));
 					Edge edge = new Edge(IdGenerator.Edge.nextId(), "Member of subsystem", dataset);
 					graph.addEdge(edge, ssNode, geneNode, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
 				}	
@@ -231,6 +234,7 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 		
 		// $return = $obj->subsystems_to_fids($subsystems, $genomes)
 	}
+	
 	
 	private Set<String> getGenesForSubsystem(String ssId, String genomeId) throws AdaptorException {
 		Set<String> geneIds = new HashSet<String>();
@@ -270,7 +274,9 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 
 	@Override
 	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities) throws AdaptorException {
-		return buildInternalNetwork(dataset, entities, Arrays.asList(EdgeType.GENE_CLUSTER));
+		// PSN: the way you construct network, it should be GENE_GENE
+		//return buildInternalNetwork(dataset, entities, Arrays.asList(EdgeType.GENE_CLUSTER));
+		return buildInternalNetwork(dataset, entities, Arrays.asList(EdgeType.GENE_GENE));
 	}
 
 	@Override
@@ -278,7 +284,10 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 			List<EdgeType> edgeTypes) throws AdaptorException {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
 		Network network = new Network(IdGenerator.Network.nextId(), "", graph);	
-		if( !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
+		
+		// PSN: the way you construct network, it should be GENE_GENE
+		//if( !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
+		if( !edgeTypes.contains(EdgeType.GENE_GENE) )
 		{
 			return network;
 		}
@@ -287,8 +296,16 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 		Map<String,List<Node>> ssToGeneNodes = new HashMap<String,List<Node>>();
 
 		for (Entity entity: entities) {
+			
+			// PSN: according to your logic the nodes can be  genes only
+			if(entity.getType() != EntityType.GENE) continue;
+			
 			String geneId = entity.getId();
-			Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), geneId, new Entity(geneId, EntityType.GENE));
+			
+			// PSN: Entity is immutable class
+			//Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), geneId, new Entity(geneId, EntityType.GENE));
+			Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), geneId, entity);
+			
 			graph.addVertex(geneNode);
 
 			for (fields_Subsystem fs : getSubsystemFieldsForGene(geneId)) {
@@ -300,7 +317,7 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 				geneNodes.add(geneNode);
 			}
 		}
-
+		
 		// build edges between genes in same subsystems; but don't build duplicate edges
 		Map<Node, Set<Node>> genePairs = new HashMap<Node, Set<Node>>();
 		
@@ -317,6 +334,20 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 				}
 			}
 		}
+		
 		return network;
 	}
+	
+	private Entity toSubsystemsEntity(String ssId) {		
+		return new Entity( "kb|subsystem." + ssId , EntityType.SUBSYSTEM);
+	}
+
+	private Entity toGeneEntity(String geneId) {		
+		return new Entity( geneId , EntityType.GENE);
+	}
+
+	private String toSubsystemsId(Entity entity) {		
+		return IdGenerator.toLocalId(entity.getId());
+	}
+	
 }

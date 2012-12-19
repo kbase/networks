@@ -3,16 +3,12 @@ package us.kbase.networks.rpc.server;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import us.kbase.networks.NetworksAPI;
 import us.kbase.networks.adaptor.AdaptorException;
-import us.kbase.networks.core.Node;
-import us.kbase.networks.core.Edge;
 import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
-import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Taxon;
 import us.kbase.networks.rpc.client.Dataset;
@@ -26,30 +22,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.util.Pair;
-
 
 public class NetworksService {
 
 	private NetworksAPI api; 
 	private static ObjectMapper m = new ObjectMapper();
 	private static JsonFactory jf = new JsonFactory();
-	
-	public static void main(String[] args) throws Exception {
-
-		NetworksService nw = new NetworksService();
-		nw.allDatasetSources();
-		
-		
-/*		
-		List<Dataset> datasets = new NetworksService().entity2Datasets("kb|g.21765.CDS.967");
-		for(Dataset ds: datasets)
-		{
-			System.out.println(ds.id + "\t" + ds.sourceReference);
-		}
-*/		
-	}
 	
 	
 	public NetworksService() throws AdaptorException
@@ -113,8 +91,7 @@ public class NetworksService {
 
     public List<Dataset> entity2Datasets(String entityId) throws Exception
     {
-    	//TODO question: how to work with entity type.... ideally, it should automatically identified from entityId
-		List<us.kbase.networks.core.Dataset> serverDatasets =  api.getDatasets(new Entity(entityId, EntityType.GENE));				
+		List<us.kbase.networks.core.Dataset> serverDatasets =  api.getDatasets(Entity.toEntity(entityId));				
 		return toClientDatasets(serverDatasets); 	
     }
 
@@ -122,41 +99,55 @@ public class NetworksService {
     /**
      * Buid network methods
      **/
-    public Network buildFirstNeighborNetwork(List<String> datasetIds, String geneId, List<String> edgeTypeRefs) throws Exception
+  
+/*    
+    public Network buildFirstNeighborNetwork(List<String> datasetIds, String entityId, List<String> edgeTypeRefs) throws Exception
     {
     	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
     	
-    	Entity entity = new Entity(geneId, EntityType.GENE);    	
+    	Entity entity = Entity.toEntity(entityId);    	
     	us.kbase.networks.core.Network network = api.buildFirstNeighborNetwork(datasetIds, entity, edgeTypes);
     	
     	return toClientNetwork(network);
     }
+*/    
 
-    public Network buildFirstNeighborNetworkLimtedByStrength(List<String> datasetIds, String geneId, List<String> edgeTypeRefs, float cutOff) throws Exception
+    public Network buildFirstNeighborNetwork(List<String> datasetIds, List<String> entityIds, List<String> edgeTypeRefs) throws Exception
     {
     	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
-    	Entity entity = new Entity(geneId, EntityType.GENE);    	
     	
-    	us.kbase.networks.core.Network network = api.buildFirstNeighborNetwork(datasetIds, entity, edgeTypes, cutOff);
+    	List<Entity> entities = Entity.toEntities(entityIds);  	
+    	us.kbase.networks.core.Network network = api.buildFirstNeighborNetwork(datasetIds, entities, edgeTypes);
+    	
+    	return toClientNetwork(network);
+    }
+
+ 
+    public Network buildFirstNeighborNetworkLimtedByStrength(List<String> datasetIds, List<String> entityIds, List<String> edgeTypeRefs, float cutOff) throws Exception
+    {
+    	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
+    	List<Entity> entities = Entity.toEntities(entityIds);  	    	
+    	
+    	us.kbase.networks.core.Network network = api.buildFirstNeighborNetwork(datasetIds, entities, edgeTypes, cutOff);
     	
     	return toClientNetwork(network);
     }
 
     
-	public Network buildInternalNetwork(List<String> datasetIds, List<String> geneIds, List<String> edgeTypeRefs) throws Exception
+	public Network buildInternalNetwork(List<String> datasetIds, List<String> entityIds, List<String> edgeTypeRefs) throws Exception
     {
     	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
-    	List<Entity> entities = Entity.toEntities(geneIds, EntityType.GENE);    	
+    	List<Entity> entities = Entity.toEntities(entityIds);    	
 
     	us.kbase.networks.core.Network network = api.buildInternalNetwork(datasetIds, entities, edgeTypes);
     	
     	return toClientNetwork(network);
     }
 
-	public Network buildInternalNetworkLimitedByStrength(List<String> datasetIds, List<String> geneIds, List<String> edgeTypeRefs, float cutOff) throws Exception
+	public Network buildInternalNetworkLimitedByStrength(List<String> datasetIds, List<String> entityIds, List<String> edgeTypeRefs, float cutOff) throws Exception
     {
     	List<us.kbase.networks.core.EdgeType> edgeTypes = getEdgeTypes(edgeTypeRefs);
-    	List<Entity> entities = Entity.toEntities(geneIds, EntityType.GENE);    	
+    	List<Entity> entities = Entity.toEntities(entityIds);    	
     	
     	us.kbase.networks.core.Network network = api.buildInternalNetwork(datasetIds, entities, edgeTypes, cutOff);
     	

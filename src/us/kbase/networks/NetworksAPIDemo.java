@@ -55,7 +55,7 @@ public class NetworksAPIDemo {
 		
 		List<Dataset> datasets = api.getDatasets(taxon);
 		NetworksUtil.printDatasets("", datasets);
-		Network network = api.buildInternalNetwork(Dataset.toDatasetIds(datasets), Entity.toEntities(geneIds, EntityType.GENE) , Arrays.asList(EdgeType.GENE_GENE));
+		Network network = api.buildInternalNetwork(Dataset.toDatasetIds(datasets), Entity.toEntities(geneIds) , Arrays.asList(EdgeType.GENE_GENE));
 		
 		NetworksUtil.printNetwork(network);
 		NetworksUtil.visualizeNetwork(network.getGraph());	

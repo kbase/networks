@@ -11,27 +11,37 @@ import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
-import us.kbase.networks.core.Taxon;
 
 public class MAKAdaptorDemo {
 
 	Adaptor adaptor;
 	Entity gene = new Entity("kb|g.20848.CDS.2811", EntityType.GENE);
-	Dataset goodDataset = new Dataset("kb|dataset.mak1", "", "", null, null, (Taxon) null);
-	
+	Entity bicluster = new Entity("kb|bicluster.245", EntityType.BICLUSTER);
+		
 	private void run() throws AdaptorException {
 		adaptor = new MAKAdaptorFactory().buildAdaptor();
 		test_getDatasets1();
 		test_buildFirstNeighborNetwork1();
+		test_buildFirstNeighborNetwork2();
 	}
 
-	
-	private void test_buildFirstNeighborNetwork1() throws AdaptorException {
-		Network network = adaptor.buildFirstNeighborNetwork(goodDataset, gene, Arrays.asList(EdgeType.GENE_CLUSTER));
+	private void test_buildFirstNeighborNetwork2() throws AdaptorException {
+		Dataset ds = adaptor.getDatasets().get(0);
+		Network network = adaptor.buildFirstNeighborNetwork(ds, bicluster, Arrays.asList(EdgeType.GENE_CLUSTER));
 		
 		NetworksUtil.printNetwork(network);
 		NetworksUtil.visualizeNetwork(network.getGraph());		
 	}
+	
+	
+	private void test_buildFirstNeighborNetwork1() throws AdaptorException {
+		Dataset ds = adaptor.getDatasets().get(0);
+		Network network = adaptor.buildFirstNeighborNetwork(ds, gene, Arrays.asList(EdgeType.GENE_CLUSTER));
+		
+		NetworksUtil.printNetwork(network);
+		NetworksUtil.visualizeNetwork(network.getGraph());		
+	}
+
 	
 	
 	private void test_getDatasets1() throws AdaptorException {

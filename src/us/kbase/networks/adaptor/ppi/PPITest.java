@@ -37,11 +37,13 @@ public class PPITest {
 
     final Entity atpSynthase = new Entity("kb|ppi.19539", EntityType.PPI_COMPLEX);
     
+
+    
     @Before
 	public void setup() throws Exception {
-	adaptor = new PPIAdaptorFactory().buildAdaptor();
+    	adaptor = new PPIAdaptorFactory().buildAdaptor();
     }
-
+    
     @Test
 	public void hasAdaptor() throws Exception {
 	assertNotNull(adaptor);
@@ -237,6 +239,6 @@ public class PPITest {
      * run all tests
      */
     public static void main(String args[]) {
-	org.junit.runner.JUnitCore.main("us.kbase.networks.adaptor.ppi.PPITest");
+	//org.junit.runner.JUnitCore.main("us.kbase.networks.adaptor.ppi.PPITest");
     }
 }

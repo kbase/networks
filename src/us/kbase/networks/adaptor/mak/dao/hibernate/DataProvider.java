@@ -64,8 +64,18 @@ public class DataProvider {
 		
 		return genes.size() > 0 ? genes.get(0) : null;
 	}
-
-
+	
+	@SuppressWarnings("unchecked")
+	public MAKBicluster getBicluster(String clusterKBaseId) {
+		List<MAKBicluster> clusters = 
+			session.createCriteria(MAKBicluster.class)
+				.add( Restrictions.eq("kbaseId", clusterKBaseId) )
+				.list();
+		
+		return clusters.size() > 0 ? clusters.get(0) : null;
+	}
+	
+	
 	@SuppressWarnings("unchecked")
 	public List<MAKBicluster> getBiclusters(int datasetId, String geneKBaseId) {
 		List<MAKGene> genes = 

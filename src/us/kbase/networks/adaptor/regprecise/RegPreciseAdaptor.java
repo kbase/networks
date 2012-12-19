@@ -86,8 +86,7 @@ public class RegPreciseAdaptor extends AbstractAdaptor{
 		Network network = new Network(IdGenerator.Network.nextId(), "", graph);	
 		
 		// Check if either GENE_GENE or GENE_CLUSTER edge type was requested 
-		Set<EdgeType> edgeTypesSet = getEdgeTypesSet(edgeTypes);
-		if( !edgeTypesSet.contains(EdgeType.GENE_GENE) && !edgeTypesSet.contains(EdgeType.GENE_CLUSTER) )
+		if( !edgeTypes.contains(EdgeType.GENE_GENE) && !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
 		{
 			return network;
 		}
@@ -96,64 +95,16 @@ public class RegPreciseAdaptor extends AbstractAdaptor{
 		ConstrainedDataProvider dataProvider = getDataProvider();
 		try{			
 			
-			//1. Build query node
-			KBaseGeneDTO queryGene = getQueryGene(dataProvider, entity.getId());
-			if(queryGene == null)
-			{
-				return network;
-			}
-			Node queryNode = buildGeneNode( queryGene ); 
-			graph.addVertex(queryNode);
 			
-			//2. Process GENE_CLUSTER edges
-			if(edgeTypesSet.contains(EdgeType.GENE_CLUSTER))
+			if(entity.getType() == EntityType.GENE)
 			{
-				// Collect first-neighbor clusters (regulons)
-				List<KBaseRegulonDTO> regulons = getRegulons(dataProvider, queryGene);
-					
-				System.out.println("Query gene: " + queryGene.getKbaseId() 
-						+ " has regulons " + (regulons != null? "" + regulons.size() : regulons) 
-						+ " in the dataset " + dataset.getId());
-				// Add cluster nodes and edges
-				for(KBaseRegulonDTO regulon: regulons)
-				{
-					Node regulonNode = buildRegulonNode(regulon);
-					graph.addVertex(regulonNode);
-					Edge edge = buildGeneRegulonEdge(regulon, queryGene, dataset); 
-					graph.addEdge(edge, regulonNode, queryNode,
-							edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
-				}					
-			}
-			
-			//3. Process GENE_GENE edges
-			if(edgeTypesSet.contains(EdgeType.GENE_GENE))
-			{
-				// Process regulators
-				List<KBaseRegulatorDTO> regulators = getRegulators(dataProvider, queryGene);
-				if(regulators != null)
-				for(KBaseRegulatorDTO regulator: regulators)
-				{
-					if(regulator.getKbaseId() == null) continue;
-					Node regulatorNode = buildRegulatorNode(regulator);
-					graph.addVertex(regulatorNode);
-					Edge edge = buildGeneRegulatorEdge(regulator, queryGene, dataset); 
-					graph.addEdge(edge, regulatorNode, queryNode, 
-							edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);					
-				}			
+				populateGeneFirstNeighborNetwork(dataProvider, network, dataset, entity.getId(), edgeTypes);
 				
-				//Process genes from the same regulon
-				List<KBaseGeneDTO> targetGenes = getCoregulatedGenes(dataProvider, queryGene);
-				if(targetGenes != null)
-				for(KBaseGeneDTO targetGene: targetGenes)
-				{
-					if(targetGene.getKbaseId() == null) continue;
-					Node targetGeneNode = buildGeneNode(targetGene);
-					graph.addVertex(targetGeneNode);
-					Edge edge = buildGeneGeneEdge(targetGene, queryGene, dataset); 
-					graph.addEdge(edge, targetGeneNode, queryNode,
-							edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);					
-				}
-			}							
+			} else if(entity.getType() == EntityType.REGULON)
+			{
+				populateRegulonFirstNeighborNetwork(dataProvider, network, dataset, entity.getId(), edgeTypes);
+				
+			}
 		}
 		finally{
 			dataProvider.close();
@@ -162,9 +113,108 @@ public class RegPreciseAdaptor extends AbstractAdaptor{
 		return network;						
 	}
 
+	private void populateRegulonFirstNeighborNetwork(
+			ConstrainedDataProvider dataProvider, Network network,
+			Dataset dataset, String regulonId, List<EdgeType> edgeTypes) {
+		
+		Graph<Node, Edge> graph = network.getGraph();
+		
+		//1. Build query node
+		KBaseRegulonDTO queryRegulon = getQueryRegulon(dataProvider, regulonId);
+		if(queryRegulon == null)
+		{
+			return;
+		}
+		Node queryNode = buildRegulonNode( queryRegulon ); 
+		graph.addVertex(queryNode);
+		
+		//2. Process GENE_CLUSTER edges
+		if(edgeTypes.contains(EdgeType.GENE_CLUSTER))
+		{
+			// Collect regulon genes
+			List<KBaseGeneDTO> genes = getRegulatedGenes(dataProvider, queryRegulon);
+				
+			// Add cluster nodes and edges
+			for(KBaseGeneDTO gene: genes)
+			{
+				Node geneNode = buildGeneNode(gene);
+				graph.addVertex(geneNode);
+				Edge edge = buildGeneRegulonEdge(queryRegulon, gene, dataset); 
+				graph.addEdge(edge, queryNode, geneNode,
+						edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+			}					
+		}
+	}
+
+
+	private void populateGeneFirstNeighborNetwork(
+			ConstrainedDataProvider dataProvider, Network network,
+			Dataset dataset, String geneId, List<EdgeType> edgeTypes) {
+		
+		
+		Graph<Node, Edge> graph = network.getGraph();
+		
+		//1. Build query node
+		KBaseGeneDTO queryGene = getQueryGene(dataProvider, geneId);
+		if(queryGene == null)
+		{
+			return;
+		}
+		Node queryNode = buildGeneNode( queryGene ); 
+		graph.addVertex(queryNode);
+		
+		//2. Process GENE_CLUSTER edges
+		if(edgeTypes.contains(EdgeType.GENE_CLUSTER))
+		{
+			// Collect first-neighbor clusters (regulons)
+			List<KBaseRegulonDTO> regulons = getRegulons(dataProvider, queryGene);
+				
+			// Add cluster nodes and edges
+			for(KBaseRegulonDTO regulon: regulons)
+			{
+				Node regulonNode = buildRegulonNode(regulon);
+				graph.addVertex(regulonNode);
+				Edge edge = buildGeneRegulonEdge(regulon, queryGene, dataset); 
+				graph.addEdge(edge, regulonNode, queryNode,
+						edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+			}					
+		}
+		
+		//3. Process GENE_GENE edges
+		if(edgeTypes.contains(EdgeType.GENE_GENE))
+		{
+			// Process regulators
+			List<KBaseRegulatorDTO> regulators = getRegulators(dataProvider, queryGene);
+			if(regulators != null)
+			for(KBaseRegulatorDTO regulator: regulators)
+			{
+				if(regulator.getKbaseId() == null) continue;
+				Node regulatorNode = buildRegulatorNode(regulator);
+				graph.addVertex(regulatorNode);
+				Edge edge = buildGeneRegulatorEdge(regulator, queryGene, dataset); 
+				graph.addEdge(edge, regulatorNode, queryNode, 
+						edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);					
+			}			
+			
+			//Process genes from the same regulon
+			List<KBaseGeneDTO> targetGenes = getCoregulatedGenes(dataProvider, queryGene);
+			if(targetGenes != null)
+			for(KBaseGeneDTO targetGene: targetGenes)
+			{
+				if(targetGene.getKbaseId() == null) continue;
+				Node targetGeneNode = buildGeneNode(targetGene);
+				graph.addVertex(targetGeneNode);
+				Edge edge = buildGeneGeneEdge(targetGene, queryGene, dataset); 
+				graph.addEdge(edge, targetGeneNode, queryNode,
+						edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);					
+			}
+		}							
+	}
+
+
 	@Override
 	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities) {
-		return buildInternalNetwork(dataset, entities, DEFAULT_EDGE_TYPES);
+		return buildInternalNetwork(dataset, entities, Arrays.asList(EdgeType.GENE_GENE));
 	}
 
 	@Override
@@ -175,8 +225,7 @@ public class RegPreciseAdaptor extends AbstractAdaptor{
 		Network network = new Network(IdGenerator.Network.nextId(), "", graph);	
 		
 		// Check if either GENE_GENE or GENE_CLUSTER edge type was requested 
-		Set<EdgeType> edgeTypesSet = getEdgeTypesSet(edgeTypes);
-		if( !edgeTypesSet.contains(EdgeType.GENE_GENE) )
+		if( !edgeTypes.contains(EdgeType.GENE_GENE) )
 		{
 			return network;
 		}
@@ -199,7 +248,7 @@ public class RegPreciseAdaptor extends AbstractAdaptor{
 			
 			
 			//2. Process GENE_GENE edges
-			if(edgeTypesSet.contains(EdgeType.GENE_GENE))
+			if(edgeTypes.contains(EdgeType.GENE_GENE))
 			{				
 				List<KBaseGene2GeneDTO> genePairs = dataProvider.getCoregulatedGenePairs(geneIds);				
 				for(KBaseGene2GeneDTO genePair: genePairs)
@@ -275,21 +324,6 @@ public class RegPreciseAdaptor extends AbstractAdaptor{
 		return IdGenerator.Dataset.toKBaseId(ADAPTOR_PREFIX, "" + regulomeId);
 	}		
 
-	/*
-	private Regulome getRegulome(ConstrainedDataProvider dataProvider, Dataset dataset)
-	{
-		String regulomeId = getRegulomeId(dataset.getId());		
-		return dataProvider.getRegulomeByKbaseId(regulomeId);
-	}
-	*/
-
-	
-	private Set<EdgeType> getEdgeTypesSet(List<EdgeType> edgeTypes) {
-		Set<EdgeType> edgeTypesSet = new HashSet<EdgeType>();
-		edgeTypesSet.addAll(edgeTypes);
-		return edgeTypesSet;
-	}
-
 	private Node buildGeneNode(KBaseGeneDTO gene) {
 		
 		Node node = Node.buildGeneNode(
@@ -364,6 +398,11 @@ public class RegPreciseAdaptor extends AbstractAdaptor{
 		return kbaseId2targetGenesMap.get(queryGene.getKbaseId());
 	}
 
+	private List<KBaseGeneDTO> getRegulatedGenes(ConstrainedDataProvider dataProvider, KBaseRegulonDTO queryRegulon) {
+		return dataProvider.getRegulonKBaseGeneDTOs(queryRegulon.getKbaseId());
+	}
+	
+	
 	private List<KBaseRegulatorDTO> getRegulators(ConstrainedDataProvider dataProvider, KBaseGeneDTO queryGene) {
 		List<String> geneIds = Arrays.asList(queryGene.getKbaseId());
 		Map<String, List<KBaseRegulatorDTO>> kbaseId2regulatorsMap = 
@@ -387,6 +426,13 @@ public class RegPreciseAdaptor extends AbstractAdaptor{
 		return genes.size() > 0 ? genes.get(0) : null;
 	}
 
+	private KBaseRegulonDTO getQueryRegulon(ConstrainedDataProvider dataProvider,
+			String regulonId) {
+		
+		List<KBaseRegulonDTO> regulons = dataProvider.getKBaseRegulonDTOs(Arrays.asList(regulonId));
+		return regulons.size() > 0 ? regulons.get(0) : null;
+	}	
+	
 	@Override
 	public List<Dataset> getDatasets(Entity entity) throws AdaptorException {
 		// TODO Auto-generated method stub
