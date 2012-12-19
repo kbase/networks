@@ -13,7 +13,7 @@ import edu.uci.ics.jung.graph.*;
 /**
  * Class implementing an Adaptor for PPI data in KBase Networks API
  * 
- * @version 1.3, 11/6/12
+ * @version 2.0, 12/18/12
  * @author JMC
  */
 public class PPIAdaptor extends AbstractAdaptor {
@@ -24,9 +24,6 @@ public class PPIAdaptor extends AbstractAdaptor {
 
     // default Cluster node ID format
     public static final String CLUSTER_PPI_ID_PREFIX = "kb|ppi.";
-
-    // default Edge ID format
-    public static final String EDGE_PPI_ID_PREFIX = "kb|ppi.edge.";
 
     public static final String ADAPTOR_PREFIX = "ppi";
 
@@ -119,77 +116,150 @@ public class PPIAdaptor extends AbstractAdaptor {
 	Network network = new Network(IdGenerator.Network.nextId(), "", graph);
 
 	String kbID = dataset.getId();
-	int datasetID = Integer.parseInt(IdGenerator.toLocalId(kbID));
+	int datasetID = StringUtil.atoi(IdGenerator.toLocalId(kbID));
 
 	try {
 	    PPI.connect();
 	    Connection con = PPI.getConnection();
+	    PreparedStatement stmt;
+	    ResultSet rs;
 
+	    EntityType queryType = entity.getType();
+	    if ((queryType != EntityType.GENE) &&
+		(queryType != EntityType.PROTEIN) &&
+		(queryType != EntityType.PPI_COMPLEX))
+		throw new AdaptorException("PPI adaptor can't handle query for entity type "+queryType);
+	    
 	    // for CLUSTER edges, just need complex that gene is in
 	    if (edgeTypes.contains(EdgeType.GENE_CLUSTER)
 		|| edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
-		PreparedStatement stmt = PPI.prepareStatement(con,"select i.id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and f.protein_id=?");
 
-		stmt.setInt(1, datasetID);
-		stmt.setString(2, entity.getId());
+		if ((queryType == EntityType.GENE) ||
+		    (queryType == EntityType.PROTEIN)) {
+		    stmt = PPI.prepareStatement(con,"select i.id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and f.protein_id=?");
+		
+		    stmt.setInt(1, datasetID);
+		    stmt.setString(2, entity.getId());
 
-		Node n2g = null; // representing query as gene
-		Node n2p = null; // representing query as protein
+		    Node n2g = null; // representing query as gene
+		    Node n2p = null; // representing query as protein
 
-		if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
-		    n2g = buildNode(entity.getId(), NodeType.GENE);
-		    graph.addVertex(n2g);
+		    if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
+			n2g = buildNode(entity.getId(), NodeType.GENE);
+			graph.addVertex(n2g);
+		    }
+		    if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
+			n2p = buildNode(entity.getId(), NodeType.PROTEIN);
+			graph.addVertex(n2p);
+		    }
+
+		    rs = stmt.executeQuery();
+		    while (rs.next()) {
+			int complexID = rs.getInt(1);
+			int interactionProteinID = rs.getInt(2);
+
+			Node n1 = buildComplexNode(complexID);
+			graph.addVertex(n1);
+
+			if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
+			    Edge e = buildEdge(n1,
+					       n2g,
+					       interactionProteinID,
+					       dataset);
+			    graph.addEdge(e,
+					  n1,
+					  n2g,
+					  edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+			}
+			if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
+			    Edge e = buildEdge(n1,
+					       n2p,
+					       interactionProteinID,
+					       dataset);
+			    graph.addEdge(e,
+					  n1,
+					  n2p,
+					  edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+			}
+		    }
 		}
-		if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
-		    n2p = buildNode(entity.getId(), NodeType.PROTEIN);
-		    graph.addVertex(n2p);
-		}
-
-		ResultSet rs = stmt.executeQuery();
-		while (rs.next()) {
-		    int complexID = rs.getInt(1);
-		    int interactionProteinID = rs.getInt(2);
+		else {
+		    // query is a complex
+		    int complexID = StringUtil.atoi(entity.getId(),
+						    CLUSTER_PPI_ID_PREFIX.length());
+		    stmt = PPI.prepareStatement(con,"select f.id, f.protein_id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and i.id=?");
+		    stmt.setInt(1, datasetID);
+		    stmt.setInt(2, complexID);
 
 		    Node n1 = buildComplexNode(complexID);
 		    graph.addVertex(n1);
 
-		    if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
-			Edge e = buildEdge(n1,
-					   n2g,
-					   interactionProteinID,
-					   dataset);
-			graph.addEdge(e,
-				      n1,
-				      n2g,
-				      edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
-		    }
-		    if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
-			Edge e = buildEdge(n1,
-					   n2p,
-					   interactionProteinID,
-					   dataset);
-			graph.addEdge(e,
-				      n1,
-				      n2p,
-				      edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+		    rs = stmt.executeQuery();
+		    while (rs.next()) {
+			int interactionProteinID = rs.getInt(1);
+			String proteinID = rs.getString(2);
+
+			if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
+			    Node n2g = buildNode(proteinID,
+						 NodeType.GENE);
+			    graph.addVertex(n2g);
+				
+			    Edge e = buildEdge(n1,
+					       n2g,
+					       interactionProteinID,
+					       dataset);
+			    graph.addEdge(e,
+					  n1,
+					  n2g,
+					  edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+			}
+			if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
+			    Node n2p = buildNode(proteinID,
+						 NodeType.PROTEIN);
+			    graph.addVertex(n2p);
+
+			    Edge e = buildEdge(n1,
+					       n2p,
+					       interactionProteinID,
+					       dataset);
+			    graph.addEdge(e,
+					  n1,
+					  n2p,
+					  edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+			}
 		    }
 		}
+
 		rs.close();
 		stmt.close();
 		con.close();
 	    }
 	    if (edgeTypes.contains(EdgeType.GENE_GENE)
 		|| edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) {
-		// get all proteins in same complex as query
-		PreparedStatement stmt = PPI.prepareStatement(con,"select i.id, f1.protein_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.protein_id=? order by i.id asc, f1.rank asc");
-		stmt.setInt(1, datasetID);
-		stmt.setString(2, entity.getId());
+
+		if ((queryType == EntityType.GENE) ||
+		    (queryType == EntityType.PROTEIN)) {
+		
+		    // get all proteins in same complex as query
+		    stmt = PPI.prepareStatement(con,"select i.id, f1.protein_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.protein_id=? order by i.id asc, f1.rank asc");
+		    stmt.setInt(1, datasetID);
+		    stmt.setString(2, entity.getId());
+		}
+		else {
+		    // query is a complex
+		    int complexID = StringUtil.atoi(entity.getId(),
+						    CLUSTER_PPI_ID_PREFIX.length());
+
+		    stmt = PPI.prepareStatement(con,"select i.id, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and i.id=? order by f.rank asc");
+		    stmt.setInt(1, datasetID);
+		    stmt.setInt(2, complexID);
+		}
 
 		Vector<Node> nodesInComplexG = new Vector<Node>(); // gene
 		Vector<Node> nodesInComplexP = new Vector<Node>(); // protein
 		int lastComplexID = 0;
 
-		ResultSet rs = stmt.executeQuery();
+		rs = stmt.executeQuery();
 		while (rs.next()) {
 		    int complexID = rs.getInt(1);
 		    String geneID2 = rs.getString(2);
@@ -211,19 +281,24 @@ public class PPIAdaptor extends AbstractAdaptor {
 			node = buildNode(geneID2, NodeType.GENE);
 			node.addProperty("interaction_protein_id", ""+interactionProteinID);
 			graph.addVertex(node);
+			nodesInComplexG.add(node);
 		    }
 		    if (edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) {
 			node = buildNode(geneID2, NodeType.PROTEIN);
 			node.addProperty("interaction_protein_id", ""+interactionProteinID);
 			graph.addVertex(node);
+			nodesInComplexP.add(node);
 		    }
-
 		}
 		rs.close();
 		stmt.close();
 		con.close();
-		connectAll(nodesInComplexG, graph, dataset);
-		connectAll(nodesInComplexP, graph, dataset);
+		connectAll(nodesInComplexG,
+			   graph,
+			   dataset);
+		connectAll(nodesInComplexP,
+			   graph,
+			   dataset);
 	    }
 	}
 	catch (Exception e) {

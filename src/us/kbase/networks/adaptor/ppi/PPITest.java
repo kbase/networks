@@ -28,116 +28,215 @@ import us.kbase.networks.core.Taxon;
 import edu.uci.ics.jung.graph.Graph;
 
 public class PPITest {
-	Adaptor adaptor = null;
+    Adaptor adaptor = null;
 
-	final String ecoliID = "kb|g.21765";
+    final String ecoliID = "kb|g.21765";
 
-	final Entity atpA = new Entity("kb|g.21765.CDS.3606", EntityType.GENE);
-	final Entity atpE = new Entity("kb|g.21765.CDS.3743", EntityType.GENE);
+    final Entity atpA = new Entity("kb|g.21765.CDS.3606", EntityType.GENE);
+    final Entity atpE = new Entity("kb|g.21765.CDS.3743", EntityType.GENE);
 
-	@Before
+    final Entity atpSynthase = new Entity("kb|ppi.19539", EntityType.PPI_COMPLEX);
+    
+    @Before
 	public void setup() throws Exception {
-		adaptor = new PPIAdaptorFactory().buildAdaptor();
-	}
+	adaptor = new PPIAdaptorFactory().buildAdaptor();
+    }
 
-	@Test
+    @Test
 	public void hasAdaptor() throws Exception {
-		assertNotNull(adaptor);
-	}
+	assertNotNull(adaptor);
+    }
 
-	@Test
+    @Test
 	public void testDatasets() throws AdaptorException {
-		assertNotNull("should return a list of Datasets", adaptor.getDatasets());
-	}
+	assertNotNull("should return a list of Datasets", adaptor.getDatasets());
+    }
 
-	@Test
+    @Test
 	public void testDatasetEcocyc() throws AdaptorException {
-		Taxon ecoli = new Taxon(ecoliID);
-		List<Dataset> datasets = adaptor.getDatasets(
-				NetworkType.PROT_PROT_INTERACTION, DatasetSource.ECOCYC, ecoli);
-		assertNotNull("should return a list of Datasets", datasets);
-		assertTrue("list should contain at least one dataset",
-				datasets.size() > 0);
-		for (Dataset dataset : datasets) {
-			assertTrue("dataset taxons should contain E. coli", dataset
-					.getTaxons().contains(ecoli));
-		}
+	Taxon ecoli = new Taxon(ecoliID);
+	List<Dataset> datasets = adaptor.getDatasets(NetworkType.PROT_PROT_INTERACTION,
+						     DatasetSource.ECOCYC,
+						     ecoli);
+	assertNotNull("should return a list of Datasets", datasets);
+	assertTrue("list should contain at least one dataset",
+		   datasets.size() > 0);
+	for (Dataset dataset : datasets) {
+	    assertTrue("dataset taxons should contain E. coli",
+		       dataset.getTaxons().contains(ecoli));
 	}
+    }
 
-	@Test
+    @Test
 	public void testDatasetEcoliGene() throws AdaptorException {
-		Taxon ecoli = new Taxon(ecoliID);
-		List<Dataset> datasets = adaptor.getDatasets(atpE);
-		assertNotNull("should return a list of Datasets", datasets);
-		assertTrue("list should contain at least one dataset",
-				datasets.size() > 0);
-		for (Dataset dataset : datasets) {
-			assertTrue("dataset taxons should contain E. coli", dataset
-					.getTaxons().contains(ecoli));
-		}
+	Taxon ecoli = new Taxon(ecoliID);
+	List<Dataset> datasets = adaptor.getDatasets(atpE);
+	assertNotNull("should return a list of Datasets", datasets);
+	assertTrue("list should contain at least one dataset",
+		   datasets.size() > 0);
+	for (Dataset dataset : datasets) {
+	    assertTrue("dataset taxons should contain E. coli",
+		       dataset.getTaxons().contains(ecoli));
 	}
+    }
 
-	@Test
+    @Test
 	public void testEcocycFirstNeighbor() throws AdaptorException {
-		Taxon ecoli = new Taxon(ecoliID);
-		List<Dataset> datasets = adaptor.getDatasets(
-				NetworkType.PROT_PROT_INTERACTION, DatasetSource.ECOCYC, ecoli);
-		assertNotNull("should return a list of Datasets", datasets);
-		assertTrue("list should contain at least one dataset",
-				datasets.size() > 0);
-		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0),
-				atpE, Arrays.asList(EdgeType.PROTEIN_CLUSTER));
-		assertNotNull("Should get a network back", network);
-		Graph<Node, Edge> g = network.getGraph();
-		assertNotNull("Network should have graph", g);
-		// should be 3 complexes with atpE, one edge to each complex
-		assertEquals("Graph should have 3 edges", 3, g.getEdgeCount());
-		assertEquals("Graph should have 4 nodes", 4, g.getVertexCount());
-	}
+	Taxon ecoli = new Taxon(ecoliID);
+	List<Dataset> datasets = adaptor.getDatasets(NetworkType.PROT_PROT_INTERACTION,
+						     DatasetSource.ECOCYC,
+						     ecoli);
+	assertNotNull("should return a list of Datasets",
+		      datasets);
+	assertTrue("list should contain at least one dataset",
+		   datasets.size() > 0);
+	Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0),
+							    atpE,
+							    Arrays.asList(EdgeType.PROTEIN_CLUSTER));
+	assertNotNull("Should get a network back", network);
+	Graph<Node, Edge> g = network.getGraph();
+	assertNotNull("Network should have graph", g);
+	
+	// should be 3 complexes with atpE, one edge to each complex
+	assertEquals("Graph should have 3 edges",
+		     3,
+		     g.getEdgeCount());
+	assertEquals("Graph should have 4 nodes",
+		     4,
+		     g.getVertexCount());
+    }
 
-	@Test
+    @Test
 	public void testEcocycNetwork() throws AdaptorException {
-		Taxon ecoli = new Taxon(ecoliID);
-		List<Dataset> datasets = adaptor.getDatasets(
-				NetworkType.PROT_PROT_INTERACTION, DatasetSource.ECOCYC, ecoli);
-		assertNotNull("should return a list of Datasets", datasets);
-		assertEquals("list should contain exactly one dataset", 1, datasets
-				.size());
-		Network network = adaptor.buildInternalNetwork(datasets.get(0), Arrays
-				.asList(atpE, atpA), Arrays.asList(EdgeType.PROTEIN_PROTEIN));
-		assertNotNull("Should get a network back", network);
-		Graph<Node, Edge> g = network.getGraph();
-		assertNotNull("Network should have graph", g);
-		// only complex left should be fragment of atp synthase
-		Collection<Node> allNodes = g.getVertices();
-		Vector<Node> nodes = new Vector<Node>(allNodes);
-		for (Node n : nodes) {
-			if (g.degree(n) == 0)
-				g.removeVertex(n);
-		}
-		assertEquals("Graph should have 1 edge", 1, g.getEdgeCount());
-		assertEquals("Graph should have 2 nodes", 2, g.getVertexCount());
-		for (Node n : allNodes) {
-			int stoichiometry = StringUtil.atoi(n.getProperty("stoichiometry"));
-			String nodeGeneID = n.getName();
-			if (atpE.equals(nodeGeneID))
-				assertEquals("atpE should have stoichiometry 10", 10,
-						stoichiometry);
-			else if (atpA.equals(nodeGeneID))
-				assertEquals("atpA should have stoichiometry 3", 3,
-						stoichiometry);
-		}
-		for (Edge e : g.getEdges()) {
-			assertEquals("Edge should be complex ATPSYN-CPLX", "ATPSYN-CPLX", e
-					.getProperty("description"));
-		}
+	Taxon ecoli = new Taxon(ecoliID);
+	List<Dataset> datasets = adaptor.getDatasets(NetworkType.PROT_PROT_INTERACTION,
+						     DatasetSource.ECOCYC,
+						     ecoli);
+	assertNotNull("should return a list of Datasets", datasets);
+	assertEquals("list should contain exactly one dataset",
+		     1,
+		     datasets.size());
+	Network network = adaptor.buildInternalNetwork(datasets.get(0),
+						       Arrays.asList(atpE, atpA),
+						       Arrays.asList(EdgeType.PROTEIN_PROTEIN));
+	assertNotNull("Should get a network back", network);
+	Graph<Node, Edge> g = network.getGraph();
+	assertNotNull("Network should have graph", g);
+	// only complex left should be fragment of atp synthase
+	Collection<Node> allNodes = g.getVertices();
+	Vector<Node> nodes = new Vector<Node>(allNodes);
+	for (Node n : nodes) {
+	    if (g.degree(n) == 0)
+		g.removeVertex(n);
+	}
+	assertEquals("Graph should have 1 edge",
+		     1,
+		     g.getEdgeCount());
+	assertEquals("Graph should have 2 nodes",
+		     2,
+		     g.getVertexCount());
+	for (Node n : allNodes) {
+	    int stoichiometry = StringUtil.atoi(n.getProperty("stoichiometry"));
+	    String nodeGeneID = n.getName();
+	    if (atpE.equals(nodeGeneID))
+		assertEquals("atpE should have stoichiometry 10",
+			     10,
+			     stoichiometry);
+	    else if (atpA.equals(nodeGeneID))
+		assertEquals("atpA should have stoichiometry 3",
+			     3,
+			     stoichiometry);
+	}
+	for (Edge e : g.getEdges()) {
+	    assertEquals("Edge should be complex ATPSYN-CPLX",
+			 "ATPSYN-CPLX",
+			 e.getProperty("description"));
+	}
+    }
+
+    @Test
+	public void testEcocycNetwork2() throws AdaptorException {
+	Taxon ecoli = new Taxon(ecoliID);
+	List<Dataset> datasets = adaptor.getDatasets(NetworkType.PROT_PROT_INTERACTION,
+						     DatasetSource.ECOCYC,
+						     ecoli);
+	assertNotNull("should return a list of Datasets", datasets);
+	assertEquals("list should contain exactly one dataset",
+		     1,
+		     datasets.size());
+	Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0),
+							    atpSynthase,
+							    Arrays.asList(EdgeType.PROTEIN_CLUSTER));
+	assertNotNull("Should get a network back", network);
+	Graph<Node, Edge> g = network.getGraph();
+	assertNotNull("Network should have graph", g);
+	
+	// only complex should be atpsyn
+	assertEquals("Graph should have 8 edges",
+		     8,
+		     g.getEdgeCount());
+	assertEquals("Graph should have 9 nodes",
+		     9,
+		     g.getVertexCount());
+	for (Node n : g.getVertices()) {
+	    String s = n.getProperty("stoichiometry");
+	    int stoichiometry = 0;
+	    if (s != null)
+		stoichiometry = StringUtil.atoi(s);
+	    
+	    String nodeGeneID = n.getName();
+	    if (atpE.equals(nodeGeneID))
+		assertEquals("atpE should have stoichiometry 10",
+			     10,
+			     stoichiometry);
+	    else if (atpA.equals(nodeGeneID))
+		assertEquals("atpA should have stoichiometry 3",
+			     3,
+			     stoichiometry);
+	}
+	for (Edge e : g.getEdges()) {
+	    assertEquals("Edge should be complex ATPSYN-CPLX",
+			 "ATPSYN-CPLX",
+			 e.getProperty("description"));
 	}
 
-	/**
-	 * run all tests
-	 */
-	public static void main(String args[]) {
-		org.junit.runner.JUnitCore
-				.main("us.kbase.networks.adaptor.ppi.PPITest");
+	// do it again, only fully connected protein to protein:
+	network = adaptor.buildFirstNeighborNetwork(datasets.get(0),
+						    atpSynthase,
+						    Arrays.asList(EdgeType.PROTEIN_PROTEIN));
+	assertNotNull("Should get a network back", network);
+	g = network.getGraph();
+	assertNotNull("Network should have graph", g);
+
+	assertEquals("Graph should have 8 nodes",
+		     8,
+		     g.getVertexCount());
+	assertEquals("Graph should have 28 edges",
+		     28,
+		     g.getEdgeCount());
+	for (Node n : g.getVertices()) {
+	    int stoichiometry = StringUtil.atoi(n.getProperty("stoichiometry"));
+	    String nodeGeneID = n.getName();
+	    if (atpE.equals(nodeGeneID))
+		assertEquals("atpE should have stoichiometry 10",
+			     10,
+			     stoichiometry);
+	    else if (atpA.equals(nodeGeneID))
+		assertEquals("atpA should have stoichiometry 3",
+			     3,
+			     stoichiometry);
 	}
+	for (Edge e : g.getEdges()) {
+	    assertEquals("Edge should be complex ATPSYN-CPLX",
+			 "ATPSYN-CPLX",
+			 e.getProperty("description"));
+	}
+    }
+    
+    /**
+     * run all tests
+     */
+    public static void main(String args[]) {
+	org.junit.runner.JUnitCore.main("us.kbase.networks.adaptor.ppi.PPITest");
+    }
 }
