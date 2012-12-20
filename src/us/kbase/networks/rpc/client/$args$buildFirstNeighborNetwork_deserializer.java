@@ -21,7 +21,7 @@ public class $args$buildFirstNeighborNetwork_deserializer extends JsonDeserializ
 	}
 	p.nextToken();
 	res.datasetIds = p.readValueAs(new TypeReference<List<String>>(){});
-	res.geneId = p.readValueAs(String.class);
+	res.entityIds = p.readValueAs(new TypeReference<List<String>>(){});
 	res.edgeTypes = p.readValueAs(new TypeReference<List<String>>(){});
 	JsonToken t = p.nextToken();
 //	System.out.println("exit $args$buildFirstNeighborNetwork_deserializer with token " + t);

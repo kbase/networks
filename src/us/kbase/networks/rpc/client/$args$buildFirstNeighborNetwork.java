@@ -14,7 +14,7 @@ import org.codehaus.jackson.*;
 public class $args$buildFirstNeighborNetwork
 {
     public List<String> datasetIds;
-    public String geneId;
+    public List<String> entityIds;
     public List<String> edgeTypes;
 }
 

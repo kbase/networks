@@ -14,7 +14,7 @@ import org.codehaus.jackson.*;
 public class $args$buildFirstNeighborNetworkLimtedByStrength
 {
     public List<String> datasetIds;
-    public String geneId;
+    public List<String> entityIds;
     public List<String> edgeTypes;
     public Float cutOff;
 }

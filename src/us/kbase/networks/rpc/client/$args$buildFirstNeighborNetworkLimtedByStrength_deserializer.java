@@ -21,7 +21,7 @@ public class $args$buildFirstNeighborNetworkLimtedByStrength_deserializer extend
 	}
 	p.nextToken();
 	res.datasetIds = p.readValueAs(new TypeReference<List<String>>(){});
-	res.geneId = p.readValueAs(String.class);
+	res.entityIds = p.readValueAs(new TypeReference<List<String>>(){});
 	res.edgeTypes = p.readValueAs(new TypeReference<List<String>>(){});
 	res.cutOff = p.readValueAs(Float.class);
 	JsonToken t = p.nextToken();

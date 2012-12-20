@@ -14,9 +14,9 @@ import us.kbase.networks.rpc.client.Network;
 
 public class KBaseNetworkTest {
 
-//	String url = "http://127.0.0.1:8080/KBaseNetworksRPC/networks";
+	String url = "http://127.0.0.1:8080/KBaseNetworksRPC/networks";
 //	String url = "http://140.221.92.181:7064/KBaseNetworksRPC/networks";
-	String url = "http://127.0.0.1:7064/KBaseNetworksRPC/networks";
+//	String url = "http://127.0.0.1:7064/KBaseNetworksRPC/networks";
 	KBaseNetworks networksAPI;
 		
 	
@@ -86,7 +86,7 @@ public class KBaseNetworkTest {
 						"kb|netdataset.modelseed.0",
 						"kb|netdataset.ppi.7"
 				), 
-				"kb|g.21765.CDS.543", 
+				Arrays.asList("kb|g.21765.CDS.543"), 
 				Arrays.asList("GENE_CLUSTER"));
 				
 		printNetwork("testBuildFirstNeighborNetwork", network);

@@ -167,24 +167,24 @@ Returns a list of all datasets that have at least one interection for a given KB
 
 /**
 Returns a "first-neighbor" network constructed basing on a given list of datasets. First-neighbor network contains 
-a "source" node and all other nodes that have at least one interaction with the "source" node. Only interactions of given types are 
+"source" nodes and all other nodes that have at least one interaction with the "source" nodes. Only interactions of given types are 
 considered.    
 
 list<string> datasetIds
 List of dataset identifiers to be used for building a network
 
-                  string geneId
-                  Identifier of a gene to be used as a source node           
+                  list<string> entityIds
+                  List of entity identifiers to be used as source nodes (can be genes, regulons, bi-clusters, etc)           
                 
 list<EdgeType> edgeTypes
 List of possible edge types to be considered for building a network
 **/
-    public Network buildFirstNeighborNetwork(List<String> datasetIds, String geneId, List<String> edgeTypes) throws Exception
+    public Network buildFirstNeighborNetwork(List<String> datasetIds, List<String> entityIds, List<String> edgeTypes) throws Exception
     {
 	try {
 	    $args$buildFirstNeighborNetwork args = new $args$buildFirstNeighborNetwork();
 	    args.datasetIds = datasetIds;
-	    args.geneId = geneId;
+	    args.entityIds = entityIds;
 	    args.edgeTypes = edgeTypes;
 
 	    $return$buildFirstNeighborNetwork res = caller.jsonrpc_call("KBaseNetworks.buildFirstNeighborNetwork", args, $return$buildFirstNeighborNetwork.class);
@@ -198,14 +198,14 @@ List of possible edge types to be considered for building a network
 
 /**
 Returns a "first-neighbor" network constructed basing on a given list of datasets. First-neighbor network contains 
-a "source" node and all other nodes that have at least one interaction with the "source" node. Only interactions of given types are 
+"source" nodes and all other nodes that have at least one interaction with the "source" nodes. Only interactions of given types are 
 considered. Additional cutOff parameter allows to set a threshold on the strength of edges to be considered.   
 
 list<string> datasetIds
 List of dataset identifiers to be used for building a network
 
-                  string geneId
-                  Identifier of a gene to be used as a source node           
+                  list<string> entityIds
+                  List of entity identifiers to be used as source nodes (can be genes, regulons, bi-clusters, etc)                   
                 
 list<EdgeType> edgeTypes
 List of possible edge types to be considered for building a network
@@ -213,12 +213,12 @@ List of possible edge types to be considered for building a network
 float cutOff
 The threshold on the strength of edges to be considered for building a network
 **/
-    public Network buildFirstNeighborNetworkLimtedByStrength(List<String> datasetIds, String geneId, List<String> edgeTypes, float cutOff) throws Exception
+    public Network buildFirstNeighborNetworkLimtedByStrength(List<String> datasetIds, List<String> entityIds, List<String> edgeTypes, float cutOff) throws Exception
     {
 	try {
 	    $args$buildFirstNeighborNetworkLimtedByStrength args = new $args$buildFirstNeighborNetworkLimtedByStrength();
 	    args.datasetIds = datasetIds;
-	    args.geneId = geneId;
+	    args.entityIds = entityIds;
 	    args.edgeTypes = edgeTypes;
 	    args.cutOff = cutOff;
 

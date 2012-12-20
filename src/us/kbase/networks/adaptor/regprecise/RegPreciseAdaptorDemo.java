@@ -10,7 +10,6 @@ import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
-import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Taxon;

@@ -15,7 +15,7 @@ public class $args$buildFirstNeighborNetworkLimtedByStrength_serializer extends 
     {
 	jgen.writeStartArray();
 	jgen.writeObject(value.datasetIds);
-	jgen.writeObject(value.geneId);
+	jgen.writeObject(value.entityIds);
 	jgen.writeObject(value.edgeTypes);
 	jgen.writeObject(value.cutOff);
 	jgen.writeEndArray();

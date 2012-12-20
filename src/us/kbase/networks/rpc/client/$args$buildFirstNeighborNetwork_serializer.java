@@ -15,7 +15,7 @@ public class $args$buildFirstNeighborNetwork_serializer extends JsonSerializer<$
     {
 	jgen.writeStartArray();
 	jgen.writeObject(value.datasetIds);
-	jgen.writeObject(value.geneId);
+	jgen.writeObject(value.entityIds);
 	jgen.writeObject(value.edgeTypes);
 	jgen.writeEndArray();
     }
