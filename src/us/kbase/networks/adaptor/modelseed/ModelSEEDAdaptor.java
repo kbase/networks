@@ -66,22 +66,21 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 	protected List<Dataset> loadDatasets() throws AdaptorException {
 		List<Dataset> datasets = new ArrayList<Dataset>();
 		try {
-			Map<String, fields_Model> models = cdmi.all_entities_Model(0, Integer.MAX_VALUE, Arrays.asList("id", "name"));
+			Map<String, fields_Model> models = cdmi.all_entities_Model(0, Integer.MAX_VALUE, Arrays.asList("id"));
 			List<String> modelids = new ArrayList<String>(models.keySet());
-			List<CDMI_EntityAPI_tuple_134> returned = cdmi.get_relationship_Models(modelids, new ArrayList<String>(), 
+			List<CDMI_EntityAPI_tuple_134> returned = cdmi.get_relationship_Models(modelids, Arrays.asList("id", "name"), 
 					new ArrayList<String>(), Arrays.asList("id"));
 			Iterator<CDMI_EntityAPI_tuple_134> it = returned.iterator();
 
-			for (String id : modelids) {
-				String name = models.get(id).name;
-
-				if (! it.hasNext()) {
-					throw new AdaptorException("No genome info for model: " + id);
-				}
+			while (it.hasNext()) {
+				CDMI_EntityAPI_tuple_134 tuple = it.next();
+				String modelid = tuple.e_1.id;
+				String name = tuple.e_1.name;
+				String genomeId = tuple.e_3.id;
 				List<Taxon> taxons = new ArrayList<Taxon>();
-				taxons.add(new Taxon(it.next().e_3.id));
+				taxons.add(new Taxon(genomeId));
 				
-				String localId = IdGenerator.toLocalId(id);
+				String localId = IdGenerator.toLocalId(modelid);
 				datasets.add(new Dataset(
 						IdGenerator.Dataset.toKBaseId(ADAPTOR_PREFIX, localId),
 						name, 
