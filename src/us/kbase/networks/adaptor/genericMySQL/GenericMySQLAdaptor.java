@@ -83,8 +83,7 @@ public class GenericMySQLAdaptor extends AbstractAdaptor{
 
 	public GenericMySQLAdaptor(Configuration config) throws Exception{
 		super(config);
-		//ConnectionManager.host   = config.getString("host", "localhost");
-		ConnectionManager.host   = "10.0.8.34";
+		ConnectionManager.host   = config.getString("host", "localhost");
 		ConnectionManager.port   = config.getInt   ("port", 3306);
 		ConnectionManager.dbName = config.getString("db", "mysql");
 		ConnectionManager.user   = config.getString("user", "root");
