@@ -14,7 +14,7 @@ import us.kbase.networks.core.Taxon;
 
 public abstract  class AbstractAdaptor implements Adaptor{
 
-	private Hashtable<String,Dataset> id2datasetHash = new Hashtable<String, Dataset>();
+	protected Hashtable<String,Dataset> id2datasetHash = new Hashtable<String, Dataset>();
 	protected Configuration config;
 
 	protected AbstractAdaptor(Configuration config) throws AdaptorException

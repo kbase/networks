@@ -5,7 +5,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorFactory;
-import us.kbase.networks.adaptor.genericMySQL.GenericMySQLAdaptor;
+import us.kbase.networks.adaptor.JDBCAdaptor.GenericMySQLAdaptor;
 
 public  class PlantFAAdaptorFactory implements AdaptorFactory {
 
