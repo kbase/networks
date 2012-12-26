@@ -1,15 +1,21 @@
-package us.kbase.networks.adaptor.plant;
+package us.kbase.networks.adaptor.JDBCAdaptor;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.adaptor.AdaptorFactory;
 import us.kbase.networks.adaptor.JDBCAdaptor.GenericAdaptor;
 
-public  class PlantPPIAdaptorFactory implements AdaptorFactory {
+public  class GenericAdaptorFactory implements AdaptorFactory {
 
-	public static final String configFN = "plant-ppi-ga.config";
+	public String configFN = "";
+	GenericAdaptorFactory(String configFN)
+	{
+		this.configFN = configFN;
+	}
+	
 	@Override
 	public Adaptor buildAdaptor() {
 		Configuration conf = null;
@@ -21,5 +27,4 @@ public  class PlantPPIAdaptorFactory implements AdaptorFactory {
     	} 
     	return null;
 	}
-
 }

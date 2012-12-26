@@ -5,6 +5,8 @@ import java.util.Vector;
 
 import us.kbase.networks.adaptor.mak.MAKAdaptorFactory;
 import us.kbase.networks.adaptor.modelseed.ModelSEEDAdaptorFactory;
+import us.kbase.networks.adaptor.plant.PlantCCAdaptorFactory;
+import us.kbase.networks.adaptor.plant.PlantCNAdaptorFactory;
 import us.kbase.networks.adaptor.plant.PlantFAAdaptorFactory;
 import us.kbase.networks.adaptor.plant.PlantPPIAdaptorFactory;
 import us.kbase.networks.adaptor.plant.PlantRNAdaptorFactory;
@@ -28,6 +30,8 @@ public class AdaptorRepository {
 		registerAdaptor(new PlantPPIAdaptorFactory());		
 		registerAdaptor(new PlantFAAdaptorFactory());		
 		registerAdaptor(new PlantRNAdaptorFactory());
+		registerAdaptor(new PlantCNAdaptorFactory());
+		registerAdaptor(new PlantCCAdaptorFactory());
 				
 	}
 	
