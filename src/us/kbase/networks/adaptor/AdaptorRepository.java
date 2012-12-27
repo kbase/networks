@@ -3,6 +3,7 @@ package us.kbase.networks.adaptor;
 import java.util.List;
 import java.util.Vector;
 
+import us.kbase.networks.adaptor.JDBCAdaptor.GenericAdaptorFactory;
 import us.kbase.networks.adaptor.mak.MAKAdaptorFactory;
 import us.kbase.networks.adaptor.modelseed.ModelSEEDAdaptorFactory;
 import us.kbase.networks.adaptor.plant.PlantCCAdaptorFactory;
@@ -30,8 +31,10 @@ public class AdaptorRepository {
 		registerAdaptor(new PlantPPIAdaptorFactory());		
 		registerAdaptor(new PlantFAAdaptorFactory());		
 		registerAdaptor(new PlantRNAdaptorFactory());
-		registerAdaptor(new PlantCNAdaptorFactory());
-		registerAdaptor(new PlantCCAdaptorFactory());
+		registerAdaptor(new GenericAdaptorFactory("plant-cc-at-ga.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-cc-pt-ga.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-cn-at-ga.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-cn-pt-ga.config"));
 				
 	}
 	

@@ -11,7 +11,7 @@ import us.kbase.networks.adaptor.JDBCAdaptor.GenericAdaptor;
 public  class GenericAdaptorFactory implements AdaptorFactory {
 
 	public String configFN = "";
-	GenericAdaptorFactory(String configFN)
+	public GenericAdaptorFactory(String configFN)
 	{
 		this.configFN = configFN;
 	}
