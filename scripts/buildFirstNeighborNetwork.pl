@@ -222,9 +222,11 @@ my $dataset_ids = $ARGV[0];
 my $edge_types = $ARGV[1];
 
 my $oc = Bio::KBase::KBaseNetworksService::Client->new("http://".$host."/KBaseNetworksRPC/networks");
-my $input = <STDIN>;
+my @input = <STDIN>;                                                                             
+my $istr = join(" ", @input);                                                                    
+$istr =~ s/[,|]/ /g;
+@input = split /\s+/, $istr;          
 my @datasetIds = split/,/, $dataset_ids;
 my @edgeTypes = split/,/, $edge_types;
-$input =~ s/\s+//g;
-my $results = $oc->buildFirstNeighborNetwork(\@datasetIds, $input, \@edgeTypes);
+my $results = $oc->buildFirstNeighborNetwork(\@datasetIds, \@input, \@edgeTypes);
 print Dumper($results);

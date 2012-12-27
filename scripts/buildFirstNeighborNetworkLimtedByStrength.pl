@@ -229,9 +229,11 @@ my $edge_types = $ARGV[1];
 my $cutOff = $ARGV[2];
 
 my $oc = Bio::KBase::KBaseNetworksService::Client->new("http://".$host."/KBaseNetworksRPC/networks");
-my $input = <STDIN>;
+my @input = <STDIN>;                                                                             
+my $istr = join(" ", @input);                                                                    
+$istr =~ s/[,|]/ /g;
+@input = split /\s+/, $istr;          
 my @datasetIds = split/,/, $dataset_ids;
 my @edgeTypes = split/,/, $edge_types;
-$input =~ s/\s+//g;
-my $results = $oc->buildFirstNeighborNetworkLimtedByStrength(\@datasetIds, $input, \@edgeTypes, $cutOff);
+my $results = $oc->buildFirstNeighborNetworkLimtedByStrength(\@datasetIds, \@input, \@edgeTypes, $cutOff);
 print Dumper($results);

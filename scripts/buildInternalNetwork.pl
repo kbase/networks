@@ -221,7 +221,6 @@ my $dataset_ids = $ARGV[0];
 my $edge_types = $ARGV[1];
 
 my $oc = Bio::KBase::KBaseNetworksService::Client->new("http://".$host."/KBaseNetworksRPC/networks");
-my $input = <STDIN>;
 my @datasetIds = split/,/, $dataset_ids;
 my @edgeTypes = split/,/, $edge_types;
 my @input = <STDIN>;
