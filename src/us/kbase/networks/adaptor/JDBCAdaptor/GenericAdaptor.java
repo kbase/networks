@@ -606,6 +606,10 @@ public class GenericAdaptor extends AbstractAdaptor{
 		try {
 			String method_name = "getDatasets";
 			String property_suffix = method_name + "." + entity.getType();
+			
+			if (dataset.getProperty(SQL_Statement_Prefix + property_suffix) == null) {
+				return false;
+			}
 
 			PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
 			String [] psIdx = dataset.getProperty(PreparedStatement_BIND_Prefix1 + property_suffix).split(":");
