@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonSerialize(using = DatasetSourceSerializer.class)
 public enum DatasetSource {
 
-
 	REGPRECISE ("kb|netsource.1", "RegPrecise", "description", "http://regprecise.lbl.gov/"), 
 	REGPREDICT("kb|netsource.2", "RegPredict", "description", "http://regpredict.lbl.gov/"),
 	REGTRANSBASE("kb|netsource.3", "RegTransBase", "description", "http://regtransbase.lbl.gov"),
@@ -18,8 +17,12 @@ public enum DatasetSource {
 	MODELSEED("kb|netsource.9", "ModelSEED", "Metabolic models", "http://www.theseed.org/models/"),
 	MO("kb|netsource.10", "Microbes Online", "A resource for browsing and comparing microbial genomes", "http://www.microbesonline.org/"),
 	ECOCYC("kb|netsource.11", "EcoCyc", "EcoCyc is a scientific database for the bacterium Escherichia coli K-12 MG1655", "http://www.ecocyc.org/"),
-	PPI("kb|netsource.12", "PPI", "Other PPI datasets", "");
-
+	PPI("kb|netsource.12", "PPI", "Other PPI datasets", ""),
+	GRAMENE("kb|netsource.13","Gramene","Pathways, G2P, Ontologies, ...", "http://www.gramene.org/"),
+	ARANET("kb|netsource.14","AraNet","Functional Association", "http://www.functionalnet.org/aranet/"),
+	POPNET("kb|netsource.15","PopNet","Functional Association projected from AraNet", "http://www.functionalnet.org/"),
+	PLANTCYC("kb|netsource.16","PlantCyc","Plant Metabolic Pathway DB", "hhttp://www.plantcyc.org/"),
+	GEO("kb|netsource.17","GEO","Gene Expression Omnibus", "http://www.ncbi.nlm.nih.gov/geo/");
 
 	private String id;
 	private String name;
