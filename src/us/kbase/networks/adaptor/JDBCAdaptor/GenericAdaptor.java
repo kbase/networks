@@ -69,6 +69,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 	private static final String DefaultEdgeTypes = "Default.EdgeTypes";
 	private static final String SupportedEdgeTypes = "Supported.EdgeTypes";
+	private static final String JUNGEdgeType = "JUNG.EdgeType";
 
 	private Hashtable<String,PreparedStatements> ds2pstmts = new Hashtable<String,PreparedStatements>();
 	
@@ -188,6 +189,12 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
 
+		edu.uci.ics.jung.graph.util.EdgeType jet = edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED;
+		String sjet = null;
+		if((sjet = dataset.getProperty(JUNGEdgeType)) != null ) {
+			jet = edu.uci.ics.jung.graph.util.EdgeType.valueOf(sjet);
+		}
+
 		Network network = new Network(
 				IdGenerator.Network.nextId(),
 				"network" + dataset.getId()+".buildNetwork", 
@@ -255,9 +262,9 @@ public class GenericAdaptor extends AbstractAdaptor{
 					}
 					Edge edge = new Edge(IdGenerator.Edge.nextId(), node1_id+":"+node2_id, dataset);
 					if(weightIdx > -1) {
-						edge.setConfidence(rs.getFloat(weightIdx));
+						edge.setStrength(rs.getFloat(weightIdx));
 					}
-					graph.addEdge(edge, node1, node2);
+					graph.addEdge(edge, node1, node2, jet);
 				}
 				rs.close();
 			}
@@ -289,6 +296,11 @@ public class GenericAdaptor extends AbstractAdaptor{
 		if( !hasDataset(dataset.getId())) return null;
 
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
+		edu.uci.ics.jung.graph.util.EdgeType jet = edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED;
+		String sjet = null;
+		if((sjet = dataset.getProperty(JUNGEdgeType)) != null ) {
+			jet = edu.uci.ics.jung.graph.util.EdgeType.valueOf(sjet);
+		}
 
 		Network network = new Network(
 				IdGenerator.Network.nextId(),
@@ -346,7 +358,6 @@ public class GenericAdaptor extends AbstractAdaptor{
 				
 				Node node1 = null;
 				Node node2 = null;
-				boolean first = true;
 				while(rs.next()) {
 
 					String node1_id = rs.getString(node1Idx);
@@ -360,10 +371,9 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 					Edge edge = new Edge(IdGenerator.Edge.nextId(), node1_id+":"+node2_id, dataset);
 					if(weightIdx > -1) {
-						edge.setConfidence(rs.getFloat(weightIdx));
+						edge.setStrength(rs.getFloat(weightIdx));
 					}
-					graph.addEdge(edge, node1, node2);
-					first = false;
+					graph.addEdge(edge, node1, node2, jet);
 				}
 				rs.close();
 			}
@@ -413,6 +423,12 @@ public class GenericAdaptor extends AbstractAdaptor{
 		if(entities.size() < 1) return null;
 		
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
+		edu.uci.ics.jung.graph.util.EdgeType jet = edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED;
+		String sjet = null;
+		if((sjet = dataset.getProperty(JUNGEdgeType)) != null ) {
+			jet = edu.uci.ics.jung.graph.util.EdgeType.valueOf(sjet);
+		}
+
 		
 		String qetstr1 = "";
 		String qetstr2 = "";
@@ -590,7 +606,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 					if(weightIdx > -1) {
 						edge.setConfidence(rs.getFloat(weightIdx));
 					}
-					graph.addEdge(edge, node1, node2);
+					graph.addEdge(edge, node1, node2, jet);
 				}
 				rs.close();
 				stmt.close();
