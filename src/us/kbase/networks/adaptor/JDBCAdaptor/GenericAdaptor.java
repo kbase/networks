@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,14 +42,30 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 
 	private class PreparedStatements {
+		private Dataset ds = null;
 		public Hashtable<String, PreparedStatement> sql2pstmt = new Hashtable<String,PreparedStatement>();
 
-		public PreparedStatements (Dataset ds) throws Exception {
+		private void reestablishStatements() throws SQLException {
 			C3P0ProxyConnection castCon = (C3P0ProxyConnection) cpds.getConnection();
 			Set<String> propertyStr = ds.getPropertyNames();
 			for( String pn : propertyStr) {
 				if (! pn.startsWith(SQL_Statement_Prefix)) continue;
 				sql2pstmt.put(pn,castCon.prepareStatement(ds.getProperty(pn)));
+			}
+		}
+		
+		public PreparedStatements (Dataset ds) throws Exception {
+			this.ds = ds;
+			reestablishStatements();
+		}
+		
+		public void sanity() throws SQLException {
+			for(PreparedStatement ps : this.sql2pstmt.values()) {
+				C3P0ProxyConnection castCon = (C3P0ProxyConnection) ps.getConnection();
+				if(castCon.isClosed()) {
+					reestablishStatements();
+				} 
+				return;
 			}
 		}
 	}
@@ -225,7 +242,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 				EntityType et2 = Enum.valueOf(EntityType.class, dataset.getProperty(Node2_Type_Mapping_Prefix+ndStr[1]));			
 
 				String property_suffix = method_name + "." + et1 + "_" + et2;
-
+				ds2pstmts.get(dataset.getId()).sanity();
 				PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
 				ResultSet rs = pstmt.executeQuery();
 
@@ -333,6 +350,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 				String property_suffix = method_name + "." + et1 + "_" + et2 + "." + entity.getType();
 
+				ds2pstmts.get(dataset.getId()).sanity();
 				PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
 				String [] psIdx = dataset.getProperty(PreparedStatement_BIND_Prefix1 + property_suffix).split(":");
 				for (String pi : psIdx) {
@@ -534,7 +552,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 				}
 
-				
+				ds2pstmts.get(dataset.getId()).sanity();
 				PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
 				Connection con = pstmt.getConnection();
 				
@@ -627,6 +645,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 				return false;
 			}
 
+			ds2pstmts.get(dataset.getId()).sanity();
 			PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
 			String [] psIdx = dataset.getProperty(PreparedStatement_BIND_Prefix1 + property_suffix).split(":");
 			for (String pi : psIdx) {
