@@ -36,6 +36,19 @@ public enum EntityType {
 				}
 			}			
 		}
+		if(entityId.matches("^A[Tt]\\d[Gg]\\d+$")) { // Arabidopsis thaliana
+			return GENE;
+		}
+		else if (entityId.matches("^A[Tt]\\d[Gg]\\d+\\.\\d+$")){
+			return PROTEIN;
+			
+		} else if (entityId.matches("^POPTR_\\d+[Ss]\\d+$")) { // POP TR
+			return GENE;
+		} else if (entityId.matches("^POPTR_\\d+[Ss]\\d+\\.\\d+$")) {
+			return PROTEIN;
+		}
+		
+		
 		return GENE;
 	}
 }
