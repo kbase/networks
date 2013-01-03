@@ -1,0 +1,21 @@
+Networks Service
+
+The Networks Service provides access to various types of
+network-related datasets accross all domains of KBase in the unified
+format. The Networks API allows KBase users or services to access data
+for protein-protein interaction, regulatory, metabolic, and functional
+association networks in microbes and plants.
+
+---------------------------------------------------------------
+
+Networks Service 0.1.0 release notes
+Jan 3, 2013
+
+This is the initial public release of the service, running
+on http://kbase.us/services/networks/
+
+All documented methods (e.g., allDatasets and allDatasetSources)
+appear to be working.
+
+There are sometimes problems with database connectivity when
+retrieving datasets.
