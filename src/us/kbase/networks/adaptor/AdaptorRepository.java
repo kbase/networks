@@ -24,7 +24,7 @@ public class AdaptorRepository {
 	{
 		// Register all adaptors; property file in the future
 		
-		registerAdaptor(new RegPreciseAdaptorFactory());
+		//registerAdaptor(new RegPreciseAdaptorFactory()); // temporarily commented out for production deployment test
 		registerAdaptor(new ModelSEEDAdaptorFactory());
 		registerAdaptor(new PPIAdaptorFactory());	
 		registerAdaptor(new MAKAdaptorFactory());
