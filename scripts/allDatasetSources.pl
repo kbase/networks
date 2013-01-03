@@ -92,7 +92,8 @@ use Bio::KBase::KBaseNetworksService::Client;
 
 my $usage = "Usage: $0 [--host=140.221.92.222:7064]\n";
 
-my $host       = "140.221.92.222:7064";
+#my $host       = "140.221.92.222:7064";
+my $host       = "kbase.us/services/networks";
 my $help       = 0;
 my $version    = 0;
 
