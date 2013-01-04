@@ -244,6 +244,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 				String property_suffix = method_name + "." + et1 + "_" + et2;
 				ds2pstmts.get(dataset.getId()).sanity();
 				PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
+				if(pstmt == null) continue;
 				ResultSet rs = pstmt.executeQuery();
 
 				if(dataset.getProperty(Resultset_Node1_Index_Prefix + property_suffix) == null || 
@@ -352,6 +353,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 				ds2pstmts.get(dataset.getId()).sanity();
 				PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
+				if(pstmt == null) continue;
 				String [] psIdx = dataset.getProperty(PreparedStatement_BIND_Prefix1 + property_suffix).split(":");
 				for (String pi : psIdx) {
 					if(dataset.getProperty(SQL_Like_Statement_Prefix + property_suffix) != null) {
@@ -513,7 +515,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 				if(qetstr2.equals("")) {
 					property_suffix = method_name + "." + et1 + "_" + et2 + "." + qetstr1;
 				} else {
-					if(!et1.equals(qetstr1)) {
+					if(!et1.toString().equals(qetstr1)) {
 						// swap 1 & 2
 						String tmp = qetstr1;
 						qetstr1 = qetstr2;
@@ -554,6 +556,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 				ds2pstmts.get(dataset.getId()).sanity();
 				PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
+				if (pstmt == null) continue;
 				Connection con = pstmt.getConnection();
 				
 				// convert all occurrence of '?' with the index
@@ -640,13 +643,13 @@ public class GenericAdaptor extends AbstractAdaptor{
 		try {
 			String method_name = "getDatasets";
 			String property_suffix = method_name + "." + entity.getType();
-			
 			if (dataset.getProperty(SQL_Statement_Prefix + property_suffix) == null) {
 				return false;
 			}
 
 			ds2pstmts.get(dataset.getId()).sanity();
 			PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
+			if(pstmt == null) return false;
 			String [] psIdx = dataset.getProperty(PreparedStatement_BIND_Prefix1 + property_suffix).split(":");
 			for (String pi : psIdx) {
 				if(dataset.getProperty(SQL_Like_Statement_Prefix + property_suffix) != null) {
