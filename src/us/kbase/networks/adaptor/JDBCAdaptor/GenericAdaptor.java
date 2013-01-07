@@ -59,15 +59,6 @@ public class GenericAdaptor extends AbstractAdaptor{
 			reestablishStatements();
 		}
 		
-		public void sanity() throws SQLException {
-			for(PreparedStatement ps : this.sql2pstmt.values()) {
-				C3P0ProxyConnection castCon = (C3P0ProxyConnection) ps.getConnection();
-				if(!castCon.isValid(10)) {
-					reestablishStatements();
-				} 
-				return;
-			}
-		}
 	}
 
 	private static final String SQL_Statement_Prefix = "SQL.";
@@ -242,7 +233,6 @@ public class GenericAdaptor extends AbstractAdaptor{
 				EntityType et2 = Enum.valueOf(EntityType.class, dataset.getProperty(Node2_Type_Mapping_Prefix+ndStr[1]));			
 
 				String property_suffix = method_name + "." + et1 + "_" + et2;
-				ds2pstmts.get(dataset.getId()).sanity();
 				PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
 				if(pstmt == null) continue;
 				ResultSet rs = pstmt.executeQuery();
@@ -351,7 +341,6 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 				String property_suffix = method_name + "." + et1 + "_" + et2 + "." + entity.getType();
 
-				ds2pstmts.get(dataset.getId()).sanity();
 				PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
 				if(pstmt == null) continue;
 				String [] psIdx = dataset.getProperty(PreparedStatement_BIND_Prefix1 + property_suffix).split(":");
@@ -554,7 +543,6 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 				}
 
-				ds2pstmts.get(dataset.getId()).sanity();
 				PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
 				if (pstmt == null) continue;
 				Connection con = pstmt.getConnection();
@@ -647,7 +635,6 @@ public class GenericAdaptor extends AbstractAdaptor{
 				return false;
 			}
 
-			ds2pstmts.get(dataset.getId()).sanity();
 			PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
 			if(pstmt == null) return false;
 			String [] psIdx = dataset.getProperty(PreparedStatement_BIND_Prefix1 + property_suffix).split(":");
