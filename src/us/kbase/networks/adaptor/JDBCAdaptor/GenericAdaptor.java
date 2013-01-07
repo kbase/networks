@@ -62,7 +62,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 		public void sanity() throws SQLException {
 			for(PreparedStatement ps : this.sql2pstmt.values()) {
 				C3P0ProxyConnection castCon = (C3P0ProxyConnection) ps.getConnection();
-				if(castCon.isClosed()) {
+				if(!castCon.isValid(10)) {
 					reestablishStatements();
 				} 
 				return;
