@@ -45,7 +45,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 		private Dataset ds = null;
 		public Hashtable<String, PreparedStatement> sql2pstmt = new Hashtable<String,PreparedStatement>();
 
-		private void reestablishStatements() throws SQLException {
+		public void reestablishStatements() throws SQLException {
 			C3P0ProxyConnection castCon = (C3P0ProxyConnection) cpds.getConnection();
 			Set<String> propertyStr = ds.getPropertyNames();
 			for( String pn : propertyStr) {
@@ -235,7 +235,14 @@ public class GenericAdaptor extends AbstractAdaptor{
 				String property_suffix = method_name + "." + et1 + "_" + et2;
 				PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
 				if(pstmt == null) continue;
-				ResultSet rs = pstmt.executeQuery();
+				ResultSet rs;
+				try {
+					rs = pstmt.executeQuery();
+				} catch (SQLException e) {
+					ds2pstmts.get(dataset.getId()).reestablishStatements();
+					pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
+					rs = pstmt.executeQuery();
+				}
 
 				if(dataset.getProperty(Resultset_Node1_Index_Prefix + property_suffix) == null || 
 						dataset.getProperty(Resultset_Node2_Index_Prefix + property_suffix) == null) {
@@ -349,10 +356,24 @@ public class GenericAdaptor extends AbstractAdaptor{
 						pstmt.setString(Integer.parseInt(pi), entity.getId() + '%');
 					} else {
 						pstmt.setString(Integer.parseInt(pi), entity.getId());
-
 					}
 				}
-				ResultSet rs = pstmt.executeQuery();
+				
+				ResultSet rs;
+				try {
+					rs = pstmt.executeQuery();
+				} catch (SQLException e) {
+					ds2pstmts.get(dataset.getId()).reestablishStatements();
+					pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
+					for (String pi : psIdx) {
+						if(dataset.getProperty(SQL_Like_Statement_Prefix + property_suffix) != null) {
+							pstmt.setString(Integer.parseInt(pi), entity.getId() + '%');
+						} else {
+							pstmt.setString(Integer.parseInt(pi), entity.getId());
+						}
+					}
+					rs = pstmt.executeQuery();
+				}
 
 				if(dataset.getProperty(Resultset_Node1_Index_Prefix + property_suffix) == null || 
 						dataset.getProperty(Resultset_Node2_Index_Prefix + property_suffix) == null) {
@@ -545,7 +566,8 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 				PreparedStatement pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
 				if (pstmt == null) continue;
-				Connection con = pstmt.getConnection();
+				Connection con = cpds.getConnection();
+				
 				
 				// convert all occurrence of '?' with the index
 				String sql_stmt = dataset.getProperty(SQL_Statement_Prefix + property_suffix);
@@ -646,7 +668,21 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 				}
 			}
-			ResultSet rs = pstmt.executeQuery();
+			ResultSet rs;
+			try {
+				rs = pstmt.executeQuery();
+			} catch (SQLException e) {
+				ds2pstmts.get(dataset.getId()).reestablishStatements();
+				pstmt = ds2pstmts.get(dataset.getId()).sql2pstmt.get(SQL_Statement_Prefix + property_suffix);
+				for (String pi : psIdx) {
+					if(dataset.getProperty(SQL_Like_Statement_Prefix + property_suffix) != null) {
+						pstmt.setString(Integer.parseInt(pi), entity.getId() + '%');
+					} else {
+						pstmt.setString(Integer.parseInt(pi), entity.getId());
+					}
+				}
+				rs = pstmt.executeQuery();
+			}
 			boolean result = false;
 			if(rs.next()) {
 				if(rs.getInt(1) > 0) {
