@@ -13,7 +13,7 @@ import edu.uci.ics.jung.graph.*;
 /**
  * Class implementing an Adaptor for PPI data in KBase Networks API
  * 
- * @version 2.0, 12/18/12
+ * @version 2.01, 1/15/13
  * @author JMC
  */
 public class PPIAdaptor extends AbstractAdaptor {
