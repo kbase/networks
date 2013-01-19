@@ -476,6 +476,13 @@ public class PPIAdaptor extends AbstractAdaptor {
     private Dataset buildDataset(int datasetID) throws AdaptorException {
 	Dataset rv = null;
 	try {
+	    String kbID = IdGenerator.Dataset.toKBaseId(ADAPTOR_PREFIX,""+datasetID);
+
+	    // try to find it in preloaded set
+	    if (id2datasetHash.contains(kbID))
+		return id2datasetHash.get(kbID);
+
+	    // otherwise build it from database
 	    PPI.connect();
 	    Connection con = PPI.getConnection();
 	    Statement stmt = PPI.createStatement(con);
@@ -508,7 +515,7 @@ public class PPIAdaptor extends AbstractAdaptor {
 	    stmt.close();
 	    con.close();
 
-	    rv = new Dataset(IdGenerator.Dataset.toKBaseId(ADAPTOR_PREFIX,""+datasetID),
+	    rv = new Dataset(kbID,
 			     datasetName,
 			     "PPI network: "+datasetName,
 			     NetworkType.PROT_PROT_INTERACTION,
