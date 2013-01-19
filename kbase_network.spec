@@ -1,6 +1,6 @@
 /* 
 	Module KBaseNetworks version 1.0
-	This module provides access to various types of network-related datasets accross all domains of KBase in the unified format.
+	This module provides access to various types of network-related datasets across all domains of KBase in the unified format.
 
 	All methods in this module can be classified into two types: 
 	i. getting general information about datasets currently available via KBaseNetworks API
