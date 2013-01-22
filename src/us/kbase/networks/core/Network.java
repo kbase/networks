@@ -1,6 +1,10 @@
 package us.kbase.networks.core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,6 +41,16 @@ public class Network {
 
 	public Graph<Node, Edge> getGraph() {
 		return graph;
+	}
+	
+	public List<Dataset> getDatasets()
+	{
+		Set<Dataset> datasets = new HashSet<Dataset>();
+		for(Edge edge : graph.getEdges())
+		{
+			datasets.add(edge.getDataset());
+		}
+		return new ArrayList<Dataset>(datasets);
 	}
 	
 	public void addUserAnnotation(String name, String value)

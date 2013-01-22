@@ -46,6 +46,9 @@ public enum EntityType {
 			return GENE;
 		} else if (entityId.matches("^POPTR_\\d+[Ss]\\d+\\.\\d+$")) {
 			return PROTEIN;
+		} else if (entityId.startsWith("EBI-")){
+			//TODO: better solution should be found....
+			return PPI_COMPLEX;
 		}
 		
 		

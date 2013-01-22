@@ -19,13 +19,17 @@ public final class Entity {
 		return ids;
 	}
 	
-	public static List<Entity> toEntities(List<String> entityIds) {
+	public static List<Entity> toEntities(String ... entityIds) {
 		List<Entity> entities = new ArrayList<Entity>();
 		for(String entityId : entityIds)
 		{
 			entities.add( toEntity(entityId) );
 		}
 		return entities;
+	}
+	
+	public static List<Entity> toEntities(List<String> entityIds) {
+		return toEntities((String[]) entityIds.toArray(new String[0]));
 	}			
 
 	public static Entity toEntity(String entityId) {

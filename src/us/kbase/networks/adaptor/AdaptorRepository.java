@@ -4,15 +4,10 @@ import java.util.List;
 import java.util.Vector;
 
 import us.kbase.networks.adaptor.JDBCAdaptor.GenericAdaptorFactory;
-import us.kbase.networks.adaptor.mak.MAKAdaptorFactory;
 import us.kbase.networks.adaptor.modelseed.ModelSEEDAdaptorFactory;
-import us.kbase.networks.adaptor.plant.PlantCCAdaptorFactory;
-import us.kbase.networks.adaptor.plant.PlantCNAdaptorFactory;
-import us.kbase.networks.adaptor.plant.PlantFAAdaptorFactory;
 import us.kbase.networks.adaptor.plant.PlantPPIAdaptorFactory;
 import us.kbase.networks.adaptor.plant.PlantRNAdaptorFactory;
 import us.kbase.networks.adaptor.ppi.PPIAdaptorFactory;
-import us.kbase.networks.adaptor.regprecise.RegPreciseAdaptorFactory;
 
 public class AdaptorRepository {
 	
@@ -24,10 +19,14 @@ public class AdaptorRepository {
 	{
 		// Register all adaptors; property file in the future
 		
-		//registerAdaptor(new RegPreciseAdaptorFactory()); // temporarily commented out for production deployment test
+		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("regprecise.config"));
+		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("mak.config"));
+		/*		
+		
+		
 		registerAdaptor(new ModelSEEDAdaptorFactory());
 		registerAdaptor(new PPIAdaptorFactory());	
-		registerAdaptor(new MAKAdaptorFactory());
+		
 		registerAdaptor(new PlantPPIAdaptorFactory());		
 		registerAdaptor(new PlantRNAdaptorFactory());
 		registerAdaptor(new GenericAdaptorFactory("plant-cc-at-ga.config"));
@@ -36,7 +35,7 @@ public class AdaptorRepository {
 		registerAdaptor(new GenericAdaptorFactory("plant-cn-pt-ga.config"));
 		registerAdaptor(new GenericAdaptorFactory("plant-fa-at-ga.config"));
 		registerAdaptor(new GenericAdaptorFactory("plant-fa-pt-ga.config"));
-				
+*/				
 	}
 	
 	public static AdaptorRepository getAdaptorRepository() throws AdaptorException

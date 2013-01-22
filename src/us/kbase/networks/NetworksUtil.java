@@ -9,26 +9,46 @@ import javax.swing.JFrame;
 
 import org.apache.commons.collections15.Transformer;
 
+import us.kbase.networks.core.Dataset;
+import us.kbase.networks.core.Edge;
+import us.kbase.networks.core.Network;
+import us.kbase.networks.core.Node;
+import us.kbase.networks.core.NodeType;
 import edu.uci.ics.jung.algorithms.layout.CircleLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.BasicVisualizationServer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 
-import us.kbase.networks.adaptor.regprecise.RegPreciseAdaptor;
-import us.kbase.networks.core.Dataset;
-import us.kbase.networks.core.Edge;
-import us.kbase.networks.core.Network;
-import us.kbase.networks.core.Node;
-import us.kbase.networks.core.NodeType;
-
 public class NetworksUtil {
 
 	public static void printNetwork(Network network) {
-		System.out.println("//------- Network");
-		System.out.println("Nodes count = " + network.getGraph().getVertexCount());
-		System.out.println("Edges count = " + network.getGraph().getEdgeCount());
-		System.out.println("Network: " + network.getGraph().toString());
+		System.out.println("//------- Network: " + network.getName());
+		List<Dataset> datasets =  network.getDatasets();
+		
+		System.out.println("### Datasets ");
+		printDatasets("", datasets);
+
+		System.out.println("### Nodes count = " + network.getGraph().getVertexCount());
+		for(Node node: network.getGraph().getVertices())
+		{
+			System.out.println("Node: " + node.getId() + "\t" + node.getName());
+			for(String propertyName: node.getPropertyNames())
+			{
+				System.out.println("\t" + propertyName + ": " + node.getProperty(propertyName));
+			}
+		}
+		System.out.println("### Edges count = " + network.getGraph().getEdgeCount());
+		for(Edge edge: network.getGraph().getEdges())
+		{
+			System.out.println("Edge: " + edge.getId() + "\t" + edge.getName());
+			for(String propertyName: edge.getPropertyNames())
+			{
+				System.out.println("\t" + propertyName + ": " + edge.getProperty(propertyName));
+			}
+		}
+		System.out.println("### Network: " + network.getGraph().toString());
+		
 	}
 	
 	public static void printDatasets(String paramName, List<Dataset> datasets)
@@ -64,7 +84,7 @@ public class NetworksUtil {
 				if(node.getType() == NodeType.GENE )
 				{
 					color = 
-						node.getProperty(RegPreciseAdaptor.NODE_PROPERTY_REGULATOR) != null 
+						node.getProperty("Regulator") != null 
 						? Color.blue: Color.green;
 				}
 				else if(node.getType() == NodeType.CLUSTER)

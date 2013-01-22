@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
@@ -52,6 +53,7 @@ public class ModelSEEDTest {
 	public void shouldReturnDataSetForEcoli() throws AdaptorException {
 		Taxon ecoli = new Taxon(genomeId);
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
+		NetworksUtil.printDatasets("", datasets);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
 		for (Dataset dataset : datasets) {
