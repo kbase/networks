@@ -21,9 +21,7 @@ public class AdaptorRepository {
 		
 		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("regprecise.config"));
 		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("mak.config"));
-		/*		
-		
-		
+
 		registerAdaptor(new ModelSEEDAdaptorFactory());
 		registerAdaptor(new PPIAdaptorFactory());	
 		
@@ -35,7 +33,6 @@ public class AdaptorRepository {
 		registerAdaptor(new GenericAdaptorFactory("plant-cn-pt-ga.config"));
 		registerAdaptor(new GenericAdaptorFactory("plant-fa-at-ga.config"));
 		registerAdaptor(new GenericAdaptorFactory("plant-fa-pt-ga.config"));
-*/				
 	}
 	
 	public static AdaptorRepository getAdaptorRepository() throws AdaptorException
