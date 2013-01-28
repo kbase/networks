@@ -340,6 +340,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 				int nodeName1Idx = getResultSetPropertyIndex(Term.Prefix_ResultsetIndex_NodeName1, propertySuffix); 
 				int nodeName2Idx = getResultSetPropertyIndex(Term.Prefix_ResultsetIndex_NodeName2, propertySuffix); 
 			
+				int edgeConfidenceIdx = getResultSetPropertyIndex(Term.Prefix_ResultsetIndex_Confidence, propertySuffix);
 				int edgeWeightIdx = getResultSetPropertyIndex(Term.Prefix_ResultsetIndex_Weight, propertySuffix);
 				int edgeNameIndex = getResultSetPropertyIndex(Term.Prefix_ResultsetIndex_EdgeName, propertySuffix);
 				int directedIndex = getResultSetPropertyIndex(Term.Prefix_ResultsetIndex_EdgeDirected, propertySuffix);
@@ -351,7 +352,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 				while(rs.next()) {
 					Node node1 = buildNode(rs, graph, nodeId2NodeHash, entity1Idx, nodeName1Idx, methodProperties.et1, methodProperties.nt1, node1FieldNames);
 					Node node2 = buildNode(rs, graph, nodeId2NodeHash, entity2Idx, nodeName2Idx, methodProperties.et2, methodProperties.nt2, node2FieldNames);
-					Edge edge  = buildEdge(rs, dataset, edgeNameIndex, edgeWeightIdx, node1, node2, edgeFieldNames);
+					Edge edge  = buildEdge(rs, dataset, edgeNameIndex, edgeWeightIdx, edgeConfidenceIdx, node1, node2, edgeFieldNames);
 				
 					if(directedIndex > -1)
 					{
@@ -380,24 +381,36 @@ public class GenericAdaptor extends AbstractAdaptor{
 		}
 	}
 	
-	private Edge buildEdge(ResultSet rs, Dataset dataset, int edgeNameIndex, int edgeWeightIdx, Node node1,
+	private Edge buildEdge(ResultSet rs, Dataset dataset, int edgeNameIndex, int edgeWeightIdx, int edgeConfidenceIdx, Node node1,
 			Node node2, String[] edgeFieldNames) throws SQLException {
 		
 		String edgeName = node1.getId() + ":" + node2.getId();
 		if(edgeNameIndex > -1)
 		{
-			edgeName = rs.getString(edgeNameIndex);
+			try{			
+				edgeName = rs.getString(edgeNameIndex);
+			}catch(Exception e){}
 		}
 		
 		Edge edge = new Edge(IdGenerator.Edge.nextId(), edgeName, dataset);
 		if(edgeWeightIdx > -1) {
-			edge.setStrength(rs.getFloat(edgeWeightIdx));
+			try{
+				edge.setStrength(rs.getFloat(edgeWeightIdx));
+			}catch(Exception e){}
+		}
+		if(edgeConfidenceIdx > -1)
+		{
+			try{
+				edge.setConfidence(rs.getFloat(edgeConfidenceIdx));
+			}catch(Exception e){}
 		}
 		
 		// Set other edge properties
 		for(String fieldName: edgeFieldNames)
 		{
-			edge.addProperty(fieldName, rs.getString(fieldName));
+			try{
+				edge.addProperty(fieldName, rs.getString(fieldName));
+			}catch(Exception e){}
 		}
 		
 		return edge;
@@ -468,7 +481,9 @@ public class GenericAdaptor extends AbstractAdaptor{
 		String nodeName = entityId;
 		if(nodeNameIdx != -1)
 		{
-			nodeName = rs.getString(nodeNameIdx);
+			try{
+				nodeName = rs.getString(nodeNameIdx);
+			}catch(Exception e){}
 		}
 		
 		Node node = nodeId2NodeHash.get(entityId);
@@ -480,11 +495,15 @@ public class GenericAdaptor extends AbstractAdaptor{
 			// Set additional node properties
 			for(String fieldName: nodeFieldNames)
 			{
-				// For nodes, the last symbol in propertyName is either 1 or 2 => we need to remove it
-				String propertyName = fieldName.substring(0, fieldName.length() - 1);
-				node.addProperty(propertyName, rs.getString(fieldName));
-			}			
-			
+				try{
+					// For nodes, the last symbol in propertyName is either 1 or 2 => we need to remove it
+					char lastSymbol = fieldName.charAt(fieldName.length() - 1);
+					String propertyName = Character.isDigit(lastSymbol) 
+						? fieldName.substring(0, fieldName.length() - 1)
+						: fieldName;
+					node.addProperty(propertyName, rs.getString(fieldName));
+				}catch(Exception e){}
+			}						
 			graph.addVertex(node);
 		}
 		return node;
