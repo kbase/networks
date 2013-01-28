@@ -254,6 +254,7 @@ build-libs:
 #		--scripts scripts \ # automatically generated scripts not working
 
 all: build-libs
+	mkdir -p WebContent/WEB-INF/classes; cp -r src/us WebContent/WEB-INF/classes
 	cd ./conf; $(ANT) build 
 
 # Deploying a server refers to the deployment of ...{TODO}
