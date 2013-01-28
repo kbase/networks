@@ -39,8 +39,9 @@ public class QueryConfig{
 			this.preparedSql = "";			
 		}catch(Exception e)
 		{
-			throw new AdaptorException(" Property suffix = " + propertySuffix + "; " 
-					+ e.getMessage() , e);
+			throw new AdaptorException(" Property suffix = " + propertySuffix
+					+ "; SQL=" + sql
+					+ "; " + e.getMessage() , e);
 		}
 	}
 	
