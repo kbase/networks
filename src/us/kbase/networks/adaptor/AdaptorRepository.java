@@ -25,14 +25,13 @@ public class AdaptorRepository {
 		registerAdaptor(new ModelSEEDAdaptorFactory());
 		registerAdaptor(new PPIAdaptorFactory());	
 		
-		registerAdaptor(new PlantPPIAdaptorFactory());		
-		registerAdaptor(new PlantRNAdaptorFactory());
-		registerAdaptor(new GenericAdaptorFactory("plant-cc-at-ga.config"));
-		registerAdaptor(new GenericAdaptorFactory("plant-cc-pt-ga.config"));
-		registerAdaptor(new GenericAdaptorFactory("plant-cn-at-ga.config"));
-		registerAdaptor(new GenericAdaptorFactory("plant-cn-pt-ga.config"));
-		registerAdaptor(new GenericAdaptorFactory("plant-fa-at-ga.config"));
-		registerAdaptor(new GenericAdaptorFactory("plant-fa-pt-ga.config"));
+		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-cc.config"));
+		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-cn.config"));
+		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-fn.config"));
+		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-gp.config"));
+		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-ppip.config"));
+		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-rn.config"));
+		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-ppi-ga.config"));
 	}
 	
 	public static AdaptorRepository getAdaptorRepository() throws AdaptorException
