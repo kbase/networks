@@ -67,6 +67,7 @@ public class Term {
 	public static final String Prefix_ResultsetIndex_NodeName1  	= "RSIndex.NodeName1.";
 	public static final String Prefix_ResultsetIndex_NodeName2  	= "RSIndex.NodeName2.";		
 	public static final String Prefix_ResultsetIndex_Weight  		= "RSIndex.Weight.";
+	public static final String Prefix_ResultsetIndex_Confidence 	= "RSIndex.Confidence.";
 	public static final String Prefix_ResultsetIndex_EdgeName 		= "RSIndex.EdgeName.";
 	public static final String Prefix_ResultsetIndex_DatasetId 		= "RSIndex.DatasetId.";
 
@@ -78,6 +79,7 @@ public class Term {
 		Prefix_ResultsetIndex_NodeName1,
 		Prefix_ResultsetIndex_NodeName2,
 		Prefix_ResultsetIndex_Weight,
+		Prefix_ResultsetIndex_Confidence,
 		Prefix_ResultsetIndex_EdgeName,
 		Prefix_ResultsetIndex_DatasetId
 	};
