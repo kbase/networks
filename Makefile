@@ -144,7 +144,7 @@ test-service:
 # of the server and it's related architecture. For illustrative
 # purposes, we include the dependency in the deploy target as we
 # prefer this when it is reasonable."
-deploy: deploy-client
+deploy: deploy-client deploy-service
 
 deploy-all: deploy-client deploy-service
 
@@ -207,10 +207,10 @@ deploy-libs:
 # what is actually the correct directory to deploy docs?
 deploy-dir:
 	mkdir -p $(SERVICE_DIR) 
-	mkdir -p $(SERVICE_DIR)/webroot/docroot 
-	if [ ! -L $(SERVICE_DIR)/webroot/webroot ] ; then \
-		ln -s $(GLASSFISH_HOME)/glassfish/domains/domain1 $(SERVICE_DIR)/webroot/webroot; \
+	if [ ! -L $(SERVICE_DIR)/webroot ] ; then \
+		ln -s $(GLASSFISH_HOME)/glassfish/domains/domain1 $(SERVICE_DIR)/webroot; \
 	fi;
+#	mkdir -p $(SERVICE_DIR)/webroot/docroot # the above webroot symlink already have `docroot'
 
 # Deploying docs here refers to the deployment of documentation
 # of the API. We'll include a description of deploying documentation
