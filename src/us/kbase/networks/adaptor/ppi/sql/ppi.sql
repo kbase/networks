@@ -37,7 +37,7 @@ create table if not exists interaction_dataset (
        unique key (description)
 ) comment='Interaction data set; i.e., a set of interactions found using one experiment' engine=innodb;
 
-create tabel if not exists interaction_dataset_genome (
+create table if not exists interaction_dataset_genome (
        interaction_dataset_id integer unsigned not null,
        genome_id varchar(250) not null,
        foreign key (interaction_dataset_id) references interaction_dataset(id) on delete cascade on update cascade
