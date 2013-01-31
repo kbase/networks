@@ -357,11 +357,15 @@ public class GenericAdaptor extends AbstractAdaptor{
 					if(directedIndex > -1)
 					{
 						final int directedValue = rs.getInt(directedIndex);
-						switch(directedValue)
+						if(directedValue > 0)
 						{
-							case  1: graph.addEdge(edge, node1, node2, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED); break;
-							case -1: graph.addEdge(edge, node2, node1, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED); break;
-							case  0: graph.addEdge(edge, node2, node1, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED); break;
+							graph.addEdge(edge, node1, node2, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+						} else if(directedValue < 0) 
+						{
+							graph.addEdge(edge, node2, node1, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+						}
+						else{
+							graph.addEdge(edge, node2, node1, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);
 						}
 					}
 					else{
