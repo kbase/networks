@@ -508,7 +508,7 @@ public class PPIAdaptor extends AbstractAdaptor {
 	    rs.close();
 
 	    Vector<Taxon> taxons = new Vector<Taxon>();
-	    rs = stmt.executeQuery("select genome_id from interaction_dataset_genome where interaction_dataset_id="+datsetID);
+	    rs = stmt.executeQuery("select genome_id from interaction_dataset_genome where interaction_dataset_id="+datasetID);
 	    while (rs.next())
 		taxons.add(new Taxon(rs.getString(1)));
 	    rs.close();
