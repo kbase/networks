@@ -15,6 +15,7 @@ import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
+import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
@@ -88,6 +89,21 @@ public class ModelSEEDTest {
 	}
 	
 	@Test
+	public void shouldReturnNetworkForEcoliGenes() throws AdaptorException {
+		Taxon ecoli = new Taxon(genomeId);
+		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
+		assertNotNull("should return a list of Datasets", datasets);
+		assertTrue("list should contain at least one dataset", datasets.size() > 0);
+		Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
+		assertNotNull("Should get a network back", network);
+		Graph<Node,Edge> g = network.getGraph();				
+		assertNotNull("Network should have graph", g);
+		assertEquals("Graph should have 11 edges", g.getEdgeCount(), 11);
+		assertEquals("Graph should have " + queryGenes.size() + " nodes", g.getVertexCount(), queryGenes.size());
+		
+	}
+	
+	@Test
 	public void shouldReturnNetworkForEcoliSubsystem() throws AdaptorException {
 		Taxon ecoli = new Taxon(genomeId);
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
@@ -102,17 +118,15 @@ public class ModelSEEDTest {
 	}
 	
 	@Test
-	public void shouldReturnNetworkForEcoliGenes() throws AdaptorException {
+	public void shouldReturnNetworkForEcoliGenesInSameSubsystems() throws AdaptorException {
 		Taxon ecoli = new Taxon(genomeId);
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
-		Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
+		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), Entity.toEntity("kb|g.0.peg.3750"), Arrays.asList(EdgeType.GENE_GENE));
 		assertNotNull("Should get a network back", network);
-		Graph<Node,Edge> g = network.getGraph();				
+		Graph<Node,Edge> g = network.getGraph();
 		assertNotNull("Network should have graph", g);
-		assertEquals("Graph should have 11 edges", g.getEdgeCount(), 11);
-		assertEquals("Graph should have " + queryGenes.size() + " nodes", g.getVertexCount(), queryGenes.size());
-		
+		assertEquals("Graph should have 39 nodes", g.getVertexCount(), 39);
 	}
 }
