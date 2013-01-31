@@ -1,6 +1,7 @@
 package us.kbase.networks.adaptor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -37,7 +38,7 @@ public abstract  class AbstractAdaptor implements Adaptor{
 	}
 	
 	@Override
-	public List<Dataset> getDatasets() throws AdaptorException{
+	public List<Dataset> getDatasets() {
 		return new ArrayList<Dataset>(id2datasetHash.values());
 	}
 	
@@ -116,4 +117,37 @@ public abstract  class AbstractAdaptor implements Adaptor{
 		}
 		return datasets;
 	}
+	
+	@Override
+	public List<NetworkType> getNetworkTypes()
+	{
+		HashSet<NetworkType> networkTypes = new HashSet<NetworkType>();
+		for(Dataset ds: getDatasets())
+		{
+			networkTypes.add(ds.getNetworkType());
+		}
+		return new ArrayList<NetworkType>(networkTypes);
+	}
+	
+	@Override
+	public List<DatasetSource> getDatasetSources() {
+		HashSet<DatasetSource> datasetSources = new HashSet<DatasetSource>();
+		for(Dataset ds: getDatasets())
+		{
+			datasetSources.add(ds.getDatasetSource());
+		}
+		return new ArrayList<DatasetSource>(datasetSources);
+	}
+	
+	@Override
+	public List<Taxon> getTaxons() 
+	{
+		HashSet<Taxon> taxons = new HashSet<Taxon>();
+		for(Dataset ds: getDatasets())
+		{
+			taxons.addAll(ds.getTaxons());
+		}
+		return new ArrayList<Taxon>(taxons);
+	}
+	
 }

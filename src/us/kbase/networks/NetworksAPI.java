@@ -1,16 +1,14 @@
 package us.kbase.networks;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.SparseMultigraph;
-import edu.uci.ics.jung.graph.util.Pair;
 
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
@@ -25,6 +23,9 @@ import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
 import us.kbase.networks.core.Taxon;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.SparseMultigraph;
+import edu.uci.ics.jung.graph.util.Pair;
 
 public class NetworksAPI {
 	
@@ -45,14 +46,54 @@ public class NetworksAPI {
 	}
 	
 	public List<NetworkType> getNetworkTypes()
-	{
-		return Arrays.asList(NetworkType.values());
+	{		
+		HashSet<NetworkType> networkTypeSet = new HashSet<NetworkType>();
+		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
+		{
+			networkTypeSet.addAll(adaptor.getNetworkTypes());
+		}		
+		List<NetworkType> networkTypes = new ArrayList<NetworkType>(networkTypeSet);
+		Collections.sort(networkTypes,  new Comparator<NetworkType>(){
+
+			@Override
+			public int compare(NetworkType nt1, NetworkType nt2) {
+				return nt1.name().compareTo(nt2.name()); 
+			}
+		}); 
+		
+		return networkTypes;
 	}
 	
 	public List<DatasetSource> getDatasetSources()
 	{
-		return Arrays.asList(DatasetSource.values());
+		HashSet<DatasetSource> datasetSourceSet = new HashSet<DatasetSource>();
+		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
+		{
+			datasetSourceSet.addAll(adaptor.getDatasetSources());
+		}
+		
+		List<DatasetSource> datasetSources = new ArrayList<DatasetSource>(datasetSourceSet);
+		Collections.sort(datasetSources,  new Comparator<DatasetSource>(){
+
+			@Override
+			public int compare(DatasetSource ds1, DatasetSource ds2) {
+				return ds1.name().compareTo(ds2.name()); 
+			}
+		}); 
+		
+		return datasetSources;
 	}
+	
+	public List<Taxon> getTaxons()
+	{
+		HashSet<Taxon> taxons = new HashSet<Taxon>();
+		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
+		{
+			taxons.addAll(adaptor.getTaxons());
+		}		
+		return new ArrayList<Taxon>(taxons);		
+	}
+	
 	
 	public List<Dataset> getDatasets() throws AdaptorException
 	{
@@ -309,5 +350,5 @@ public class NetworksAPI {
     		}
     	}
     }
-	
+	       
 }
