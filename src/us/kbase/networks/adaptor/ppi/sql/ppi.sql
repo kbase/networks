@@ -1,12 +1,15 @@
 # temporary protein interaction schema,
 # awaiting integration into CDM
 #
+# 1/30/13 - store both ProteinID and FeatureID, since ProteinID is ambiguous
+#           also, add interaction_dataset_genome table to simplify retrieval
 # 10/25/12 - changed to point to ProteinSequences in CS instead of Features
 # 10/2/12 - created by JMC, based on InteractionSchema_v3_Sept2012 by Miriam
 
 drop table if exists interaction_data;
 drop table if exists interaction_protein;
 drop table if exists interaction;
+drop table if exists interaction_dataset_genome;
 drop table if exists interaction_dataset;
 drop table if exists interaction_detection_type;
 drop table if exists tmp_publication;
@@ -34,6 +37,13 @@ create table if not exists interaction_dataset (
        unique key (description)
 ) comment='Interaction data set; i.e., a set of interactions found using one experiment' engine=innodb;
 
+create tabel if not exists interaction_dataset_genome (
+       interaction_dataset_id integer unsigned not null,
+       genome_id varchar(250) not null,
+       foreign key (interaction_dataset_id) references interaction_dataset(id) on delete cascade on update cascade
+       # foreign key (genome_id) references Genome(id) on delete cascade on update cascade,
+) comment='Denormalized mapping from datasets to the genomes they cover' engine=innodb;
+
 create table if not exists interaction (
        id integer unsigned not null auto_increment,
        interaction_dataset_id integer unsigned not null,
@@ -53,15 +63,15 @@ create table if not exists interaction (
 create table if not exists interaction_protein (
        id integer unsigned not null auto_increment,
        interaction_id integer unsigned not null,
-       protein_id varchar(250) not null,
        feature_id varchar(250) not null,
+       protein_id varchar(250) not null,
        stoichiometry integer unsigned comment 'if applicable',
        strength double comment 'optional numeric measure of strength',
        rank integer unsigned comment 'numbered starting with 1 within interaction, if proteins are ordered',
        primary key (id),
        foreign key (interaction_id) references interaction(id) on delete cascade on update cascade
-       # foreign key (protein_id) references ProteinSequence(id) on delete cascade on update cascade,
        # foreign key (feature_id) references Feature(id) on delete cascade on update cascade,
+       # foreign key (protein_id) references ProteinSequence(id) on delete cascade on update cascade,
 ) comment='Link betweeen Proteins and Interactions' engine=innodb;
 
 create table if not exists interaction_data (

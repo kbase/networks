@@ -13,29 +13,32 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
 
    1) Unique identifiers for Interactors A and B are KBase Feature ids.
 
-   2) When the complex expansion method (the 16th column in the file)
+   2) Alternate identifiers for Interactors A and B are KBase MD5
+      Protein ids.
+
+   3) When the complex expansion method (the 16th column in the file)
       is "spoke expansion" everything about Interactor B is ignored,
       and the data are assumed to refer to a multi-protein complex
       described by multiple lines listing data for Interactor A.
 
-   3) Several pieces of optional metadata are encoded in the "Xref for
+   4) Several pieces of optional metadata are encoded in the "Xref for
       Interactor A" field (the 23rd column in the file):  "dataset:"
       refers to interaction_dataset.description, "dataseturl:" refers to the
       interaction_dataset.data_url, and "url:" refers to interaction.data_url.
 
-   4) We have extended the PSI ontology for interaction detection methods
+   5) We have extended the PSI ontology for interaction detection methods
       (column 7) to include "kb:" methods, which refer to
       interaction_detection_type.description.  If one if these methods
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-   5) We have extended the PSI ontology for source database
+   6) We have extended the PSI ontology for source database
       (column 13) to include "kb:" descriptions, which refer to
       interaction_dataset.data_source.  If one if these methods
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-  @version 2.0, 11/29/12
+  @version 2.1, 1/30/13
   @author JMC
 */
 public class ImportPSIMI {
@@ -260,12 +263,14 @@ public class ImportPSIMI {
 	    while ((buffer=infile.readLine()) != null) {
 		StringTokenizer st = new StringTokenizer(buffer,"\t");
 
+		// feature ids
+		String featureID1 = st.nextToken();
+		String featureID2 = st.nextToken();
+
 		// protein ids
 		String proteinID1 = st.nextToken();
 		String proteinID2 = st.nextToken();
-
-		st.nextToken();
-		st.nextToken();
+		
 		st.nextToken();
 		st.nextToken();
 
@@ -462,9 +467,9 @@ public class ImportPSIMI {
 
 		// add protein(s)
 		if (reverseIDs && !isSpoke) {
-		    String tmpS = proteinID1;
-		    proteinID1 = proteinID2;
-		    proteinID2 = tmpS;
+		    String tmpS = featureID1;
+		    featureID1 = featureID2;
+		    featureID2 = tmpS;
 
 		    int tmpI = stoich1;
 		    stoich1 = stoich2;
@@ -476,11 +481,12 @@ public class ImportPSIMI {
 		}
 
 		// add 1st protein
-		stmt2 = PPI.prepareStatement(con, "insert into interaction_protein values (null, ?, ?, ?, null, ?)",
+		stmt2 = PPI.prepareStatement(con, "insert into interaction_protein values (null, ?, ?, ?, ?, null, ?)",
 					     Statement.RETURN_GENERATED_KEYS);
 		PreparedStatement stmt3 = PPI.prepareStatement(con, "insert into interaction_data values (null, ?, ?, ?)");
 		stmt2.setInt(1,interactionID);
-		stmt2.setString(2,proteinID1);
+		stmt2.setString(2,featureID1);
+		stmt2.setString(3,proteinID2);
 		if (stoich1 > 0)
 		    stmt2.setInt(3,stoich1);
 		else
@@ -504,7 +510,8 @@ public class ImportPSIMI {
 
 		if (!isSpoke) {
 		    // add 2nd protein
-		    stmt2.setString(2,proteinID2);
+		    stmt2.setString(2,featureID2);
+		    stmt2.setString(3,proteinID2);
 		    if (stoich2 > 0)
 		    stmt2.setInt(3,stoich2);
 		    else
@@ -523,9 +530,22 @@ public class ImportPSIMI {
 			stmt3.executeUpdate();
 		    }
 		}
-		stmt3.close();
 		stmt2.close();
+		stmt3.close();
 	    }
+
+	    // fill in the interaction_dataset_genome table
+	    stmt.executeUpdate("truncate table interaction_dataset_genome");
+	    stmt2 = PPI.prepareStatement(con, "insert into interaction_dataset_genome values (?, ?)");
+	    ResultSet rs = stmt.executeQuery("select i.interaction_dataset_id, substring_index(p.protein_id, '.',2) as g from interaction i, interaction_protein p where p.interaction_id=i.id group by i.interaction_dataset_id,g");
+	    while (rs.next()) {
+		stmt2.setInt(1,rs.getInt(1));
+		stmt2.setString(2,rs.getString(2));
+		stmt2.executeUpdate();
+	    }
+	    rs.close();
+	    
+	    stmt2.close();
 	    stmt.close();
 	    con.close();
 	}

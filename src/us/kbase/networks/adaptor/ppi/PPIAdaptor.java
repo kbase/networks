@@ -13,7 +13,7 @@ import edu.uci.ics.jung.graph.*;
 /**
  * Class implementing an Adaptor for PPI data in KBase Networks API
  * 
- * @version 2.01, 1/15/13
+ * @version 2.1, 1/30/13
  * @author JMC
  */
 public class PPIAdaptor extends AbstractAdaptor {
@@ -72,10 +72,10 @@ public class PPIAdaptor extends AbstractAdaptor {
 	try {
 	    PPI.connect();
 	    Connection con = PPI.getConnection();
-	    PreparedStatement stmt = PPI.prepareStatement(con,"select distinct(i.interaction_dataset_id) from interaction i, interaction_protein f where f.interaction_id=i.id and f.protein_id=?");
+	    PreparedStatement stmt = PPI.prepareStatement(con,"select distinct(i.interaction_dataset_id) from interaction i, interaction_protein f where f.interaction_id=i.id and f.feature_id=?");
 
-	    String proteinID = entity.getId();
-	    stmt.setString(1, proteinID);
+	    String featureID = entity.getId();
+	    stmt.setString(1, featureID);
 
 	    ResultSet rs = stmt.executeQuery();
 	    while (rs.next()) {
@@ -136,7 +136,7 @@ public class PPIAdaptor extends AbstractAdaptor {
 
 		if ((queryType == EntityType.GENE) ||
 		    (queryType == EntityType.PROTEIN)) {
-		    stmt = PPI.prepareStatement(con,"select i.id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and f.protein_id=?");
+		    stmt = PPI.prepareStatement(con,"select i.id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and f.feature_id=?");
 		
 		    stmt.setInt(1, datasetID);
 		    stmt.setString(2, entity.getId());
@@ -187,7 +187,7 @@ public class PPIAdaptor extends AbstractAdaptor {
 		    // query is a complex
 		    int complexID = StringUtil.atoi(entity.getId(),
 						    CLUSTER_PPI_ID_PREFIX.length());
-		    stmt = PPI.prepareStatement(con,"select f.id, f.protein_id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and i.id=?");
+		    stmt = PPI.prepareStatement(con,"select f.id, f.feature_id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and i.id=?");
 		    stmt.setInt(1, datasetID);
 		    stmt.setInt(2, complexID);
 
@@ -197,10 +197,10 @@ public class PPIAdaptor extends AbstractAdaptor {
 		    rs = stmt.executeQuery();
 		    while (rs.next()) {
 			int interactionProteinID = rs.getInt(1);
-			String proteinID = rs.getString(2);
+			String featureID = rs.getString(2);
 
 			if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
-			    Node n2g = buildNode(proteinID,
+			    Node n2g = buildNode(featureID,
 						 NodeType.GENE);
 			    graph.addVertex(n2g);
 				
@@ -214,7 +214,7 @@ public class PPIAdaptor extends AbstractAdaptor {
 					  edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
 			}
 			if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
-			    Node n2p = buildNode(proteinID,
+			    Node n2p = buildNode(featureID,
 						 NodeType.PROTEIN);
 			    graph.addVertex(n2p);
 
@@ -241,7 +241,7 @@ public class PPIAdaptor extends AbstractAdaptor {
 		    (queryType == EntityType.PROTEIN)) {
 		
 		    // get all proteins in same complex as query
-		    stmt = PPI.prepareStatement(con,"select i.id, f1.protein_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.protein_id=? order by i.id asc, f1.rank asc");
+		    stmt = PPI.prepareStatement(con,"select i.id, f1.feature_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.feature_id=? order by i.id asc, f1.rank asc");
 		    stmt.setInt(1, datasetID);
 		    stmt.setString(2, entity.getId());
 		}
@@ -250,7 +250,7 @@ public class PPIAdaptor extends AbstractAdaptor {
 		    int complexID = StringUtil.atoi(entity.getId(),
 						    CLUSTER_PPI_ID_PREFIX.length());
 
-		    stmt = PPI.prepareStatement(con,"select i.id, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and i.id=? order by f.rank asc");
+		    stmt = PPI.prepareStatement(con,"select i.id, f.feature_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and i.id=? order by f.rank asc");
 		    stmt.setInt(1, datasetID);
 		    stmt.setInt(2, complexID);
 		}
@@ -367,7 +367,7 @@ public class PPIAdaptor extends AbstractAdaptor {
 	    Connection con = PPI.getConnection();
 
 	    // get all complexes / proteins in this dataset
-	    PreparedStatement stmt = PPI.prepareStatement(con,"select i.id, i.description, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id order by i.id asc, f.rank asc");
+	    PreparedStatement stmt = PPI.prepareStatement(con,"select i.id, i.description, f.feature_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id order by i.id asc, f.rank asc");
 	    stmt.setInt(1, datasetID);
 
 	    Vector<Node> nodesInComplexG = new Vector<Node>(); // gene
@@ -508,7 +508,7 @@ public class PPIAdaptor extends AbstractAdaptor {
 	    rs.close();
 
 	    Vector<Taxon> taxons = new Vector<Taxon>();
-	    rs = stmt.executeQuery("select distinct(substring_index(f.protein_id,'.',2)) from interaction_protein f, interaction i where f.interaction_id=i.id and i.interaction_dataset_id="+datasetID);
+	    rs = stmt.executeQuery("select genome_id from interaction_dataset_genome where interaction_dataset_id="+datsetID);
 	    while (rs.next())
 		taxons.add(new Taxon(rs.getString(1)));
 	    rs.close();
@@ -591,19 +591,19 @@ public class PPIAdaptor extends AbstractAdaptor {
     /**
      * make a node representing a protein or gene
      */
-    private Node buildNode(String proteinID, NodeType nodeType) {
+    private Node buildNode(String featureID, NodeType nodeType) {
 	Node rv;
 	if (nodeType == NodeType.GENE) {
 	    // fixme: should use API to lookup gene from protein
 	    rv = Node.buildGeneNode(IdGenerator.Node.nextId(),
-				    proteinID,
-				    new Entity(proteinID,
+				    featureID,
+				    new Entity(featureID,
 					       EntityType.PROTEIN));
 	}
 	else {
 	    rv = Node.buildProteinNode(IdGenerator.Node.nextId(),
-				       proteinID,
-				       new Entity(proteinID,
+				       featureID,
+				       new Entity(featureID,
 						  EntityType.PROTEIN));
 	}
 
