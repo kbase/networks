@@ -32,7 +32,7 @@ import edu.uci.ics.jung.graph.Graph;
  */
 public class MAKTest {
 
-    Adaptor adaptor;
+    static Adaptor adaptor = new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("mak.config").buildAdaptor();
 
 //	final String genomeId = "kb|g.0";
     final String genomeId = "kb|g.20848";//g.21765";
@@ -71,11 +71,10 @@ public class MAKTest {
     	    new Entity("kb|g.20848.CDS.3862", EntityType.GENE)
     );
 
-
-    @Before
-    public void setUp() throws Exception {
-        adaptor = new MAKAdaptorFactory().buildAdaptor();
-    }
+    @Test
+   	public void hasAdaptor() throws Exception {
+   	assertNotNull(adaptor);
+       }
 
     @Test
     public void shouldReturnListOfDatasets() throws AdaptorException {
