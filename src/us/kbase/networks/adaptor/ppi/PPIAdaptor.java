@@ -167,6 +167,7 @@ public class PPIAdaptor extends AbstractAdaptor {
 		    while (rs.next()) {
 			int complexID = rs.getInt(1);
 			int interactionProteinID = rs.getInt(2);
+			
 			if (queryType==EntityType.GENE) {
 			    proteinID = rs.getString(3);
 			    if ((lastProteinID != null) &&
@@ -174,6 +175,8 @@ public class PPIAdaptor extends AbstractAdaptor {
 				n2p = null; // build a new protein
 			}
 
+			// build node representing query protein, if not
+			// already done
 			if ((n2g==null) ||
 			    edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
 			    n2g = buildNode(featureID,
