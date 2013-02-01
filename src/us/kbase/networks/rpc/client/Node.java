@@ -39,6 +39,12 @@ public class Node
     public String type;
     public Map<String, String> properties;
     public Map<String, String> userAnnotations;
+    
+    @Override
+    public String toString()
+    {
+    	return name;
+    }
 }
 
 

@@ -155,14 +155,6 @@ public class GenericAdaptor extends AbstractAdaptor{
 		return buildNetwork(dataset, edgeTypes);
 	}
 
-	
-	/*		
-	String sjet = null;
-	if((sjet = dataset.getProperty(JUNGEdgeType)) != null ) {
-		jet = edu.uci.ics.jung.graph.util.EdgeType.valueOf(sjet);
-	}
-*/
-	
 	@Override
 	public Network buildNetwork(Dataset dataset, List<EdgeType> queryEdgeTypes)
 			throws AdaptorException {
@@ -260,9 +252,10 @@ public class GenericAdaptor extends AbstractAdaptor{
 				IdGenerator.Network.nextId(),
 				dataset.getId() + ": " + methodProperties.methodName, 
 				graph);
+
 		
 		List<EdgeType> edgeTypes = getEdgeTypes(Term.SupportedEdgeTypes, queryEdgeTypes);
-		if(edgeTypes.isEmpty()) return null;
+		if(edgeTypes.isEmpty()) return network;
 
 		try {
 			Hashtable<String,Node> nodeId2NodeHash = new Hashtable<String,Node>(); 
@@ -352,6 +345,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 				while(rs.next()) {
 					Node node1 = buildNode(rs, graph, nodeId2NodeHash, entity1Idx, nodeName1Idx, methodProperties.et1, methodProperties.nt1, node1FieldNames);
 					Node node2 = buildNode(rs, graph, nodeId2NodeHash, entity2Idx, nodeName2Idx, methodProperties.et2, methodProperties.nt2, node2FieldNames);
+					
 					Edge edge  = buildEdge(rs, dataset, edgeNameIndex, edgeWeightIdx, edgeConfidenceIdx, node1, node2, edgeFieldNames);
 				
 					if(directedIndex > -1)

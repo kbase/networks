@@ -12,8 +12,12 @@ import us.kbase.networks.core.Taxon;
 
 public interface Adaptor {
 
-		
-	public List<Dataset> getDatasets() throws AdaptorException;
+	public List<NetworkType> getNetworkTypes();
+	public List<DatasetSource> getDatasetSources();
+	public List<Taxon> getTaxons();
+
+	
+	public List<Dataset> getDatasets();
 	
 	public List<Dataset> getDatasets(NetworkType networkType) throws AdaptorException;
 	public List<Dataset> getDatasets(DatasetSource datasetSource) throws AdaptorException;

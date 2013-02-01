@@ -215,7 +215,6 @@ public class QueryConfig{
 		String[] placeholderStrs = new String[arrayPlaceholders.size()];
 		for(int i = 0; i < arrayPlaceholders.size(); i++)
 		{
-			System.out.println("From  getPlaceholderPatterns: " + propertySuffix);
 			placeholderStrs[i] = arrayPlaceholders.get(i).toStringPattern();
 		}
 		return placeholderStrs;		

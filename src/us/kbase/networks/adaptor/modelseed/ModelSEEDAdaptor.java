@@ -229,6 +229,22 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 				}	
 			}
 		}
+		else if (edgeTypes.contains(EdgeType.GENE_GENE) && entity.getType() == EntityType.GENE) {
+			Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), entity.getId(), entity);
+
+			// find genes in same subsystems as this gene
+			graph.addVertex(geneNode);
+			Set<String> geneNbrs = new HashSet<String>();
+			for (fields_Subsystem fs : getSubsystemFieldsForGene(entity.getId())) {
+				geneNbrs.addAll(getGenesForSubsystem(fs.id, dataset.getTaxons().get(0).getGenomeId()));
+			}
+			for (String geneId : geneNbrs) {
+				Node gNode = Node.buildGeneNode(IdGenerator.Node.nextId(), geneId, toGeneEntity(geneId));
+				graph.addVertex(gNode);
+				Edge edge = new Edge(IdGenerator.Edge.nextId(), "Member of same subsystem", dataset);
+				graph.addEdge(edge, gNode, geneNode, edu.uci.ics.jung.graph.util.EdgeType.UNDIRECTED);
+			}
+		}
 		return network;
 		
 		// $return = $obj->subsystems_to_fids($subsystems, $genomes)
