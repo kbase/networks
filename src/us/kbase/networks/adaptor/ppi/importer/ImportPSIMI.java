@@ -58,6 +58,7 @@ public class ImportPSIMI {
 	    String rv = rs.getString(1);
 	    rs.close();
 	    stmt.close();
+	    con.close();
 	    return rv;
 	}
 	rs.close();
@@ -74,18 +75,21 @@ public class ImportPSIMI {
     final public static int lookupOrCreateDataset(String description) throws Exception {
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
-	PreparedStatement stmt = PPI.prepareStatement(con,"select id from interaction_dataset where description=?");
+	PreparedStatement stmt = PPI.prepareStatement(con,
+						      "select id from interaction_dataset where description=?");
 	stmt.setString(1,description);
 	ResultSet rs = stmt.executeQuery();
 	if (rs.next()) {
 	    int rv = rs.getInt(1);
 	    rs.close();
 	    stmt.close();
+	    con.close();
 	    return rv;
 	}
 	rs.close();
 	stmt.close();
-	stmt = PPI.prepareStatement(con, "insert into interaction_dataset values (null, ?, null, null)",
+	stmt = PPI.prepareStatement(con,
+				    "insert into interaction_dataset values (null, ?, null, null)",
 				    Statement.RETURN_GENERATED_KEYS);
 	stmt.setString(1,description);
 	stmt.executeUpdate();
@@ -108,7 +112,8 @@ public class ImportPSIMI {
 	
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
-	PreparedStatement stmt = PPI.prepareStatement(con, "select id from interaction_detection_type where description=?");
+	PreparedStatement stmt = PPI.prepareStatement(con,
+						      "select id from interaction_detection_type where description=?");
 	stmt.setString(1,description);
 	ResultSet rs = stmt.executeQuery();
 	if (rs.next()) {
@@ -131,7 +136,8 @@ public class ImportPSIMI {
     final public static int createMethod(String description) throws Exception {
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
-	PreparedStatement stmt = PPI.prepareStatement(con, "insert into interaction_detection_type values (null, ?)",
+	PreparedStatement stmt = PPI.prepareStatement(con,
+						      "insert into interaction_detection_type values (null, ?)",
 						      Statement.RETURN_GENERATED_KEYS);
 	stmt.setString(1,description);
 	stmt.executeUpdate();
@@ -152,7 +158,8 @@ public class ImportPSIMI {
 						      String description) throws Exception {
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
-	PreparedStatement stmt = PPI.prepareStatement(con, "select id from interaction where interaction_dataset_id=? and description=?");
+	PreparedStatement stmt = PPI.prepareStatement(con,
+						      "select id from interaction where interaction_dataset_id=? and description=?");
 	stmt.setInt(1,datasetID);
 	stmt.setString(2,description);
 	ResultSet rs = stmt.executeQuery();
@@ -165,7 +172,8 @@ public class ImportPSIMI {
 	}
 	rs.close();
 	stmt.close();
-	stmt = PPI.prepareStatement(con, "insert into interaction values (null, ?, ?, false, null, null, null, null)",
+	stmt = PPI.prepareStatement(con,
+				    "insert into interaction values (null, ?, ?, false, null, null, null, null)",
 				    Statement.RETURN_GENERATED_KEYS);
 	stmt.setInt(1,datasetID);
 	stmt.setString(2,description);
@@ -215,6 +223,9 @@ public class ImportPSIMI {
 	return rv;
     }
 
+    /**
+       parse crossreferences field into key/value pairs
+    */
     final public static HashMap<String,String> parseXrefs(String xrefString) {
 	HashMap<String,String> rv = new HashMap<String,String>();
 	String[] xrefs = xrefString.split("\\|");
@@ -233,7 +244,6 @@ public class ImportPSIMI {
 	}
 	return rv;
     }
-					  
     
     final public static void main(String argv[]) {
 	try {
@@ -261,6 +271,8 @@ public class ImportPSIMI {
 	    BufferedReader infile = IO.openReader(argv[0]);
 	    String buffer;
 	    while ((buffer=infile.readLine()) != null) {
+		// System.out.println(buffer);
+		
 		StringTokenizer st = new StringTokenizer(buffer,"\t");
 
 		// feature ids
@@ -402,7 +414,8 @@ public class ImportPSIMI {
 		if ((datasetURL != null) &&
 		    (!datasetURL.equals(datasetURLMap.get(datasetName)))) {
 		    datasetURLMap.put(datasetName, datasetURL);
-		    stmt2 = PPI.prepareStatement(con, "update interaction_dataset set data_url=? where id=?");
+		    stmt2 = PPI.prepareStatement(con,
+						 "update interaction_dataset set data_url=? where id=?");
 		    stmt2.setString(1,datasetURL);
 		    stmt2.setInt(2,datasetID);
 		    stmt2.executeUpdate();
@@ -411,7 +424,8 @@ public class ImportPSIMI {
 		if ((sourceDB != null) &&
 		    (!sourceDB.equals(datasetSourceMap.get(datasetName)))) {
 		    datasetSourceMap.put(datasetName, sourceDB);
-		    stmt2 = PPI.prepareStatement(con, "update interaction_dataset set data_source=? where id=?");
+		    stmt2 = PPI.prepareStatement(con,
+						 "update interaction_dataset set data_source=? where id=?");
 		    stmt2.setString(1,sourceDB);
 		    stmt2.setInt(2,datasetID);
 		    stmt2.executeUpdate();
@@ -449,7 +463,8 @@ public class ImportPSIMI {
 		if ((url != null) &&
 		    (!url.equals(interactionURL.get(interactionKey)))) {
 		    interactionURL.put(interactionKey,url);
-		    stmt2 = PPI.prepareStatement(con, "update interaction set data_url=? where id=?");
+		    stmt2 = PPI.prepareStatement(con,
+						 "update interaction set data_url=? where id=?");
 		    stmt2.setString(1,url);
 		    stmt2.setInt(2,interactionID);
 		    stmt2.executeUpdate();
@@ -458,7 +473,8 @@ public class ImportPSIMI {
 		if ((publicationID != null) &&
 		    (!publicationID.equals(interactionPublication.get(interactionKey)))) {
 		    interactionPublication.put(interactionKey,publicationID);
-		    stmt2 = PPI.prepareStatement(con, "update interaction set citation_id=? where id=?");
+		    stmt2 = PPI.prepareStatement(con,
+						 "update interaction set citation_id=? where id=?");
 		    stmt2.setString(1,publicationID);
 		    stmt2.setInt(2,interactionID);
 		    stmt2.executeUpdate();
@@ -481,22 +497,24 @@ public class ImportPSIMI {
 		}
 
 		// add 1st protein
-		stmt2 = PPI.prepareStatement(con, "insert into interaction_protein values (null, ?, ?, ?, ?, null, ?)",
+		stmt2 = PPI.prepareStatement(con,
+					     "insert into interaction_protein values (null, ?, ?, ?, ?, null, ?)",
 					     Statement.RETURN_GENERATED_KEYS);
-		PreparedStatement stmt3 = PPI.prepareStatement(con, "insert into interaction_data values (null, ?, ?, ?)");
+		PreparedStatement stmt3 = PPI.prepareStatement(con,
+							       "insert into interaction_data values (null, ?, ?, ?)");
 		stmt2.setInt(1,interactionID);
 		stmt2.setString(2,featureID1);
 		stmt2.setString(3,proteinID2);
 		if (stoich1 > 0)
-		    stmt2.setInt(3,stoich1);
+		    stmt2.setInt(4,stoich1);
 		else
-		    stmt2.setNull(3,Types.INTEGER);
+		    stmt2.setNull(4,Types.INTEGER);
 		int rank = 1;
 		Integer lastRank = interactionRank.get(interactionKey);
 		if (lastRank != null)
 		    rank = lastRank.intValue()+1;
 		interactionRank.put(interactionKey, new Integer(rank));
-		stmt2.setInt(4,rank);
+		stmt2.setInt(5,rank);
 		stmt2.executeUpdate();
 		ResultSet rs = stmt2.getGeneratedKeys();
 		rs.next();
@@ -513,12 +531,12 @@ public class ImportPSIMI {
 		    stmt2.setString(2,featureID2);
 		    stmt2.setString(3,proteinID2);
 		    if (stoich2 > 0)
-		    stmt2.setInt(3,stoich2);
+			stmt2.setInt(4,stoich2);
 		    else
-			stmt2.setNull(3,Types.INTEGER);
+			stmt2.setNull(4,Types.INTEGER);
 		    rank++;
 		    interactionRank.put(interactionKey, new Integer(rank));
-		    stmt2.setInt(4,rank);
+		    stmt2.setInt(5,rank);
 		    stmt2.executeUpdate();
 		    rs = stmt2.getGeneratedKeys();
 		    rs.next();
@@ -536,7 +554,8 @@ public class ImportPSIMI {
 
 	    // fill in the interaction_dataset_genome table
 	    stmt.executeUpdate("truncate table interaction_dataset_genome");
-	    stmt2 = PPI.prepareStatement(con, "insert into interaction_dataset_genome values (?, ?)");
+	    stmt2 = PPI.prepareStatement(con,
+					 "insert into interaction_dataset_genome values (?, ?)");
 	    ResultSet rs = stmt.executeQuery("select i.interaction_dataset_id, substring_index(p.protein_id, '.',2) as g from interaction i, interaction_protein p where p.interaction_id=i.id group by i.interaction_dataset_id,g");
 	    while (rs.next()) {
 		stmt2.setInt(1,rs.getInt(1));

@@ -1,6 +1,7 @@
 package us.kbase.networks.adaptor.ppi;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -17,33 +18,27 @@ import org.strbio.util.StringUtil;
 import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
-import us.kbase.networks.core.Dataset;
-import us.kbase.networks.core.DatasetSource;
-import us.kbase.networks.core.Edge;
-import us.kbase.networks.core.EdgeType;
-import us.kbase.networks.core.Entity;
-import us.kbase.networks.core.EntityType;
-import us.kbase.networks.core.Network;
-import us.kbase.networks.core.NetworkType;
-import us.kbase.networks.core.Node;
-import us.kbase.networks.core.Taxon;
+import us.kbase.networks.core.*;
 import edu.uci.ics.jung.graph.Graph;
 
 public class PPITest {
-    static Adaptor adaptor = new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("ppi.config").buildAdaptor();
+    static Adaptor adaptor;
 
-    final String ecoliID = "kb|g.21765";
+    final String ecoliID = "kb|g.1870";
 
-    final Entity atpA = new Entity("kb|g.21765.CDS.3606", EntityType.GENE);
-    final Entity atpE = new Entity("kb|g.21765.CDS.3743", EntityType.GENE);
-
-    final Entity atpSynthase = new Entity("kb|ppi.19539", EntityType.PPI_COMPLEX);
+    final Entity atpA = new Entity("kb|g.1870.peg.3693",
+				   EntityType.GENE);
     
+    final Entity atpE = new Entity("kb|g.1870.peg.3980",
+				   EntityType.GENE);
 
+    final Entity atpSynthase = new Entity("kb|ppi.19539",
+					  EntityType.PPI_COMPLEX);
     
     @Before
 	public void setup() throws Exception {
-    	//adaptor = new PPIAdaptorFactory().buildAdaptor();
+    	adaptor = new PPIAdaptorFactory().buildAdaptor();
+	// adaptor = new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("ppi.config").buildAdaptor();	
     }
     
     @Test
@@ -108,6 +103,54 @@ public class PPITest {
 	assertEquals("Graph should have 4 nodes",
 		     4,
 		     g.getVertexCount());
+
+	// should be one node with entity type GENE
+	Collection<Node> allNodes = g.getVertices();
+	int geneCount = 0;
+	Node geneNode = null;
+	for (Node n : allNodes) {
+	    if (n.getType() == NodeType.GENE) {
+		geneCount++;
+		geneNode = n;
+	    }
+	}
+	assertEquals("Graph should have 1 gene node",
+		     1,
+		     geneCount);
+
+	// that node should have incoming edges from every other node
+	Collection<Edge> inEdges = g.getInEdges(geneNode);
+	assertEquals("Graph should have 3 incoming edges to atpE",
+		     3,
+		     inEdges.size());
+
+	// no outgoing edges from gene
+	Collection<Edge> outEdges = g.getOutEdges(geneNode);
+	assertEquals("Graph should have 0 outgoing edges from atpE",
+		     0,
+		     outEdges.size());
+
+	// check properties of atpE node
+	assertNull("atpE should not be a bait in EcoCyc",
+		   geneNode.getProperty("is_bait"));
+
+	// incoming edges should have properties matching complex names
+	for (Node n : allNodes) {
+	    if (n.getType() == NodeType.CLUSTER) {
+		String clusterName = n.getName();
+		Edge e = g.findEdge(n, geneNode);
+		assertNotNull("Needs edge to each complex",
+			      e);
+		assertEquals("Edge should be named correctly",
+			     clusterName+"_"+atpE.getId(),
+			     e.getName());
+		assertNotNull("Edge should have is_directional property",
+			      e.getProperty("is_directional"));
+		assertEquals("Edge should have stoichiometry 10",
+			     "10",
+			     e.getProperty("stoichiometry"));
+	    }
+	}
     }
 
     @Test
@@ -126,6 +169,7 @@ public class PPITest {
 	assertNotNull("Should get a network back", network);
 	Graph<Node, Edge> g = network.getGraph();
 	assertNotNull("Network should have graph", g);
+
 	// only complex left should be fragment of atp synthase
 	Collection<Node> allNodes = g.getVertices();
 	Vector<Node> nodes = new Vector<Node>(allNodes);
@@ -204,53 +248,31 @@ public class PPITest {
 			 e.getProperty("description"));
 	}
 
-	// do it again, only fully connected protein to protein:
-	/*
-	network = adaptor.buildFirstNeighborNetwork(datasets.get(0),
-						    atpSynthase,
-						    Arrays.asList(EdgeType.GENE_GENE));
-	*/
-	
-	//PSN begin replace 
-	//it should be done in two steps
-	network = adaptor.buildFirstNeighborNetwork(datasets.get(0),
-		    atpSynthase,
-		    Arrays.asList(EdgeType.GENE_CLUSTER));
-	List<Entity> genes = new ArrayList<Entity>();
-	for(Node node: network.getGraph().getVertices())
-	{
-		if(node.getEntity().getType() == EntityType.GENE)
-		{
-			genes.add(node.getEntity());
-			System.out.println(node.getEntity().getId());
-		}
+	// find all protein-protein connections within ATP Synthase genes
+	List<Entity> atpGenes = new ArrayList<Entity>();
+	for (Node n: network.getGraph().getVertices()) {
+	    if (n.getEntity().getType() == EntityType.GENE)
+		atpGenes.add(n.getEntity());
 	}
 	network = adaptor.buildInternalNetwork(datasets.get(0),
-		    genes,
-		    Arrays.asList(EdgeType.GENE_GENE));
-	//PSN end replace 
-//	NetworksUtil.visualizeNetwork(network.getGraph());
-	NetworksUtil.printNetwork(network);
+					       atpGenes,
+					       Arrays.asList(EdgeType.GENE_GENE));
+	// NetworksUtil.visualizeNetwork(network.getGraph());
+	// NetworksUtil.printNetwork(network);
 	
-	assertNotNull("Should get a network back", network);
+	assertNotNull("Should get a network back",
+		      network);
 	g = network.getGraph();
-	assertNotNull("Network should have graph", g);
+	assertNotNull("Network should have graph",
+		      g);
 
 	assertEquals("Graph should have 8 nodes",
 		     8,
 		     g.getVertexCount());
 
-	/*
-	assertEquals("Graph should have 28 edges",
-		     28,
-		     g.getEdgeCount());
-	*/
-	//PSN: it should be 41
 	assertEquals("Graph should have 41 edges",
 		     41,
 		     g.getEdgeCount());
-	
-	
 	
 	for (Node n : g.getVertices()) {
 	    int stoichiometry = StringUtil.atoi(n.getProperty("stoichiometry"));
@@ -264,21 +286,15 @@ public class PPITest {
 			     3,
 			     stoichiometry);
 	}
-	for (Edge e : g.getEdges()) {
-		/*
-	    assertEquals("Edge should be complex ATPSYN-CPLX",
-			 "ATPSYN-CPLX",
-			 e.getProperty("description"));
-		*/
+	for (Edge e : g.getEdges())
 	    assertTrue("Edge should be complex with name like  *CPLX  ",  
 	    		e.getProperty("description").endsWith("CPLX"));
-	}
     }
     
     /**
      * run all tests
      */
     public static void main(String args[]) {
-	//org.junit.runner.JUnitCore.main("us.kbase.networks.adaptor.ppi.PPITest");
+	org.junit.runner.JUnitCore.main("us.kbase.networks.adaptor.ppi.PPITest");
     }
 }

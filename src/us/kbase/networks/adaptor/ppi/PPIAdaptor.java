@@ -13,7 +13,7 @@ import edu.uci.ics.jung.graph.*;
 /**
  * Class implementing an Adaptor for PPI data in KBase Networks API
  * 
- * @version 2.1, 1/30/13
+ * @version 3.0, 1/31/13
  * @author JMC
  */
 public class PPIAdaptor extends AbstractAdaptor {
@@ -72,7 +72,8 @@ public class PPIAdaptor extends AbstractAdaptor {
 	try {
 	    PPI.connect();
 	    Connection con = PPI.getConnection();
-	    PreparedStatement stmt = PPI.prepareStatement(con,"select distinct(i.interaction_dataset_id) from interaction i, interaction_protein f where f.interaction_id=i.id and f.feature_id=?");
+	    PreparedStatement stmt = PPI.prepareStatement(con,
+							  "select distinct(i.interaction_dataset_id) from interaction i, interaction_protein f where f.interaction_id=i.id and f.feature_id=?");
 
 	    String featureID = entity.getId();
 	    stmt.setString(1, featureID);
@@ -131,63 +132,101 @@ public class PPIAdaptor extends AbstractAdaptor {
 		throw new AdaptorException("PPI adaptor can't handle query for entity type "+queryType);
 	    
 	    // for CLUSTER edges, just need complex that gene is in
-	    if (edgeTypes.contains(EdgeType.GENE_CLUSTER)
-		|| edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
+	    if (edgeTypes.contains(EdgeType.GENE_CLUSTER) ||
+		edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
 
 		if ((queryType == EntityType.GENE) ||
 		    (queryType == EntityType.PROTEIN)) {
-		    stmt = PPI.prepareStatement(con,"select i.id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and f.feature_id=?");
+		    if (queryType==EntityType.GENE)
+			stmt = PPI.prepareStatement(con,
+						    "select i.id, f.id, f.protein_id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and f.feature_id=? order by f.protein_id");
+		    else
+			stmt = PPI.prepareStatement(con,
+						    "select i.id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and f.feature_id=? and f.protein_id=?");
+
+		    String featureID = entity.getId();
+		    String proteinID = null;
+		    if (queryType==EntityType.PROTEIN) {
+			String[] ids = parseProteinID(featureID);
+			featureID = ids[0];
+			proteinID = ids[1];
+		    }
 		
 		    stmt.setInt(1, datasetID);
-		    stmt.setString(2, entity.getId());
+		    stmt.setString(2, featureID);
+		    if (queryType==EntityType.PROTEIN)
+			stmt.setString(3, proteinID);
 
 		    Node n2g = null; // representing query as gene
 		    Node n2p = null; // representing query as protein
 
-		    if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
-			n2g = buildNode(entity.getId(), NodeType.GENE);
-			graph.addVertex(n2g);
-		    }
-		    if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
-			n2p = buildNode(entity.getId(), NodeType.PROTEIN);
-			graph.addVertex(n2p);
-		    }
-
+		    // track multiple possible proteins per feature
+		    String lastProteinID = null;
+		    
 		    rs = stmt.executeQuery();
 		    while (rs.next()) {
 			int complexID = rs.getInt(1);
 			int interactionProteinID = rs.getInt(2);
+			if (queryType==EntityType.GENE) {
+			    proteinID = rs.getString(3);
+			    if ((lastProteinID != null) &&
+				(!lastProteinID.equals(proteinID)))
+				n2p = null; // build a new protein
+			}
+
+			if ((n2g==null) ||
+			    edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
+			    n2g = buildNode(featureID,
+					    null,
+					    NodeType.GENE);
+			    graph.addVertex(n2g);
+			}
+			if ((n2p==null) &&
+			    edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
+			    n2p = buildNode(featureID,
+					    proteinID,
+					    NodeType.PROTEIN);
+			    graph.addVertex(n2p);
+			}
 
 			Node n1 = buildComplexNode(complexID);
 			graph.addVertex(n1);
 
+			Edge e = null;
 			if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
-			    Edge e = buildEdge(n1,
-					       n2g,
-					       interactionProteinID,
-					       dataset);
+			    e = buildEdge(n1,
+					  n2g,
+					  interactionProteinID,
+					  dataset);
 			    graph.addEdge(e,
 					  n1,
 					  n2g,
 					  edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
 			}
 			if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
-			    Edge e = buildEdge(n1,
-					       n2p,
-					       interactionProteinID,
-					       dataset);
+			    e = buildEdge(n1,
+					  n2p,
+					  interactionProteinID,
+					  dataset);
 			    graph.addEdge(e,
 					  n1,
 					  n2p,
 					  edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
 			}
+
+			// add approprate TAP bait properties
+			if (n2g != null)
+			    detectTAPBait(n2g, e);
+			if (n2p != null)
+			    detectTAPBait(n2p, e);
 		    }
 		}
 		else {
 		    // query is a complex
 		    int complexID = StringUtil.atoi(entity.getId(),
 						    CLUSTER_PPI_ID_PREFIX.length());
-		    stmt = PPI.prepareStatement(con,"select f.id, f.feature_id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and i.id=?");
+		    stmt = PPI.prepareStatement(con,
+						"select f.id, f.feature_id, f.protein_id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and i.id=?");
 		    stmt.setInt(1, datasetID);
 		    stmt.setInt(2, complexID);
 
@@ -198,9 +237,11 @@ public class PPIAdaptor extends AbstractAdaptor {
 		    while (rs.next()) {
 			int interactionProteinID = rs.getInt(1);
 			String featureID = rs.getString(2);
+			String proteinID = rs.getString(3);
 
 			if (edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
 			    Node n2g = buildNode(featureID,
+						 null,
 						 NodeType.GENE);
 			    graph.addVertex(n2g);
 				
@@ -212,9 +253,11 @@ public class PPIAdaptor extends AbstractAdaptor {
 					  n1,
 					  n2g,
 					  edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+			    detectTAPBait(n2g, e);
 			}
 			if (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER)) {
 			    Node n2p = buildNode(featureID,
+						 proteinID,
 						 NodeType.PROTEIN);
 			    graph.addVertex(n2p);
 
@@ -226,6 +269,8 @@ public class PPIAdaptor extends AbstractAdaptor {
 					  n1,
 					  n2p,
 					  edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+
+			    detectTAPBait(n2p, e);
 			}
 		    }
 		}
@@ -237,20 +282,29 @@ public class PPIAdaptor extends AbstractAdaptor {
 	    if (edgeTypes.contains(EdgeType.GENE_GENE)
 		|| edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) {
 
-		if ((queryType == EntityType.GENE) ||
-		    (queryType == EntityType.PROTEIN)) {
-		
+		if (queryType == EntityType.GENE) {
 		    // get all proteins in same complex as query
-		    stmt = PPI.prepareStatement(con,"select i.id, f1.feature_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.feature_id=? order by i.id asc, f1.rank asc");
+		    stmt = PPI.prepareStatement(con,
+						"select i.id, f1.feature_id, f1.protein_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.feature_id=? order by i.id asc, f1.rank asc");
 		    stmt.setInt(1, datasetID);
 		    stmt.setString(2, entity.getId());
+		}
+		else if (queryType == EntityType.PROTEIN) {
+		    // get all proteins in same complex as query
+		    stmt = PPI.prepareStatement(con,
+						"select i.id, f1.feature_id, f1.protein_id, f1.id from interaction i, interaction_protein f1, interaction_protein f2 where i.interaction_dataset_id=? and f1.interaction_id=i.id and f2.interaction_id=i.id and f2.feature_id=? and f2.protein_id=? order by i.id asc, f1.rank asc");
+		    stmt.setInt(1, datasetID);
+		    String[] ids = parseProteinID(entity.getId());
+		    stmt.setString(2, ids[0]);
+		    stmt.setString(3, ids[1]);
 		}
 		else {
 		    // query is a complex
 		    int complexID = StringUtil.atoi(entity.getId(),
 						    CLUSTER_PPI_ID_PREFIX.length());
 
-		    stmt = PPI.prepareStatement(con,"select i.id, f.feature_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and i.id=? order by f.rank asc");
+		    stmt = PPI.prepareStatement(con,
+						"select i.id, f.feature_id, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id and i.id=? order by f.rank asc");
 		    stmt.setInt(1, datasetID);
 		    stmt.setInt(2, complexID);
 		}
@@ -263,7 +317,8 @@ public class PPIAdaptor extends AbstractAdaptor {
 		while (rs.next()) {
 		    int complexID = rs.getInt(1);
 		    String geneID2 = rs.getString(2);
-		    int interactionProteinID = rs.getInt(3);
+		    String proteinID2 = rs.getString(3);
+		    int interactionProteinID = rs.getInt(4);
 
 		    // if new complex, fully connect all nodes in last complex
 		    if (complexID != lastComplexID) {
@@ -278,13 +333,17 @@ public class PPIAdaptor extends AbstractAdaptor {
 
 		    Node node;
 		    if (edgeTypes.contains(EdgeType.GENE_GENE)) {
-			node = buildNode(geneID2, NodeType.GENE);
+			node = buildNode(geneID2,
+					 null,
+					 NodeType.GENE);
 			node.addProperty("interaction_protein_id", ""+interactionProteinID);
 			graph.addVertex(node);
 			nodesInComplexG.add(node);
 		    }
 		    if (edgeTypes.contains(EdgeType.PROTEIN_PROTEIN)) {
-			node = buildNode(geneID2, NodeType.PROTEIN);
+			node = buildNode(geneID2,
+					 proteinID2,
+					 NodeType.PROTEIN);
 			node.addProperty("interaction_protein_id", ""+interactionProteinID);
 			graph.addVertex(node);
 			nodesInComplexP.add(node);
@@ -367,7 +426,8 @@ public class PPIAdaptor extends AbstractAdaptor {
 	    Connection con = PPI.getConnection();
 
 	    // get all complexes / proteins in this dataset
-	    PreparedStatement stmt = PPI.prepareStatement(con,"select i.id, i.description, f.feature_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id order by i.id asc, f.rank asc");
+	    PreparedStatement stmt = PPI.prepareStatement(con,
+							  "select i.id, i.description, f.feature_id, f.protein_id, f.id from interaction i, interaction_protein f where i.interaction_dataset_id=? and f.interaction_id=i.id order by i.id asc, f.rank asc");
 	    stmt.setInt(1, datasetID);
 
 	    Vector<Node> nodesInComplexG = new Vector<Node>(); // gene
@@ -380,7 +440,8 @@ public class PPIAdaptor extends AbstractAdaptor {
 		int complexID = rs.getInt(1);
 		String complexDescription = rs.getString(2);
 		String geneID = rs.getString(3);
-		int interactionProteinID = rs.getInt(4);
+		String proteinID = rs.getString(4);
+		int interactionProteinID = rs.getInt(5);
 
 		// if new complex, process all of last complex
 		if (complexID != lastComplexID) {
@@ -421,14 +482,18 @@ public class PPIAdaptor extends AbstractAdaptor {
 		Node node;
 		if ((edgeTypes.contains(EdgeType.GENE_GENE))
 		    || (edgeTypes.contains(EdgeType.GENE_CLUSTER))) {
-		    node = buildNode(geneID, NodeType.GENE);
+		    node = buildNode(geneID,
+				     null,
+				     NodeType.GENE);
 		    node.addProperty("interaction_protein_id", ""+interactionProteinID);
 		    graph.addVertex(node);
 		    nodesInComplexG.add(node);
 		}
 		if ((edgeTypes.contains(EdgeType.PROTEIN_PROTEIN))
 		    || (edgeTypes.contains(EdgeType.PROTEIN_CLUSTER))) {
-		    node = buildNode(geneID, NodeType.PROTEIN);
+		    node = buildNode(geneID,
+				     proteinID,
+				     NodeType.PROTEIN);
 		    node.addProperty("interaction_protein_id", ""+interactionProteinID);
 		    graph.addVertex(node);
 		    nodesInComplexP.add(node);
@@ -508,7 +573,7 @@ public class PPIAdaptor extends AbstractAdaptor {
 	    rs.close();
 
 	    Vector<Taxon> taxons = new Vector<Taxon>();
-	    rs = stmt.executeQuery("select genome_id from interaction_dataset_genome where interaction_dataset_id="+datsetID);
+	    rs = stmt.executeQuery("select genome_id from interaction_dataset_genome where interaction_dataset_id="+datasetID);
 	    while (rs.next())
 		taxons.add(new Taxon(rs.getString(1)));
 	    rs.close();
@@ -589,25 +654,27 @@ public class PPIAdaptor extends AbstractAdaptor {
     }
 
     /**
-     * make a node representing a protein or gene
+     * make a node representing a protein or gene.  proteinID is null
+     * for genes, and contains the KBase MD5 identifier for proteins.
+     * featureID is required for both.
      */
-    private Node buildNode(String featureID, NodeType nodeType) {
+    private Node buildNode(String featureID,
+			   String proteinID,
+			   NodeType nodeType) {
 	Node rv;
 	if (nodeType == NodeType.GENE) {
-	    // fixme: should use API to lookup gene from protein
 	    rv = Node.buildGeneNode(IdGenerator.Node.nextId(),
 				    featureID,
 				    new Entity(featureID,
-					       EntityType.PROTEIN));
+					       EntityType.GENE));
 	}
 	else {
 	    rv = Node.buildProteinNode(IdGenerator.Node.nextId(),
-				       featureID,
-				       new Entity(featureID,
+				       featureID+"|"+proteinID,
+				       new Entity(featureID+"|"+proteinID,
 						  EntityType.PROTEIN));
 	}
 
-	// todo: add properties, such as aliases
 	return rv;
     }
 
@@ -715,6 +782,8 @@ public class PPIAdaptor extends AbstractAdaptor {
 	    for (String propertyName : e.getPropertyNames())
 		n1.addProperty(propertyName, e.getProperty(propertyName));
 
+	    detectTAPBait(n1, e);
+
 	    for (int j=i+1; j<n; j++) {
 		Node n2 = nodes.get(j);
 
@@ -755,8 +824,48 @@ public class PPIAdaptor extends AbstractAdaptor {
 
 	    g.addEdge(e,
 		      complexNode,
-		      n,
+		      n,		     
 		      edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
+
+	    detectTAPBait(n, e);
 	}
+    }
+
+    /**
+       set "is_bait" property on a node appropriately based on whether a
+       node is TAP bait in a complex.  Note that this is a node property,
+       so it generally indicates whether a node has been tested as a
+       TAP bait in this dataset.       
+    */
+    public void detectTAPBait(Node n,
+			      Edge e) {
+	// check whether node is a TAP bait
+	String rank = e.getProperty("rank");
+	String method = e.getProperty("detection_method");
+	if ((rank != null) &&
+	    (method != null) &&
+	    (method.equals("TAP")) &&
+	    (rank.equals("1"))) {
+	    String datasetID = e.getProperty("interaction_dataset_id");
+	    n.addProperty("is_bait","1");
+	    if (datasetID != null)
+		n.addProperty("is_bait_dataset_"+datasetID,"1");
+	    String interactionID = e.getProperty("interaction_id");
+	    if (interactionID != null)
+		n.addProperty("is_bait_interaction_"+interactionID,"1");
+	}
+    }
+
+    /**
+       parse out protein, feature ids
+    */
+    public String[] parseProteinID(String mixedID) throws Exception {
+	String[] rv = new String[2];
+	String[] ids = mixedID.split("|");
+	if (ids.length != 3)
+	    throw new AdaptorException("Malformed query id; protein id must be specified as featureID|MD5");
+	rv[0] = ids[0]+"|"+ids[1]; // feature ID
+	rv[1] = ids[2]; // protein ID
+	return rv;
     }
 }
