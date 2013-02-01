@@ -13,15 +13,7 @@ import org.junit.Test;
 import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
-import us.kbase.networks.core.Dataset;
-import us.kbase.networks.core.DatasetSource;
-import us.kbase.networks.core.Edge;
-import us.kbase.networks.core.Entity;
-import us.kbase.networks.core.EntityType;
-import us.kbase.networks.core.Network;
-import us.kbase.networks.core.NetworkType;
-import us.kbase.networks.core.Node;
-import us.kbase.networks.core.Taxon;
+import us.kbase.networks.core.*;
 import edu.uci.ics.jung.graph.Graph;
 
 /**
@@ -70,6 +62,30 @@ public class MAKTest {
             new Entity("kb|g.20848.CDS.3769", EntityType.GENE),
             new Entity("kb|g.20848.CDS.3862", EntityType.GENE)
     );
+
+    final List<Entity> queryMixed = Arrays.asList(
+               new Entity("kb|g.20848.CDS.998", EntityType.GENE),
+               new Entity("47", EntityType.BICLUSTER),
+               new Entity("170", EntityType.BICLUSTER),
+               new Entity("444", EntityType.BICLUSTER),
+               new Entity("444", EntityType.BICLUSTER),
+               new Entity("718", EntityType.BICLUSTER),
+               new Entity("821", EntityType.BICLUSTER),
+               new Entity("980", EntityType.BICLUSTER),
+               new Entity("1093", EntityType.BICLUSTER),
+               new Entity("1351", EntityType.BICLUSTER),
+               new Entity("1379", EntityType.BICLUSTER),
+               new Entity("1652", EntityType.BICLUSTER),
+               new Entity("1820", EntityType.BICLUSTER),
+               new Entity("3091", EntityType.BICLUSTER),
+               new Entity("3125", EntityType.BICLUSTER),
+               new Entity("3144", EntityType.BICLUSTER),
+               new Entity("3148", EntityType.BICLUSTER),
+               new Entity("3163", EntityType.BICLUSTER),
+               new Entity("3175", EntityType.BICLUSTER),
+               new Entity("3194", EntityType.BICLUSTER),
+               new Entity("3235", EntityType.BICLUSTER)
+       );
 
     @Test
     public void hasAdaptor() throws Exception {
@@ -135,11 +151,34 @@ public class MAKTest {
         System.out.println("shouldReturnNetworkForSOMR1Genes networkType " +
                 networkType.getDesccription() + "\t" + networkType.getId() + "\t" + networkType.getName());
 
-        Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
+        Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes, Arrays.asList(EdgeType.GENE_GENE));//adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
         assertNotNull("Should get a network back", network);
         Graph<Node, Edge> g = network.getGraph();
         assertNotNull("Network should have graph", g);
         assertEquals("Graph should have X edges", 11, g.getEdgeCount());
-        assertEquals("Graph should have " + queryGenes.size() + " nodes", g.getVertexCount(), queryGenes.size());
+        assertEquals("Graph should have " + queryGenes.size() + " nodes", queryGenes.size(), g.getVertexCount());
+    }
+
+    @Test
+    public void shouldReturnNetworkForSOMR1GenesandBiclusters() throws AdaptorException {
+        Taxon taxid = new Taxon(genomeId);
+        List<Dataset> datasets = adaptor.getDatasets(NetworkType.REGULATORY_NETWORK, DatasetSource.MAK_BICLUSTER, taxid);
+        assertNotNull("should return a list of Datasets for " + genomeId, datasets);
+        assertTrue("list should contain at least one dataset for " + genomeId, datasets.size() > 0);
+
+        System.out.println("shouldReturnNetworkForSOMR1GenesandBiclusters " + datasets.size() + "\t" + datasets.get(0));
+        Dataset dataset = (Dataset) datasets.get(0);
+        NetworkType networkType = (NetworkType) dataset.getNetworkType();
+        System.out.println("shouldReturnNetworkForSOMR1GenesandBiclusters " + datasets.size() + "\tdataset " + dataset.getDescription()
+                + "\t" + dataset.getId() + "\t" + dataset.getName());
+        System.out.println("shouldReturnNetworkForSOMR1GenesandBiclusters networkType " +
+                networkType.getDesccription() + "\t" + networkType.getId() + "\t" + networkType.getName());
+
+        Network network = adaptor.buildInternalNetwork(datasets.get(0), queryMixed);//adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
+        assertNotNull("Should get a network back", network);
+        Graph<Node, Edge> g = network.getGraph();
+        assertNotNull("Network should have graph", g);
+        assertEquals("Graph should have X edges", 20, g.getEdgeCount());
+        assertEquals("Graph should have " + queryMixed.size() + " nodes", queryMixed.size(), g.getVertexCount());
     }
 }
