@@ -488,10 +488,17 @@ public class KBase_JsonRpcServer {
 		ObjectNode error = mapper.createObjectNode();
 		error.put("code", code);
 		error.put("message", message);
+		//PSN hack: exclude data from the output
+/*		
 		if (data!=null) {
 			error.put("data",  mapper.valueToTree(data));
 		}
-		response.put("jsonrpc", jsonRpc);
+*/		
+		
+		//PSN hack: substitute "jsonrpc" to "version"
+//		response.put("jsonrpc", jsonRpc);
+		response.put("version", "1.1");
+		
 		if (Integer.class.isInstance(id)) {
 			response.put("id", Integer.class.cast(id).intValue());
 		} else if (Long.class.isInstance(id)) {
