@@ -128,12 +128,18 @@ public class MAKTest {
         assertTrue("list should contain at least one dataset for " + genomeId, datasets.size() > 0);
 
         System.out.println("shouldReturnNetworkForSOMR1Genes " + datasets.size() + "\t" + datasets.get(0));
+        Dataset dataset = (Dataset) datasets.get(0);
+        NetworkType networkType = (NetworkType) dataset.getNetworkType();
+        System.out.println("shouldReturnNetworkForSOMR1Genes " + datasets.size() + "\tdataset " + dataset.getDescription()
+                + "\t" + dataset.getId() + "\t" + dataset.getName());
+        System.out.println("shouldReturnNetworkForSOMR1Genes networkType " +
+                networkType.getDesccription() + "\t" + networkType.getId() + "\t" + networkType.getName());
 
         Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
         assertNotNull("Should get a network back", network);
         Graph<Node, Edge> g = network.getGraph();
         assertNotNull("Network should have graph", g);
-        assertEquals("Graph should have X edges", g.getEdgeCount(), 11);
+        assertEquals("Graph should have X edges", 11, g.getEdgeCount());
         assertEquals("Graph should have " + queryGenes.size() + " nodes", g.getVertexCount(), queryGenes.size());
     }
 }
