@@ -34,47 +34,47 @@ public class MAKTest {
 
     static Adaptor adaptor = new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("mak.config").buildAdaptor();
 
-//	final String genomeId = "kb|g.0";
+    //	final String genomeId = "kb|g.0";
     final String genomeId = "kb|g.20848";//g.21765";
 
-//	final String queryGeneId = "kb|g.0.peg.10";
+    //	final String queryGeneId = "kb|g.0.peg.10";
     final Entity queryGene = new Entity("kb|g.20848.CDS.578", EntityType.GENE);
 
-//	final List<String> queryGeneIds = Arrays.asList("kb|g.0.peg.10",      "kb|g.0.peg.1032",     "kb|g.0.peg.1002",
+    //	final List<String> queryGeneIds = Arrays.asList("kb|g.0.peg.10",      "kb|g.0.peg.1032",     "kb|g.0.peg.1002",
 // "kb|g.0.peg.880", "kb|g.0.peg.847",      "kb|g.0.peg.843",      "kb|g.0.peg.1247");
     final List<Entity> queryGenes = Arrays.asList(
-    		new Entity("kb|g.20848.CDS.578 ", EntityType.GENE),
-    		new Entity("kb|g.20848.CDS.47  ", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.769 ", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.669 ", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.406 ", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1347", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1304", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1130", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1303", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1995", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1083", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1127", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1030", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.1732", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2281", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2680", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2473", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2290", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2498", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2369", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2176", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.2914", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.3647", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.3564", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.3769", EntityType.GENE),
-    	    new Entity("kb|g.20848.CDS.3862", EntityType.GENE)
+            new Entity("kb|g.20848.CDS.578", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.47", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.769", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.669", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.406", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.1347", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.1304", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.1130", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.1303", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.1995", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.1083", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.1127", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.1030", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.1732", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.2281", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.2680", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.2473", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.2290", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.2498", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.2369", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.2176", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.2914", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.3647", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.3564", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.3769", EntityType.GENE),
+            new Entity("kb|g.20848.CDS.3862", EntityType.GENE)
     );
 
     @Test
-   	public void hasAdaptor() throws Exception {
-   	assertNotNull(adaptor);
-       }
+    public void hasAdaptor() throws Exception {
+        assertNotNull(adaptor);
+    }
 
     @Test
     public void shouldReturnListOfDatasets() throws AdaptorException {
@@ -116,16 +116,18 @@ public class MAKTest {
         assertNotNull("Should get a network back", network);
         Graph<Node, Edge> g = network.getGraph();
         assertNotNull("Network should have graph", g);
-        assertEquals("Graph should have "+testnodes+" edges", testedges, g.getEdgeCount());
-        assertEquals("Graph should have "+testedges+" nodes", testnodes, g.getVertexCount());
+        assertEquals("Graph should have " + testnodes + " edges", testedges, g.getEdgeCount());
+        assertEquals("Graph should have " + testedges + " nodes", testnodes, g.getVertexCount());
     }
 
     @Test
     public void shouldReturnNetworkForSOMR1Genes() throws AdaptorException {
         Taxon taxid = new Taxon(genomeId);
         List<Dataset> datasets = adaptor.getDatasets(NetworkType.REGULATORY_NETWORK, DatasetSource.MAK_BICLUSTER, taxid);
-        assertNotNull("should return a list of Datasets for "+genomeId, datasets);
-        assertTrue("list should contain at least one dataset for "+genomeId, datasets.size() > 0);
+        assertNotNull("should return a list of Datasets for " + genomeId, datasets);
+        assertTrue("list should contain at least one dataset for " + genomeId, datasets.size() > 0);
+
+        System.out.println("shouldReturnNetworkForSOMR1Genes " + datasets.size() + "\t" + datasets.get(0));
 
         Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
         assertNotNull("Should get a network back", network);
