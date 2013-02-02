@@ -540,7 +540,7 @@ public class ImportPSIMI {
 							       "insert into interaction_data values (null, ?, ?, ?)");
 		stmt2.setInt(1,interactionID);
 		stmt2.setString(2,featureID1);
-		stmt2.setString(3,proteinID2);
+		stmt2.setString(3,proteinID1);
 		if (stoich1 > 0)
 		    stmt2.setInt(4,stoich1);
 		else
