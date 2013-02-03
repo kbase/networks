@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import us.kbase.networks.NetworksUtil;
@@ -24,16 +25,28 @@ import us.kbase.networks.core.Taxon;
 import edu.uci.ics.jung.graph.Graph;
 
 public class ModelSEEDTest {
-	Adaptor adaptor;
+	static Adaptor adaptor;
 	
-//	final String genomeId = "kb|g.0";
-	final String genomeId = "kb|g.21765";
+	final String genomeId = "kb|g.0";
+//	final String genomeId = "kb|g.21765";
 	
-//	final String queryGeneId = "kb|g.0.peg.10";
-	final Entity queryGene = Entity.toEntity("kb|g.21765.CDS.967"); 
+	final Entity queryGene = Entity.toEntity("kb|g.0.peg.10");
+//	final Entity queryGene = Entity.toEntity("kb|g.21765.CDS.967"); 
 	final Entity querySS = Entity.toEntity("kb|subsystem.Nitrate and nitrite ammonification");
 	
 //	final List<String> queryGeneIds = Arrays.asList("kb|g.0.peg.10",      "kb|g.0.peg.1032",     "kb|g.0.peg.1002",     "kb|g.0.peg.880", "kb|g.0.peg.847",      "kb|g.0.peg.843",      "kb|g.0.peg.1247");
+	final List<Entity> queryGenes = Entity.toEntities( 		
+		Arrays.asList(new String[]{
+			"kb|g.0.peg.10",      
+			"kb|g.0.peg.1032",     
+			"kb|g.0.peg.1002",     
+			"kb|g.0.peg.880", 
+			"kb|g.0.peg.847",      
+			"kb|g.0.peg.843",      
+			"kb|g.0.peg.1247"
+	})); 
+
+	/*	
 	final List<Entity> queryGenes = Entity.toEntities( 		
 		Arrays.asList(new String[]{
 			"kb|g.21765.CDS.967", 
@@ -43,12 +56,12 @@ public class ModelSEEDTest {
 			"kb|g.21765.CDS.2426", 
 			"kb|g.21765.CDS.2043"
 		})); 
+*/	
 	
-	
-	public ModelSEEDTest() throws Exception {
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
 		adaptor = new ModelSEEDAdaptorFactory().buildAdaptor();
 	}
-	
 	
 	@Test
 	public void shouldReturnDataSetForEcoli() throws AdaptorException {
@@ -98,7 +111,7 @@ public class ModelSEEDTest {
 		assertNotNull("Should get a network back", network);
 		Graph<Node,Edge> g = network.getGraph();				
 		assertNotNull("Network should have graph", g);
-		assertEquals("Graph should have 11 edges", 11, g.getEdgeCount());
+		assertEquals("Graph should have 16 edges", 16, g.getEdgeCount());
 		assertEquals("Graph should have " + queryGenes.size() + " nodes", queryGenes.size(), g.getVertexCount());
 		
 	}
