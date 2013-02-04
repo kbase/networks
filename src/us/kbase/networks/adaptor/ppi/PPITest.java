@@ -100,6 +100,9 @@ public class PPITest {
 	assertEquals("Graph should have 3 edges",
 		     3,
 		     g.getEdgeCount());
+
+	NetworksUtil.printNetwork(network);
+
 	assertEquals("Graph should have 4 nodes",
 		     4,
 		     g.getVertexCount());

@@ -42,6 +42,12 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
   @author JMC
 */
 public class ImportPSIMI {
+    // cache DB lookups:
+    static HashMap <Integer,String> pubMap = new HashMap<Integer,String>();
+    static HashMap <String,Integer> dsMap = new HashMap<String,Integer>();
+    static HashMap <String,Integer> methodMap = new HashMap<String,Integer>();
+    static HashMap <String,Integer> intMap = new HashMap<String,Integer>();
+    
     /**
        Looks up a publication by its pubmed id, or creates one if it
        doesn't already exist in the (standin) publication table.
@@ -50,22 +56,30 @@ public class ImportPSIMI {
        with the real publications in the CS.
     */
     final public static String lookupOrCreatePublication(int pubmedID) throws Exception {
+	String kbID = pubMap.get(new Integer(pubmedID));
+	if (kbID != null)
+	    return kbID;
+	
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
 	Statement stmt = PPI.createStatement(con);
 	ResultSet rs = stmt.executeQuery("select id from tmp_publication where link=\"pubmed:"+pubmedID+"\"");
 	if (rs.next()) {
-	    String rv = rs.getString(1);
+	    kbID = rs.getString(1);
+	    pubMap.put(new Integer(pubmedID), kbID);
 	    rs.close();
 	    stmt.close();
 	    con.close();
-	    return rv;
+	    return kbID;
 	}
 	rs.close();
 	stmt.executeUpdate("insert into tmp_publication values (\"jmc|pub."+pubmedID+"\", null, \"pubmed:"+pubmedID+"\")");
 	stmt.close();
 	con.close();
-	return ("jmc|pub."+pubmedID);
+	
+	kbID = "jmc|pub."+pubmedID;
+	pubMap.put(new Integer(pubmedID), kbID);
+	return kbID;
     }
 
     /**
@@ -73,6 +87,10 @@ public class ImportPSIMI {
        one if it doesn't already exist
     */
     final public static int lookupOrCreateDataset(String description) throws Exception {
+	Integer kbID = dsMap.get(description);
+	if (kbID != null)
+	    return kbID.intValue();
+	
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
 	PreparedStatement stmt = PPI.prepareStatement(con,
@@ -84,6 +102,7 @@ public class ImportPSIMI {
 	    rs.close();
 	    stmt.close();
 	    con.close();
+	    dsMap.put(description, new Integer(rv));
 	    return rv;
 	}
 	rs.close();
@@ -99,6 +118,7 @@ public class ImportPSIMI {
 	rs.close();
 	stmt.close();
 	con.close();
+	dsMap.put(description, new Integer(rv));
 	return rv;
     }
 
@@ -109,6 +129,10 @@ public class ImportPSIMI {
     final public static int lookupMethod(String description) throws Exception {
 	if (description==null)
 	    return 0;
+
+	Integer kbID = methodMap.get(description);
+	if (kbID != null)
+	    return kbID.intValue();
 	
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
@@ -121,6 +145,7 @@ public class ImportPSIMI {
 	    rs.close();
 	    stmt.close();
 	    con.close();
+	    methodMap.put(description, new Integer(rv));
 	    return rv;
 	}
 	rs.close();
@@ -147,6 +172,7 @@ public class ImportPSIMI {
 	rs.close();
 	stmt.close();
 	con.close();
+	methodMap.put(description, new Integer(rv));
 	return rv;
     }
 
@@ -156,6 +182,10 @@ public class ImportPSIMI {
     */
     final public static int lookupOrCreateInteraction(int datasetID,
 						      String description) throws Exception {
+	Integer kbID = intMap.get(datasetID+"_"+description);
+	if (kbID != null)
+	    return kbID.intValue();
+	
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
 	PreparedStatement stmt = PPI.prepareStatement(con,
@@ -168,6 +198,7 @@ public class ImportPSIMI {
 	    rs.close();
 	    stmt.close();
 	    con.close();
+	    intMap.put(datasetID+"_"+description, new Integer(rv));
 	    return rv;
 	}
 	rs.close();
@@ -184,6 +215,7 @@ public class ImportPSIMI {
 	rs.close();
 	stmt.close();
 	con.close();
+	intMap.put(datasetID+"_"+description, new Integer(rv));
 	return rv;
     }
 
@@ -487,6 +519,10 @@ public class ImportPSIMI {
 		    featureID1 = featureID2;
 		    featureID2 = tmpS;
 
+		    tmpS = proteinID1;
+		    proteinID1 = proteinID2;
+		    proteinID2 = tmpS;
+		    
 		    int tmpI = stoich1;
 		    stoich1 = stoich2;
 		    stoich2 = tmpI;
@@ -504,7 +540,7 @@ public class ImportPSIMI {
 							       "insert into interaction_data values (null, ?, ?, ?)");
 		stmt2.setInt(1,interactionID);
 		stmt2.setString(2,featureID1);
-		stmt2.setString(3,proteinID2);
+		stmt2.setString(3,proteinID1);
 		if (stoich1 > 0)
 		    stmt2.setInt(4,stoich1);
 		else
@@ -556,7 +592,7 @@ public class ImportPSIMI {
 	    stmt.executeUpdate("truncate table interaction_dataset_genome");
 	    stmt2 = PPI.prepareStatement(con,
 					 "insert into interaction_dataset_genome values (?, ?)");
-	    ResultSet rs = stmt.executeQuery("select i.interaction_dataset_id, substring_index(p.protein_id, '.',2) as g from interaction i, interaction_protein p where p.interaction_id=i.id group by i.interaction_dataset_id,g");
+	    ResultSet rs = stmt.executeQuery("select i.interaction_dataset_id, substring_index(p.feature_id, '.',2) as g from interaction i, interaction_protein p where p.interaction_id=i.id group by i.interaction_dataset_id,g");
 	    while (rs.next()) {
 		stmt2.setInt(1,rs.getInt(1));
 		stmt2.setString(2,rs.getString(2));

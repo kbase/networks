@@ -64,8 +64,14 @@ public class NetworksService {
      **/
     public List<Dataset> datasetSource2Datasets(String datasetSourceRef) throws Exception
     {
-    	us.kbase.networks.core.DatasetSource datasetSource = 
-    		Enum.valueOf(us.kbase.networks.core.DatasetSource.class, datasetSourceRef);
+    	us.kbase.networks.core.DatasetSource datasetSource = null;
+    	try{
+    		datasetSource = 
+    			Enum.valueOf(us.kbase.networks.core.DatasetSource.class, datasetSourceRef);
+    	}catch(Exception e)
+    	{
+    		throw new Exception(datasetSourceRef + " is not a valid DatasetSource. Please use allDatasetSources() method to get a list of suuported DatasetSources.");
+    	}
     	
 		List<us.kbase.networks.core.Dataset> serverDatasets =  api.getDatasets(datasetSource);				
 		return toClientDatasets(serverDatasets); 		
@@ -81,8 +87,14 @@ public class NetworksService {
 
     public List<Dataset> networkType2Datasets(String networkTypeRef) throws Exception
     {
-    	us.kbase.networks.core.NetworkType networkType = 
-    		Enum.valueOf(us.kbase.networks.core.NetworkType.class, networkTypeRef);
+    	us.kbase.networks.core.NetworkType networkType = null;
+    	try{
+    		networkType = Enum.valueOf(us.kbase.networks.core.NetworkType.class, networkTypeRef);
+		}catch(Exception e)
+		{
+			throw new Exception(networkTypeRef + " is not a valid NetworkType. Please use allNetworkTypes() method to get a list of suuported NetworkTypes.");
+		}
+    	
     	
 		List<us.kbase.networks.core.Dataset> serverDatasets =  api.getDatasets(networkType);				
 		return toClientDatasets(serverDatasets); 		
@@ -211,7 +223,7 @@ public class NetworksService {
 		return datasets;
 	}
 */
-    private List<EdgeType> getEdgeTypes(List<String> edgeTypeRefs) {
+    private List<EdgeType> getEdgeTypes(List<String> edgeTypeRefs) throws Exception {
     	if(edgeTypeRefs == null) {
     		return null;
     	}
@@ -220,7 +232,13 @@ public class NetworksService {
     	
     	for(String edgeTypeRef: edgeTypeRefs)
     	{
-        	EdgeType edgeType = Enum.valueOf(EdgeType.class, edgeTypeRef);
+        	EdgeType edgeType = null;
+        	try{
+        		edgeType = Enum.valueOf(EdgeType.class, edgeTypeRef);        		
+        	}catch(Exception e)
+        	{
+    			throw new Exception(edgeTypeRef + " is not a valid EdgeType.");
+        	}
         	if(edgeType != null)
         	{
         		edgeTypes.add(edgeType);
