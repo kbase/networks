@@ -256,6 +256,7 @@ build-libs:
 all: build-libs
 	mkdir -p WebContent/WEB-INF/classes; cp -r src/us WebContent/WEB-INF/classes
 	cd ./conf; $(ANT) build 
+	cd src; jar cvf ../lib/JDBCGenericAdaptorConfig.jar us/kbase/networks/adaptor/jdbc/*.config
 
 # Deploying a server refers to the deployment of ...{TODO}
 deploy-service: deploy-dir stop_domain1 start_domain1 deploy_config deploy_war generate_script deploy-scripts deploy-libs deploy-docs
