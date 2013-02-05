@@ -13,7 +13,7 @@ import edu.uci.ics.jung.graph.*;
 /**
  * Class implementing an Adaptor for PPI data in KBase Networks API
  * 
- * @version 3.0, 1/31/13
+ * @version 3.01, 2/5/13
  * @author JMC
  */
 public class PPIAdaptor extends AbstractAdaptor {
@@ -167,17 +167,19 @@ public class PPIAdaptor extends AbstractAdaptor {
 		    while (rs.next()) {
 			int complexID = rs.getInt(1);
 			int interactionProteinID = rs.getInt(2);
-			
+
 			if (queryType==EntityType.GENE) {
 			    proteinID = rs.getString(3);
 			    if ((lastProteinID != null) &&
-				(!lastProteinID.equals(proteinID)))
+				(!lastProteinID.equals(proteinID))) {
 				n2p = null; // build a new protein
+				lastProteinID = proteinID;
+			    }
 			}
 
 			// build node representing query protein, if not
 			// already done
-			if ((n2g==null) ||
+			if ((n2g==null) &&
 			    edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
 			    n2g = buildNode(featureID,
 					    null,
