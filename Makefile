@@ -208,7 +208,7 @@ deploy-libs:
 deploy-dir:
 	mkdir -p $(SERVICE_DIR) 
 	if [ ! -L $(SERVICE_DIR)/webroot ] ; then \
-		ln -s $(GLASSFISH_HOME)/glassfish/domains/domain1 $(SERVICE_DIR)/webroot; \
+		ln -s $(GLASSFISH_HOME)/glassfish/domains/domain1/ $(SERVICE_DIR)/webroot; \
 	fi;
 	mkdir -p $(SERVICE_DIR)/webroot/docroot # the above webroot symlink already have `docroot'
 
