@@ -26,13 +26,16 @@ public class PPITest {
 
     final String ecoliID = "kb|g.1870";
 
+    final String huID = "7";
+    final String huKBID = "kb|netdataset.ppi."+huID;
+
     final Entity atpA = new Entity("kb|g.1870.peg.3693",
 				   EntityType.GENE);
     
     final Entity atpE = new Entity("kb|g.1870.peg.3980",
 				   EntityType.GENE);
 
-    final Entity atpSynthase = new Entity("kb|ppi.19539",
+    final Entity atpSynthase = new Entity("kb|ppi.19381",
 					  EntityType.PPI_COMPLEX);
     
     @Before
@@ -40,7 +43,7 @@ public class PPITest {
     	adaptor = new PPIAdaptorFactory().buildAdaptor();
 	// adaptor = new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("ppi.config").buildAdaptor();	
     }
-    
+
     @Test
 	public void hasAdaptor() throws Exception {
 	assertNotNull(adaptor);
@@ -101,7 +104,7 @@ public class PPITest {
 		     3,
 		     g.getEdgeCount());
 
-	NetworksUtil.printNetwork(network);
+	// NetworksUtil.printNetwork(network);
 
 	assertEquals("Graph should have 4 nodes",
 		     4,
@@ -147,8 +150,11 @@ public class PPITest {
 		assertEquals("Edge should be named correctly",
 			     clusterName+"_"+atpE.getId(),
 			     e.getName());
-		assertNotNull("Edge should have is_directional property",
-			      e.getProperty("is_directional"));
+		assertNull("Edge should NOT have is_directional property",
+			   e.getProperty("is_directional"));
+		assertEquals("Edge should be directed",
+			     edu.uci.ics.jung.graph.util.EdgeType.DIRECTED,
+			     g.getEdgeType(e));
 		assertEquals("Edge should have stoichiometry 10",
 			     "10",
 			     e.getProperty("stoichiometry"));
@@ -261,6 +267,11 @@ public class PPITest {
 					       atpGenes,
 					       Arrays.asList(EdgeType.GENE_GENE));
 	// NetworksUtil.visualizeNetwork(network.getGraph());
+	// try {
+	// Thread.sleep(100000);
+	// }
+	// catch (Exception e) {
+	// }
 	// NetworksUtil.printNetwork(network);
 	
 	assertNotNull("Should get a network back",
@@ -269,8 +280,13 @@ public class PPITest {
 	assertNotNull("Network should have graph",
 		      g);
 
-	assertEquals("Graph should have 8 nodes",
-		     8,
+	// question about how API should work: unique node for each
+	// protein, or for each protein/complex?  i.e., if one protein
+	// is in 2 different complexes, should it be in the network
+	// once or twice?  Old adaptor says twice (20 nodes), new one
+	// says once (8 nodes).
+	assertEquals("Graph should have 20 nodes",
+		     20,
 		     g.getVertexCount());
 
 	assertEquals("Graph should have 41 edges",
@@ -292,6 +308,107 @@ public class PPITest {
 	for (Edge e : g.getEdges())
 	    assertTrue("Edge should be complex with name like  *CPLX  ",  
 	    		e.getProperty("description").endsWith("CPLX"));
+    }
+
+    @Test
+	public void testHuTAP() throws AdaptorException {
+	Taxon ecoli = new Taxon(ecoliID);
+	List<Dataset> datasets = adaptor.getDatasets(NetworkType.PROT_PROT_INTERACTION,
+						     DatasetSource.MO,
+						     ecoli);
+	assertNotNull("should return a list of Datasets", datasets);
+	assertEquals("list should contain 2 datasets",
+		     2,
+		     datasets.size());
+
+	// find Hu dataset
+	Dataset huSet = null;
+	for (Dataset d : datasets) {
+	    if (huKBID.equals(d.getId()))
+		huSet = d;
+	}
+	assertNotNull("should include Hu 2009 dataset", huSet);
+	
+	Network network = adaptor.buildFirstNeighborNetwork(huSet,
+							    atpA,
+							    Arrays.asList(EdgeType.GENE_CLUSTER));
+	assertNotNull("Should get a network back", network);
+	Graph<Node, Edge> g = network.getGraph();
+	assertNotNull("Network should have graph", g);
+
+	// NetworksUtil.printNetwork(network);
+	
+	assertEquals("Graph should have 16 nodes",
+		     16,
+		     g.getVertexCount());
+
+	assertEquals("Graph should have 15 edges",
+		     15,
+		     g.getEdgeCount());
+
+	// should be one node with entity type GENE
+	Collection<Node> allNodes = g.getVertices();
+	int geneCount = 0;
+	Node geneNode = null;
+	for (Node n : allNodes) {
+	    if (n.getType() == NodeType.GENE) {
+		geneCount++;
+		geneNode = n;
+	    }
+	}
+	assertEquals("Graph should have 1 gene node",
+		     1,
+		     geneCount);
+
+	// that node should have incoming edges from every other node
+	Collection<Edge> inEdges = g.getInEdges(geneNode);
+	assertEquals("Graph should have 15 incoming edges to atpA",
+		     15,
+		     inEdges.size());
+
+	// no outgoing edges from gene
+	Collection<Edge> outEdges = g.getOutEdges(geneNode);
+	assertEquals("Graph should have 0 outgoing edges from atpA",
+		     0,
+		     outEdges.size());
+
+	// check properties of atpA node
+	assertNotNull("atpA should be a bait in TAP",
+		      geneNode.getProperty("is_bait"));
+	assertNotNull("atpA should be a bait in Hu dataset",
+		      geneNode.getProperty("is_bait_dataset_"+huID));
+	
+	// check which complexes atpA is a bait in
+	for (Node n : allNodes) {
+	    if (n.getType() == NodeType.CLUSTER) {
+		String clusterName = n.getName();
+		Edge e = g.findEdge(n, geneNode);
+		assertNotNull("Needs edge to each complex",
+			      e);
+		assertEquals("Edge should be named correctly",
+			     clusterName+"_"+atpA.getId(),
+			     e.getName());
+		assertNotNull("Edge should have is_directional property",
+			      e.getProperty("is_directional"));
+		assertEquals("Edge should be directed",
+			     edu.uci.ics.jung.graph.util.EdgeType.DIRECTED,
+			     g.getEdgeType(e));
+		assertNull("Edge should NOT have stoichiometry",
+			   e.getProperty("stoichiometry"));
+		assertNotNull("Edge should have rank property",
+			      e.getProperty("rank"));
+		int rank = StringUtil.atoi(e.getProperty("rank"));
+		String complexID = e.getProperty("interaction_id");
+		assertNotNull("Edge should have interaction_id property",
+			      complexID);
+		if (rank==1)
+		    assertNotNull("atpA should be a bait in complex "+complexID,
+				  geneNode.getProperty("is_bait_interaction_"+complexID));
+		else 
+		    assertNull("atpA should NOT be a bait in complex "+complexID,
+			       geneNode.getProperty("is_bait_interaction_"+complexID));
+	    }
+	}
     }
     
     /**
