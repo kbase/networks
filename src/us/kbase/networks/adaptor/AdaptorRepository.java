@@ -23,7 +23,9 @@ public class AdaptorRepository {
 		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("mak.config"));
 
 		registerAdaptor(new ModelSEEDAdaptorFactory());
-		registerAdaptor(new PPIAdaptorFactory());	
+
+		// registerAdaptor(new PPIAdaptorFactory());	
+		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("ppi.config"));
 		
 		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-cc.config"));
 		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-cn.config"));
