@@ -33,12 +33,14 @@ public class KBaseNetworkTest {
 
     @Test
     public void testAllDatasets() throws Exception {
+        System.out.println("testAllDatasets");
         List<Dataset> datasets = networksAPI.allDatasets();
         printDatasets("testAllDatasets", datasets);
     }
 
     @Test
     public void testAllDatasetSources() throws Exception {
+        System.out.println("testAllDatasetSources");
         List<DatasetSource> dsSources = networksAPI.allDatasetSources();
         printDatasetSources("testAllDatasetSources", dsSources);
     }
@@ -46,6 +48,7 @@ public class KBaseNetworkTest {
 
     @Test
     public void testAllNetworkTypes() throws Exception {
+        System.out.println("testAllNetworkTypes");
         List<String> networkTypes = networksAPI.allNetworkTypes();
         printStrings("testAllNetworkTypes", networkTypes);
     }
@@ -53,12 +56,14 @@ public class KBaseNetworkTest {
 
     @Test
     public void testDatasetSource2DatasetsModelSEED() throws Exception {
+        System.out.println("testDatasetSource2DatasetsModelSEED");
         List<Dataset> datasets = networksAPI.datasetSource2Datasets("MODELSEED");
         printDatasets("testDatasetSource2DatasetsModelSEED", datasets);
     }
 
     @Test
     public void testDatasetSource2DatasetsMAK() throws Exception {
+        System.out.println("testDatasetSource2DatasetsMAK");
         List<Dataset> datasets = networksAPI.datasetSource2Datasets("MAK_BICLUSTER");
         printDatasets("testDatasetSource2DatasetsMAK", datasets);
     }
