@@ -31,30 +31,36 @@ public class KBaseNetworkTest {
     public void tearDown() throws Exception {
     }
 
-    //@Test
+    @Test
     public void testAllDatasets() throws Exception {
         List<Dataset> datasets = networksAPI.allDatasets();
         printDatasets("testAllDatasets", datasets);
     }
 
-    //@Test
+    @Test
     public void testAllDatasetSources() throws Exception {
         List<DatasetSource> dsSources = networksAPI.allDatasetSources();
         printDatasetSources("testAllDatasetSources", dsSources);
     }
 
 
-    //@Test
+    @Test
     public void testAllNetworkTypes() throws Exception {
         List<String> networkTypes = networksAPI.allNetworkTypes();
         printStrings("testAllNetworkTypes", networkTypes);
     }
 
 
-    //@Test
-    public void testDatasetSource2Datasets() throws Exception {
+    @Test
+    public void testDatasetSource2DatasetsModelSEED() throws Exception {
         List<Dataset> datasets = networksAPI.datasetSource2Datasets("MODELSEED");
-        printDatasets("testDatasetSource2Datasets", datasets);
+        printDatasets("testDatasetSource2DatasetsModelSEED", datasets);
+    }
+
+    @Test
+    public void testDatasetSource2DatasetsMAK() throws Exception {
+        List<Dataset> datasets = networksAPI.datasetSource2Datasets("MAK_BICLUSTER");
+        printDatasets("testDatasetSource2DatasetsMAK", datasets);
     }
 
     @Test
@@ -66,7 +72,15 @@ public class KBaseNetworkTest {
     }
 
     @Test
-    public void testNetworkType2Datasets() throws Exception {
+    public void testNetworkType2DatasetsFunc() throws Exception {
+        String nettype = "FUNCTIONAL_ASSOCIATION";
+        System.out.println("attempting datasets from network type " + nettype);
+        List<Dataset> datasets = networksAPI.networkType2Datasets(nettype);
+        printDatasets("testNetworkType2Datasets", datasets);
+    }
+
+    @Test
+    public void testNetworkType2DatasetsPPI() throws Exception {
         String nettype = "PROT_PROT_INTERACTION";
         System.out.println("attempting datasets from network type " + nettype);
         List<Dataset> datasets = networksAPI.networkType2Datasets(nettype);
