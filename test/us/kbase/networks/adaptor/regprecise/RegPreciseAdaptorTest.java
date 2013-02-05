@@ -1,4 +1,4 @@
-package us.kbase.networks.adaptor.jdbc;
+package us.kbase.networks.adaptor.regprecise;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.EdgeType;
