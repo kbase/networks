@@ -85,7 +85,7 @@ public class IntegratedNetworksAPITest {
                 api.buildFirstNeighborNetwork(Dataset.toDatasetIds(datasets), new Entity(genes1, EntityType.GENE), edgeTypes1);
 
         NetworksUtil.printNetwork(network);
-        NetworksUtil.visualizeNetwork(network.getGraph());
+        //NetworksUtil.visualizeNetwork(network.getGraph());
     }
 
     @Test
