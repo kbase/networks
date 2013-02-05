@@ -64,7 +64,7 @@ public class IntegratedNetworksAPITest {
         Network network = api.buildInternalNetwork(Dataset.toDatasetIds(datasets), Entity.toEntities(genes2), edgeTypes2);
 
         NetworksUtil.printNetwork(network);
-        NetworksUtil.visualizeNetwork(network.getGraph());
+        //NetworksUtil.visualizeNetwork(network.getGraph());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class IntegratedNetworksAPITest {
                 adaptor.buildFirstNeighborNetwork(datasets.get(0), new Entity(geneIds3, EntityType.GENE), edgeTypes3);
 
         NetworksUtil.printNetwork(network);
-        NetworksUtil.visualizeNetwork(network.getGraph());
+        //NetworksUtil.visualizeNetwork(network.getGraph());
         for (Edge edge : network.getGraph().getEdges()) {
             System.out.println("Edge: " + edge.getName());
             Node node = network.getGraph().getSource(edge);
