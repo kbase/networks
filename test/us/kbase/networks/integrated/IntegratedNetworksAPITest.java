@@ -56,7 +56,7 @@ public class IntegratedNetworksAPITest {
     }
 
     @Test
-    private void test_buildInternalNetwork() throws AdaptorException {
+    public void test_buildInternalNetwork() throws AdaptorException {
         Taxon taxon = new Taxon(genomeId2);
 
         List<Dataset> datasets = api.getDatasets(taxon);
@@ -68,7 +68,7 @@ public class IntegratedNetworksAPITest {
     }
 
     @Test
-    private void test_buildFirstNeighborNetwork() throws AdaptorException {
+    public void test_buildFirstNeighborNetwork() throws AdaptorException {
         Taxon taxon = new Taxon(genomeId1);
 
         List<Dataset> datasets = api.getDatasets(taxon);
@@ -89,7 +89,7 @@ public class IntegratedNetworksAPITest {
     }
 
     @Test
-    private void testAdaptor_buildFirstNeighborNetwork() throws AdaptorException {
+    public void testAdaptor_buildFirstNeighborNetwork() throws AdaptorException {
         Adaptor adaptor = new GenericAdaptorFactory("regprecise.config").buildAdaptor();
 
         Taxon taxon = new Taxon(genomeId3);

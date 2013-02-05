@@ -225,7 +225,7 @@ my @datasetIds = split/,/, $dataset_ids;
 my @edgeTypes = split/,/, $edge_types;
 my @input = <STDIN>;
 my $istr = join(" ", @input);
-$istr =~ s/[,|]/ /g;
+$istr =~ s/[,]/ /g;
 @input = split /\s+/, $istr;
 my $results = $oc->buildInternalNetwork(\@datasetIds, \@input, \@edgeTypes);
 print Dumper($results);

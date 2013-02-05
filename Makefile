@@ -210,7 +210,7 @@ deploy-dir:
 	if [ ! -L $(SERVICE_DIR)/webroot ] ; then \
 		ln -s $(GLASSFISH_HOME)/glassfish/domains/domain1 $(SERVICE_DIR)/webroot; \
 	fi;
-#	mkdir -p $(SERVICE_DIR)/webroot/docroot # the above webroot symlink already have `docroot'
+	mkdir -p $(SERVICE_DIR)/webroot/docroot # the above webroot symlink already have `docroot'
 
 # Deploying docs here refers to the deployment of documentation
 # of the API. We'll include a description of deploying documentation
