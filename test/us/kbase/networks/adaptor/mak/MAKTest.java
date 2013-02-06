@@ -68,7 +68,6 @@ public class MAKTest {
                new Entity("47", EntityType.BICLUSTER),
                new Entity("170", EntityType.BICLUSTER),
                new Entity("444", EntityType.BICLUSTER),
-               new Entity("444", EntityType.BICLUSTER),
                new Entity("718", EntityType.BICLUSTER),
                new Entity("821", EntityType.BICLUSTER),
                new Entity("980", EntityType.BICLUSTER),
@@ -178,7 +177,7 @@ public class MAKTest {
         assertNotNull("Should get a network back", network);
         Graph<Node, Edge> g = network.getGraph();
         assertNotNull("Network should have graph", g);
-        assertEquals("Graph should have X edges", 20, g.getEdgeCount());
+        assertEquals("Graph should have X edges", 19, g.getEdgeCount());
         assertEquals("Graph should have " + queryMixed.size() + " nodes", queryMixed.size(), g.getVertexCount());
     }
 }
