@@ -2,12 +2,9 @@ package us.kbase.networks.adaptor;
 
 import java.util.List;
 import java.util.Vector;
+import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
 
-import us.kbase.networks.adaptor.JDBCAdaptor.GenericAdaptorFactory;
 import us.kbase.networks.adaptor.modelseed.ModelSEEDAdaptorFactory;
-import us.kbase.networks.adaptor.plant.PlantPPIAdaptorFactory;
-import us.kbase.networks.adaptor.plant.PlantRNAdaptorFactory;
-import us.kbase.networks.adaptor.ppi.PPIAdaptorFactory;
 
 public class AdaptorRepository {
 	
@@ -19,21 +16,17 @@ public class AdaptorRepository {
 	{
 		// Register all adaptors; property file in the future
 		
-		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("regprecise.config"));
-		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("mak.config"));
-
-		registerAdaptor(new ModelSEEDAdaptorFactory());
-
-		// registerAdaptor(new PPIAdaptorFactory());	
-		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("ppi.config"));
-		
-		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-cc.config"));
-		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-cn.config"));
-		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-fn.config"));
-		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-gp.config"));
-		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-ppip.config"));
-		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-rn.config"));
-		registerAdaptor(new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("plant-ppi-ga.config"));
+		registerAdaptor(new ModelSEEDAdaptorFactory());		
+		registerAdaptor(new GenericAdaptorFactory("regprecise.config"));
+		registerAdaptor(new GenericAdaptorFactory("mak.config"));
+		registerAdaptor(new GenericAdaptorFactory("ppi.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-cc.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-cn.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-fn.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-gp.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-ppip.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-rn.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-ppi-ga.config"));
 	}
 	
 	public static AdaptorRepository getAdaptorRepository() throws AdaptorException
