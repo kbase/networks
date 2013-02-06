@@ -64,6 +64,8 @@ public class IntegratedNetworksAPITest {
         datasets.add(seed);*/
 
         //NetworksUtil.printDatasets("", datasets);
+        System.out.println("test_buildIntegratedNetwork");
+        System.out.println(datasetsIntegrate.get(0) + "\t" + datasetsIntegrate.get(1));
         Network network = api.buildInternalNetwork(datasetsIntegrate, Entity.toEntities(genesIntegrate), edgeTypes2);//Dataset.toDatasetIds(datasets)
 
         NetworksUtil.printNetwork(network);
