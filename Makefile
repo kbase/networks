@@ -276,7 +276,7 @@ deploy_war:
 	then\
 		$(GLASSFISH_HOME)/bin/asadmin undeploy KBaseNetworksRPC;\
 		$(GLASSFISH_HOME)/bin/asadmin deploy ./dist/KBaseNetworksRPC.war;\
-        fi\
+	fi\
 
 generate_script:
 	@echo 'sudo '$(GLASSFISH_HOME)'/bin/asadmin start-domain ' > $(TARGET)/services/$(SERVICE_NAME)/start_service.sh
