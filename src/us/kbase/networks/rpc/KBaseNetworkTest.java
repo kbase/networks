@@ -30,6 +30,20 @@ public class KBaseNetworkTest {
     @After
     public void tearDown() throws Exception {
     }
+    
+    @Test
+    public void testUseCase4Shiran() throws Exception {
+
+        Network network = networksAPI.buildFirstNeighborNetwork(
+                Arrays.asList(
+                        "kb|netdataset.regprecise.301",
+                        "kb|netdataset.modelseed.5"
+                ),
+                Arrays.asList("kb|g.21765.CDS.3832","kb|g.21765.CDS.1709","kb|g.21765.CDS.71"),
+                Arrays.asList("GENE_CLUSTER"));
+
+        printNetwork("testBuildFirstNeighborNetwork", network);
+    }  
 
     @Test
     public void testAllDatasets() throws Exception {
