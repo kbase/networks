@@ -263,7 +263,6 @@ stop_domain1:
 
 start_domain1:
 	@START_RESULT='$(shell $(GLASSFISH_HOME)/bin/asadmin start-domain | grep successfully)'
-	@if ["$(START_RESULT)" != ""]; then exit; fi
 
 deploy_config:
 	@DEL_NET='$(shell $(GLASSFISH_HOME)/bin/asadmin delete-network-listener http-listener-1)'
@@ -271,12 +270,7 @@ deploy_config:
 	@CRT_LST='$(shell $(GLASSFISH_HOME)/bin/asadmin create-http-listener --default-virtual-server server --listenerport $(SERVICE_PORT) --listeneraddress 0.0.0.0 http-listener-1)'
 
 deploy_war:
-	@DEPLOY='$(shell $(GLASSFISH_HOME)/bin/asadmin deploy ./dist/KBaseNetworksRPC.war | grep failed)'
-	@if ["$(DEPLOY)" != ""];\
-	then\
-		$(GLASSFISH_HOME)/bin/asadmin undeploy KBaseNetworksRPC;\
-		$(GLASSFISH_HOME)/bin/asadmin deploy ./dist/KBaseNetworksRPC.war;\
-	fi\
+	$(GLASSFISH_HOME)/bin/asadmin deploy --force=true ./dist/KBaseNetworksRPC.war;\
 
 generate_script:
 	@echo 'sudo '$(GLASSFISH_HOME)'/bin/asadmin start-domain ' > $(TARGET)/services/$(SERVICE_NAME)/start_service.sh
