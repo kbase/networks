@@ -206,11 +206,8 @@ deploy-libs:
 
 # what is actually the correct directory to deploy docs?
 deploy-dir:
-	mkdir -p $(SERVICE_DIR) 
-	if [ ! -L $(SERVICE_DIR)/webroot ] ; then \
-		ln -s $(GLASSFISH_HOME)/glassfish/domains/domain1/docroot/ $(SERVICE_DIR)/webroot; \
-	fi;
-#	mkdir -p $(SERVICE_DIR)/webroot/docroot # the above webroot symlink already have `docroot'
+	if [ ! -d $(SERVICE_DIR) ] ; then mkdir $(SERVICE_DIR) ; fi
+	if [ ! -d $(SERVICE_DIR)/webroot ] ; then mkdir $(SERVICE_DIR)/webroot ; fi
 
 # Deploying docs here refers to the deployment of documentation
 # of the API. We'll include a description of deploying documentation
