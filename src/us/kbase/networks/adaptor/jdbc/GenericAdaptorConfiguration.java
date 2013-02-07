@@ -36,7 +36,7 @@ public class GenericAdaptorConfiguration {
 
 		try {
 			cpds = new ComboPooledDataSource(config.getString("storename"));
-			cpds.setTestConnectionOnCheckin(true);
+			cpds.setTestConnectionOnCheckout(true);
 			Iterator<String> it = config.getKeys("c3po");
 			while(it.hasNext()){
 				String key = it.next();
