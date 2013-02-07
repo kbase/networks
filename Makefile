@@ -273,10 +273,10 @@ deploy_war:
 	$(GLASSFISH_HOME)/bin/asadmin deploy --force=true ./dist/KBaseNetworksRPC.war;\
 
 generate_script:
-	@echo 'sudo '$(GLASSFISH_HOME)'/bin/asadmin start-domain ' > $(TARGET)/services/$(SERVICE_NAME)/start_service.sh
-	chmod 755 $(TARGET)/services/$(SERVICE_NAME)/start_service.sh
-	@echo 'sudo '$(GLASSFISH_HOME)'/bin/asadmin stop-domain ' > $(TARGET)/services/$(SERVICE_NAME)/stop_service.sh
-	chmod 755 $(TARGET)/services/$(SERVICE_NAME)/stop_service.sh
+	@echo 'sudo '$(GLASSFISH_HOME)'/bin/asadmin start-domain ' > $(TARGET)/services/$(SERVICE_NAME)/start_service
+	chmod 755 $(TARGET)/services/$(SERVICE_NAME)/start_service
+	@echo 'sudo '$(GLASSFISH_HOME)'/bin/asadmin stop-domain ' > $(TARGET)/services/$(SERVICE_NAME)/stop_service
+	chmod 755 $(TARGET)/services/$(SERVICE_NAME)/stop_service
 
 clean:
 	cd ./conf; $(ANT) clean	
