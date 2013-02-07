@@ -71,11 +71,11 @@ public class GenericAdaptor extends AbstractAdaptor{
 				{
 					datasets.add(buildDataset(rs));
 				}
-				rs.close();
-				pst.close();
 			}
 			finally{
-				connection.close();
+				try{ rs.close(); } catch(Exception e){}
+				try{ pst.close(); } catch(Exception e){}
+				try{ connection.close(); } catch(Exception e){}
 			}
 		}
 		catch(SQLException e)
@@ -130,10 +130,10 @@ public class GenericAdaptor extends AbstractAdaptor{
 						datasets.add(dataset);
 					}
 				}		
-				rs.close();
-				pst.close();
 			}finally{
-				connection.close();
+				try{ rs.close(); } catch(Exception e){}
+				try{ pst.close(); } catch(Exception e){}
+				try{ connection.close(); } catch(Exception e){}
 			}
 		}
 		catch(SQLException e)
@@ -367,10 +367,10 @@ public class GenericAdaptor extends AbstractAdaptor{
 					}				
 				}
 			
-				rs.close();
-				pst.close();
 			} finally{
-				connection.close();
+				try{ rs.close(); } catch(Exception e){}
+				try{ pst.close(); } catch(Exception e){}
+				try{ connection.close(); } catch(Exception e){}
 			}
 		}
 		catch(Exception e)
