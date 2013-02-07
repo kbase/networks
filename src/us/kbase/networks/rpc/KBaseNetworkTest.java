@@ -16,7 +16,7 @@ public class KBaseNetworkTest {
 
     //	String url = "http://127.0.0.1:8080/KBaseNetworksRPC/networks";
 //	String url = "http://140.221.92.181:7064/KBaseNetworksRPC/networks";
-    String url = "http://140.221.92.76:7064/KBaseNetworksRPC/networks";
+    String url = "http://127.0.0.1:7064/KBaseNetworksRPC/networks";
     KBaseNetworks networksAPI;
 
 
@@ -30,6 +30,20 @@ public class KBaseNetworkTest {
     @After
     public void tearDown() throws Exception {
     }
+    
+    @Test
+    public void testUseCase4Shiran() throws Exception {
+
+        Network network = networksAPI.buildFirstNeighborNetwork(
+                Arrays.asList(
+                        "kb|netdataset.regprecise.301",
+                        "kb|netdataset.modelseed.5"
+                ),
+                Arrays.asList("kb|g.21765.CDS.3832","kb|g.21765.CDS.1709","kb|g.21765.CDS.71"),
+                Arrays.asList("GENE_CLUSTER"));
+
+        printNetwork("testBuildFirstNeighborNetwork", network);
+    }  
 
     @Test
     public void testAllDatasets() throws Exception {

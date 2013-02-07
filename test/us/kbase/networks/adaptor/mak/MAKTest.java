@@ -65,26 +65,25 @@ public class MAKTest {
 
     final List<Entity> queryMixed = Arrays.asList(
                new Entity("kb|g.20848.CDS.998", EntityType.GENE),
-               new Entity("47", EntityType.BICLUSTER),
-               new Entity("170", EntityType.BICLUSTER),
-               new Entity("444", EntityType.BICLUSTER),
-               new Entity("444", EntityType.BICLUSTER),
-               new Entity("718", EntityType.BICLUSTER),
-               new Entity("821", EntityType.BICLUSTER),
-               new Entity("980", EntityType.BICLUSTER),
-               new Entity("1093", EntityType.BICLUSTER),
-               new Entity("1351", EntityType.BICLUSTER),
-               new Entity("1379", EntityType.BICLUSTER),
-               new Entity("1652", EntityType.BICLUSTER),
-               new Entity("1820", EntityType.BICLUSTER),
-               new Entity("3091", EntityType.BICLUSTER),
-               new Entity("3125", EntityType.BICLUSTER),
-               new Entity("3144", EntityType.BICLUSTER),
-               new Entity("3148", EntityType.BICLUSTER),
-               new Entity("3163", EntityType.BICLUSTER),
-               new Entity("3175", EntityType.BICLUSTER),
-               new Entity("3194", EntityType.BICLUSTER),
-               new Entity("3235", EntityType.BICLUSTER)
+               new Entity("kb|bicluster.47", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.170", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.444", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.718", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.821", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.980", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.1093", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.1351", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.1379", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.1652", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.1820", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.3091", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.3125", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.3144", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.3148", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.3163", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.3175", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.3194", EntityType.BICLUSTER),
+               new Entity("kb|bicluster.3235", EntityType.BICLUSTER)
        );
 
     @Test
@@ -178,7 +177,7 @@ public class MAKTest {
         assertNotNull("Should get a network back", network);
         Graph<Node, Edge> g = network.getGraph();
         assertNotNull("Network should have graph", g);
-        assertEquals("Graph should have X edges", 20, g.getEdgeCount());
+        assertEquals("Graph should have X edges", 19, g.getEdgeCount());
         assertEquals("Graph should have " + queryMixed.size() + " nodes", queryMixed.size(), g.getVertexCount());
     }
 }

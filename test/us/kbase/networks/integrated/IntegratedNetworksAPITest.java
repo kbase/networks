@@ -1,5 +1,6 @@
 package us.kbase.networks.integrated;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,14 +11,8 @@ import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
-import us.kbase.networks.core.Dataset;
-import us.kbase.networks.core.Edge;
-import us.kbase.networks.core.EdgeType;
-import us.kbase.networks.core.Entity;
-import us.kbase.networks.core.EntityType;
-import us.kbase.networks.core.Network;
-import us.kbase.networks.core.Node;
-import us.kbase.networks.core.Taxon;
+import us.kbase.networks.adaptor.modelseed.ModelSEEDAdaptorFactory;
+import us.kbase.networks.core.*;
 
 public class IntegratedNetworksAPITest {
 
@@ -43,8 +38,6 @@ public class IntegratedNetworksAPITest {
     List<String> datasetsIntegrate = Arrays.asList(
             "kb|netdataset.regprecise.301",
             "kb|netdataset.modelseed.5");
-
-
     List<String> genesIntegrate = Arrays.asList(
             "kb|g.21765.CDS.3832",
             "kb|g.21765.CDS.1709",
@@ -53,6 +46,29 @@ public class IntegratedNetworksAPITest {
     @Before
     public void run() throws AdaptorException {
         api = NetworksAPI.getNetworksAPI();
+    }
+
+
+    @Test
+    public void test_buildIntegratedNetwork() throws AdaptorException {
+
+        /*Adaptor adaptor = new GenericAdaptorFactory("regprecise.config").buildAdaptor();
+        Dataset regp = adaptor.getDataset("kb|netdataset.regprecise.301");
+
+        adaptor = new ModelSEEDAdaptorFactory().buildAdaptor();
+
+        Dataset seed = adaptor.getDataset("kb|netdataset.modelseed.5");
+
+        List<Dataset> datasets = new ArrayList<Dataset>();
+        datasets.add(regp);
+        datasets.add(seed);*/
+
+        //NetworksUtil.printDatasets("", datasets);
+        System.out.println("test_buildIntegratedNetwork");
+        System.out.println(datasetsIntegrate.get(0) + "\t" + datasetsIntegrate.get(1));
+        Network network = api.buildInternalNetwork(datasetsIntegrate, Entity.toEntities(genesIntegrate), edgeTypes2);//Dataset.toDatasetIds(datasets)
+
+        NetworksUtil.printNetwork(network);
     }
 
     @Test
