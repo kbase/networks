@@ -20,7 +20,7 @@ public class IntegratedNetworksAPITest {
 
     String genomeId1 = "kb|g.21765";
     String genes1 = "kb|g.21765.CDS.543";
-    List edgeTypes1 = Arrays.asList(EdgeType.GENE_CLUSTER);
+    List<EdgeType> edgeTypes1 = Arrays.asList(EdgeType.GENE_CLUSTER);
 
 
     String genomeId2 = "kb|g.20848";
