@@ -34,7 +34,7 @@ public class RegPreciseAdaptorTest {
 	final String badDatasetId = "kb|netdataset.regprecise.QQQ";
 
 	final String geneId = "kb|g.20848.CDS.1671";
-	final String regulonId = "kb|g.20848.regulon.54";
+	final String regulonId = "kb|g.20848.regulon.5527";
 	
 	
 	final List<String> geneIds = Arrays.asList(
@@ -45,13 +45,13 @@ public class RegPreciseAdaptorTest {
 			"kb|g.20848.CDS.1031");		
 	
 	final List<String> regulonIds =  Arrays.asList(
-			"kb|g.20848.regulon.33", 
-			"kb|g.20848.regulon.2", 
-			"kb|g.20848.regulon.54", 
-			"kb|g.20848.regulon.29", 
-			"kb|g.20848.regulon.48", 
-			"kb|g.20848.regulon.169", 
-			"kb|g.20848.regulon.171" );
+			"kb|g.20848.regulon.5895", 
+			"kb|g.20848.regulon.6391", 
+			"kb|g.20848.regulon.5527", 
+			"kb|g.20848.regulon.5959", 
+			"kb|g.20848.regulon.5623", 
+			"kb|g.20848.regulon.42337", 
+			"kb|g.20848.regulon.44741" );
 	
 	
 	
@@ -82,7 +82,7 @@ public class RegPreciseAdaptorTest {
 	public void testGetTaxons() throws AdaptorException {
 		List<Taxon> taxons = adaptor.getTaxons();
 		assertNotNull("should return a list of Taxons", taxons);
-		assertTrue("list should contain > 100 taxons", taxons.size() > 100);
+		assertTrue("list should contain > 90 taxons", taxons.size() > 90);
 		assertTrue("should contain Shewanella oneidensis MR1 genome", taxons.contains(taxon));
 	}
 
