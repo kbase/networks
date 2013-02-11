@@ -21,8 +21,8 @@ Returns a "first-neighbor" network constructed basing on a given list of dataset
 list<string> datasetIds
 List of dataset identifiers to be used for building a network
 
-string geneId
-Identifier of a gene to be used as a source node           
+list<string> geneIds
+Identifiers of genes of interest for building a network         
                 
 list<EdgeType> edgeTypes
 List of possible edge types to be considered for building a network
@@ -31,7 +31,7 @@ List of possible edge types to be considered for building a network
 
 =over 6
 
-=item B<-u> I<[http://kbase.us/services/ontology_service]> B<--url>=I<[http://kbase.us/services/ontology_service]>
+=item B<-u> I<[http://kbase.us/services/networks]> B<--url>=I<[http://kbase.us/services/networks]>
 the service url
 
 =item B<-h> B<--help>
@@ -59,7 +59,7 @@ use Bio::KBase::KBaseNetworksService::Client;
 
 my $usage = "Usage: net_build_first_neighbor_network [--url=http://kbase.us/services/networks] dataset_ids edge_types < query_entity_ids\n";
 
-my $url       = "140.221.92.222:7064";
+my $url       = "http://kbase.us/services/networks";
 my $help       = 0;
 my $version    = 0;
 
@@ -69,43 +69,43 @@ GetOptions("help"       => \$help,
 
 if($help)
 {
-	print "$usage\n";
-	print "\n";
-	print "General options\n";
-	print "\t--url=[xxx.xxx.xx.xxx:xxxx]\t\tthe service url\n";
-	print "\t--help\t\tprint help information\n";
-	print "\t--version\t\tprint version information\n";
-	print "\tdataset_ids=[xxx,yyy,zzz,...]\t\tdataset id list(comma separated)\n";
-	print "\tedge_types=[xxx,yyy,zzz,...]\t\tinterested edge types(comma separated)\n";
-	print "\n";
-	print "Examples: \n";
-	print "$0 --url=x.x.x.x:x \n";
-	print "\n";
-	print "$0 --help\tprint out help\n";
-	print "\n";
-	print "$0 --version\tprint out version information\n";
-	print "\n";
-	print "Report bugs to kbase-networks\@lists.kbase.us\n";
-	exit(1);
+    print "$usage\n";
+    print "\n";
+    print "General options\n";
+    print "\t--url=[http://kbase.us/services/networks]\t\tthe service url\n";
+    print "\t--help\t\tprint help information\n";
+    print "\t--version\t\tprint version information\n";
+    print "\tdataset_ids=[xxx,yyy,zzz,...]\t\tdataset id list(comma separated)\n";
+    print "\tedge_types=[xxx,yyy,zzz,...]\t\tinterested edge types(comma separated)\n";
+    print "\n";
+    print "Examples: \n";
+    print "echo 'kb|g.3899.locus.10 kb|g.3899.locus.11' | net_build_first_neighbor_network 'kb|netdataset.plant.fn.25,kb|netdataset.plant.cn.6' 'GENE_GENE'\n";
+    print "\n";
+    print "net_build_first_neighbor_network --help\tprint out help\n";
+    print "\n";
+    print "net_build_first_neighbor_network --version\tprint out version information\n";
+    print "\n";
+    print "Report bugs to kbase-networks\@lists.kbase.us\n";
+    exit(0);
 }
 
 if($version)
 {
-	print "$0 version 1.0\n";
-	print "Copyright (C) 2012 KBase Network Team\n";
-	print "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n";
-	print "This is free software: you are free to change and redistribute it.\n";
-	print "There is NO WARRANTY, to the extent permitted by law.\n";
-	print "\n";
-	print "Written by Shinjae Yoo\n";
-	exit(1);
+    print "net_build_first_neighbor_network version 1.0\n";
+    print "Copyright (C) 2012 KBase Network Team\n";
+    print "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n";
+    print "This is free software: you are free to change and redistribute it.\n";
+    print "There is NO WARRANTY, to the extent permitted by law.\n";
+    print "\n";
+    print "Written by Shinjae Yoo\n";
+    exit(0);
 }
 
 die $usage unless @ARGV == 2;
 my $dataset_ids = $ARGV[0];
 my $edge_types = $ARGV[1];
 
-my $oc = Bio::KBase::KBaseNetworksService::Client->new("http://".$url."/KBaseNetworksRPC/networks");
+my $oc = Bio::KBase::KBaseNetworksService::Client->new($url);
 my @input = <STDIN>;                                                                             
 my $istr = join(" ", @input);                                                                    
 $istr =~ s/[,]/ /g;

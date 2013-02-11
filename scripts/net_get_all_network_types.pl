@@ -2,127 +2,97 @@ use strict;
 use Data::Dumper;
 use Carp;
 
-#
-# This is a SAS Component
-#
+=head1 NAME
 
-=head1 allNetworkTypes
+net_get_all_network_types - list all network types
 
-Example:
+=head1 SYNOPSIS
 
-    allNetworkTypes [arguments] < input > output
+net_get_all_network_types [--url=http://kbase.us/services/networks]
 
-The standard input should be a tab-separated table (i.e., each line
-is a tab-separated set of fields).  Normally, the last field in each
-line would contain the identifer. If another column contains the identifier
-use
+=head1 DESCRIPTION
 
-    -c N
-
-where N is the column (from 1) that contains the identifier.
-
-This is a pipe command. The input is taken from the standard input, and the
-output is to the standard output.
+List all network types
 
 =head2 Documentation for underlying call
 
-This script is a wrapper for the CDMI-API call allNetworkTypes. It is documented as follows:
+Returns a list of all network types.
 
-Returns a list of all types of networks that can be created.
+=head1 OPTIONS
 
-=over 4
+=over 6
 
-=item Parameter and return types
+=item B<-u> I<[http://kbase.us/services/networks]> B<--url>=I<[http://kbase.us/services/networks]>
+the service url
 
-=begin html
+=item B<-h> B<--help>
+prints help information
 
-<pre>
-$networkTypes is a reference to a list where each element is a NetworkType
-NetworkType is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$networkTypes is a reference to a list where each element is a NetworkType
-NetworkType is a string
-
-
-=end text
+=item B<--version>
+print version information
 
 =back
 
-=head2 Command-Line Options
+=head1 EXAMPLE
 
-=over 4
+ net_get_all_network_types 
+ net_get_all_network_types --help
+ net_get_all_network_types --version
 
-=item -c Column
+=head1 VERSION
 
-This is used only if the column containing the identifier is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
-Input lines that cannot be extended are written to stderr.
+1.0
 
 =cut
 
 use Getopt::Long;
 use Bio::KBase::KBaseNetworksService::Client;
 
-my $usage = "Usage: $0 [--host=140.221.92.222:7064]\n";
+my $usage = "Usage: net_get_all_network_types [--url=http://kbase.us/services/networks/]\n";
 
-my $host       = "140.221.92.222:7064";
+my $url       = "http://kbase.us/services/networks/";
 my $help       = 0;
 my $version    = 0;
 
 GetOptions("help"       => \$help,
            "version"    => \$version,
-           "host=s"     => \$host) or die $usage;
+           "url=s"     => \$url) or die $usage;
 
 if($help)
 {
 	print "$usage\n";
 	print "\n";
 	print "General options\n";
-	print "\t--host=[xxx.xxx.xx.xxx:xxxx]\t\thostname of the server\n";
+	print "\t--url=[http://kbase.us/services/networks/]\t\tthe url of the service\n";
 	print "\t--help\t\tprint help information\n";
 	print "\t--version\t\tprint version information\n";
 	print "\n";
 	print "Examples: \n";
-	print "$0 --host=x.x.x.x:x \n";
+	print "net_get_all_network_types\n";
 	print "\n";
-	print "$0 --help\tprint out help\n";
+	print "net_get_all_network_types --help\tprint out help\n";
 	print "\n";
-	print "$0 --version\tprint out version information\n";
+	print "net_get_all_network_types --version\tprint out version information\n";
 	print "\n";
 	print "Report bugs to kbase-networks\@lists.kbase.us\n";
-	exit(1);
+	exit(0);
 }
 
 if($version)
 {
-	print "$0 version 1.0\n";
+	print "net_get_all_network_types version 1.0\n";
 	print "Copyright (C) 2012 KBase Network Team\n";
 	print "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n";
 	print "This is free software: you are free to change and redistribute it.\n";
 	print "There is NO WARRANTY, to the extent permitted by law.\n";
 	print "\n";
 	print "Written by Shinjae Yoo\n";
-	exit(1);
+	exit(0);
 }
 
 die $usage unless @ARGV == 0;
 
-my $oc = Bio::KBase::KBaseNetworksService::Client->new("http://".$host."/KBaseNetworksRPC/networks");
+my $oc = Bio::KBase::KBaseNetworksService::Client->new($url);
 my $results = $oc->allNetworkTypes();
 foreach my $rh (@{$results}) {
   print "$rh\n";
