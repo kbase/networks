@@ -79,7 +79,7 @@ if($help)
     print "net_network_type_to_datasets --version\tprint out version information\n";
     print "\n";
     print "Report bugs to kbase-networks\@lists.kbase.us\n";
-    exit(1);
+    exit(0);
 }
 
 if($version)
@@ -91,7 +91,7 @@ if($version)
     print "There is NO WARRANTY, to the extent permitted by law.\n";
     print "\n";
     print "Written by Shinjae Yoo\n";
-    exit(1);
+    exit(0);
 }
 
 die $usage unless @ARGV == 0;
