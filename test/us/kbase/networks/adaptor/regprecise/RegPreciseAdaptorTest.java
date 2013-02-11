@@ -311,6 +311,14 @@ public class RegPreciseAdaptorTest {
 		{
 			assertTrue("should be specific for the kb|g.20848 genome", 
 					ds.getTaxons().contains(taxon));
+		}	
+		
+		datasets = adaptor.getDatasets(Entity.toEntity(regulonId));
+		assertTrue("should return > 0 datasets", datasets.size() > 0);
+		for(Dataset ds: datasets)
+		{
+			assertTrue("should be specific for the kb|g.20848 genome", 
+					ds.getTaxons().contains(taxon));
 		}		
 	}
 
