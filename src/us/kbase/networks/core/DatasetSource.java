@@ -22,7 +22,8 @@ public enum DatasetSource {
 	ARANET("kb|netsource.14","AraNet","Functional Association", "http://www.functionalnet.org/aranet/"),
 	POPNET("kb|netsource.15","PopNet","Functional Association projected from AraNet", "http://www.functionalnet.org/"),
 	PLANTCYC("kb|netsource.16","PlantCyc","Plant Metabolic Pathway DB", "hhttp://www.plantcyc.org/"),
-	GEO("kb|netsource.17","GEO","Gene Expression Omnibus", "http://www.ncbi.nlm.nih.gov/geo/");
+	GEO("kb|netsource.17","GEO","Gene Expression Omnibus", "http://www.ncbi.nlm.nih.gov/geo/"),
+	MG_RAST("kb|netsource.18","MG-RAST","Metagenomics Analysis Server", "http://metagenomics.anl.gov");
 
 	private String id;
 	private String name;
