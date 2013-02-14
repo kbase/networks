@@ -128,4 +128,3 @@ foreach my $hr (@{$results->{'edges'}}) {
   my $enm = $hr->{'name'};
   print "$id1\t$id2\t$strength\t$ds\t$nm1\t$nm2\t$enm\n";
 }
-#print Dumper($results);
