@@ -335,7 +335,8 @@ public class NetworksAPI {
     	Graph<Node,Edge> graph = network.getGraph();
     	List<Edge> deletedEdges = new ArrayList<Edge>();
     	for( Edge e : network.getGraph().getEdges()) {
-    		if( e.getConfidence() < cutOff) {
+    		//if( e.getConfidence() < cutOff) {
+    		if( e.getStrength() < cutOff) {
     			deletedEdges.add(e);
     		}
     	}
