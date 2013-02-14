@@ -115,10 +115,10 @@ my @edgeTypes = split/,/, $edge_types;
 my $results = $oc->buildFirstNeighborNetwork(\@datasetIds, \@input, \@edgeTypes);
 
 my %nodes = ();
-foreach my $hr (@{$result->{'nodes'}}) {
+foreach my $hr (@{$results->{'nodes'}}) {
   $nodes{$hr->{'id'}} = [$hr->{'entityId'}, $hr->{'name'}];
 }
-foreach my $hr (@{$result->{'edges'}}) {
+foreach my $hr (@{$results->{'edges'}}) {
   my $id1 = $nodes{$hr->{'nodeId1'}}[0];
   my $id2 = $nodes{$hr->{'nodeId2'}}[0];
   my $nm1 = $nodes{$hr->{'nodeId1'}}[1];
