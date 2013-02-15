@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 27;
 use Test::Cmd;
 use String::Random qw(random_regex random_string);
 use JSON;
