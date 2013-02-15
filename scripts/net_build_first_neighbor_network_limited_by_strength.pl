@@ -4,7 +4,7 @@ use Carp;
 
 =head1 NAME
 
-net_build_first_neighbor_network - build a "first-neighbor" network with strength cut-off
+net_build_first_neighbor_network_limited_by_strength - build a "first-neighbor" network with strength cut-off
 
 =head1 SYNOPSIS
 
@@ -16,16 +16,19 @@ Build a first-neighbor network given the list of dataset, edge types, and entity
 
 =head2 Documentation for underlying call
 
-Returns a "first-neighbor" network constructed basing on a given list of datasets with the edge strength above cut-off threshold. First-neighbor network contains a "source" node and all other nodes that have at least one interaction with the "source" node. Only interactions of given edge types are considered.    
+Returns a "first-neighbor" network constructed from a given list of datasets with the edge strength above cut-off threshold. A first-neighbor network contains a "source" node and all other nodes that have at least one interaction with the "source" node. Only interactions of given edge types are considered.    
 
-list<string> datasetIds
+list<string> dataset_ids
 List of dataset identifiers to be used for building a network
 
-string geneId
-Identifier of a gene to be used as a source node           
+string query_entity_ids
+List of entity identifiers of interest for building a network         
                 
-list<EdgeType> edgeTypes
+list<EdgeType> edge_types
 List of possible edge types to be considered for building a network
+
+float cut_off
+Threshold for edge strength
 
 =head1 OPTIONS
 
@@ -35,7 +38,7 @@ List of possible edge types to be considered for building a network
 the service url
 
 =item B<-h> B<--help>
-prints help information
+print help information
 
 =item B<--version>
 print version information

@@ -16,7 +16,10 @@ Find a list of all datasets from a given entity id.
 
 =head2 Documentation for underlying call
 
-Returns a list of all datasets that have at least one interection for a given KBase entity (gene, protein, molecule, genome, etc)
+Returns a list of all datasets that have at least one interaction for a given KBase entity (gene, protein, molecule, genome, etc)
+
+string entity_id
+The entity identifier 
 
 =head1 OPTIONS
 
@@ -26,7 +29,7 @@ Returns a list of all datasets that have at least one interection for a given KB
 the service url
 
 =item B<-h> B<--help>
-prints help information
+print help information
 
 =item B<--version>
 print version information

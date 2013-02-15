@@ -4,7 +4,7 @@ use Carp;
 
 =head1 NAME
 
-net_build_internal_network - build an internally connected neighbor network with strength cut-off
+net_build_internal_network_limited_by_strength - build an internally connected neighbor network with strength cut-off
 
 =head1 SYNOPSIS
 
@@ -16,16 +16,19 @@ Build an internal network given the list of dataset, edge types, and entity ids 
 
 =head2 Documentation for underlying call
 
-Returns an "internal" network constructed basing on a given list of datasets with the edge strength above cut-off threshold. Internal network contains the only nodes defined by the geneIds parameter, and edges representing interactions between these nodes.  Only interactions of given types are considered.    
+Returns an "internal" network constructed from a given list of datasets with the edge strength above cut-off threshold. An internal network contains the nodes defined by the query_entity_ids parameter, and edges representing interactions between these nodes.  Only interactions of given types are considered.    
 
-list<string> datasetIds
+list<string> dataset_ids
 List of dataset identifiers to be used for building a network
 
-list<string> geneIds
-Identifiers of genes of interest for building a network         
+list<string> gene_ids
+List of entity identifiers of interest for building a network         
                 
-list<EdgeType> edgeTypes
+list<EdgeType> edge_types
 List of possible edge types to be considered for building a network
+
+float cut_off
+Threshold for edge strength
 
 =head1 OPTIONS
 

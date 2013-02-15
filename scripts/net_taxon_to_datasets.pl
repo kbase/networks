@@ -18,8 +18,8 @@ Find a list of all datasets from a given taxon id.
 
 Returns a list of all datasets that can be used to build a network for a particular genome represented by KBase taxonomy id. 
                   
-Taxon taxon
-KBase taxonomy id
+string taxon_id
+KBase taxonomy identifier
 
 =head1 OPTIONS
 
@@ -29,7 +29,7 @@ KBase taxonomy id
 the service url
 
 =item B<-h> B<--help>
-prints help information
+print help information
 
 =item B<--version>
 print version information

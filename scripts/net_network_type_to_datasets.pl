@@ -4,7 +4,7 @@ use Carp;
 
 =head1 NAME
 
-net_network_type_to_datasets - find a list of all datasets that can be used to build a netowrk of a given type
+net_network_type_to_datasets - find a list of all datasets that can be used to build a network of a given type
 
 =head1 SYNOPSIS
 
@@ -12,13 +12,13 @@ net_network_type_to_datasets [--url=http://kbase.us/services/networks]  < networ
 
 =head1 DESCRIPTION
 
-Find a list of all datasets that can be used to build a netowrk of a given type.
+Find a list of all datasets that can be used to build a network of a given type.
 
 =head2 Documentation for underlying call
 
-Returns a list of all datasets that can be used to build a netowrk of a given type.
+Returns a list of all datasets that can be used to build a network of a given type.
 
-NetworkType networkType
+string network_type
 The type of network
 
 =head1 OPTIONS
@@ -29,7 +29,7 @@ The type of network
 the service url
 
 =item B<-h> B<--help>
-prints help information
+print help information
 
 =item B<--version>
 print version information

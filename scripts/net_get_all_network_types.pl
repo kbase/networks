@@ -26,7 +26,7 @@ Returns a list of all network types.
 the service url
 
 =item B<-h> B<--help>
-prints help information
+print help information
 
 =item B<--version>
 print version information

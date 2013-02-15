@@ -18,8 +18,8 @@ Find a list of all datasets from a given dataset source.
 
 Returns a list of all datasets from a given dataset source.
 
-DatasetSourceRef datasetSourceRef
-A reference to a dataset source
+string datasource_id
+A dataset source identifier
 
 =head1 OPTIONS
 
@@ -29,7 +29,7 @@ A reference to a dataset source
 the service url
 
 =item B<-h> B<--help>
-prints help information
+print help information
 
 =item B<--version>
 print version information
