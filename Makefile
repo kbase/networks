@@ -31,7 +31,7 @@ SRC_PERL = $(wildcard scripts/*.pl)
 # You can change these if you are putting your tests somewhere
 # else or if you are not using the standard .t suffix
 CLIENT_TESTS = $(wildcard client-tests/*.j)
-SCRIPTS_TESTS = $(wildcard script-tests/*.j)
+SCRIPTS_TESTS = $(wildcard script-tests/*.t)
 SERVER_TESTS = $(wildcard server-tests/*.j)
 
 # This is a very client centric view of release engineering.
@@ -100,7 +100,7 @@ test-client:
 # will move in this direction.
 test-scripts:
 	# run each test
-	for t in $(SCRIPT_TESTS) ; do \
+	for t in $(SCRIPTS_TESTS) ; do \
 		if [ -f $$t ] ; then \
 			$(DEPLOY_RUNTIME)/bin/perl $$t ; \
 			if [ $$? -ne 0 ] ; then \
