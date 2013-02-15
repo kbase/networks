@@ -26,8 +26,13 @@ public class PPITest {
 
     final String ecoliID = "kb|g.1870";
 
-    final String huID = "7";
-    final String huKBID = "kb|netdataset.ppi."+huID;
+    // dataset records for Hu 2009 TAP data
+    // 1st is ENIGMA dataset; 2nd is MOL dataset
+    final String huID1 = "1";
+    final String huKBID1 = "kb|netdataset.ppi."+huID1;
+
+    final String huID2 = "7";
+    final String huKBID2 = "kb|netdataset.ppi."+huID2;
 
     final Entity atpA = new Entity("kb|g.1870.peg.3693",
 				   EntityType.GENE);
@@ -104,7 +109,7 @@ public class PPITest {
 		     3,
 		     g.getEdgeCount());
 
-	NetworksUtil.printNetwork(network);
+	// NetworksUtil.printNetwork(network);
 
 	assertEquals("Graph should have 4 nodes",
 		     4,
@@ -273,7 +278,7 @@ public class PPITest {
 	// }
 	// catch (Exception e) {
 	// }
-	NetworksUtil.printNetwork(network);
+	// NetworksUtil.printNetwork(network);
 	
 	assertNotNull("Should get a network back",
 		      network);
@@ -286,11 +291,9 @@ public class PPITest {
 	// is in 2 different complexes, should it be in the network
 	// once or twice?  Old adaptor says twice (20 nodes), new one
 	// says once (8 nodes).
-	/*
-	assertEquals("Graph should have 20 nodes",
-		     20,
-		     g.getVertexCount());
-	*/
+	// assertEquals("Graph should have 20 nodes",
+	// 20,
+	// g.getVertexCount());
 
 	assertEquals("Graph should have 41 edges",
 		     41,
@@ -313,21 +316,61 @@ public class PPITest {
 	    		e.getProperty("description").endsWith("CPLX"));
     }
 
+
     @Test
-	public void testHuTAP() throws AdaptorException {
+	public void testHuTAPENIGMA() throws AdaptorException {
+	Taxon ecoli = new Taxon(ecoliID);
+	List<Dataset> datasets = adaptor.getDatasets(NetworkType.PROT_PROT_INTERACTION,
+						     DatasetSource.PPI,
+						     ecoli);
+	assertNotNull("should return a list of Datasets", datasets);
+	assertTrue("list should contain at least 1 dataset",
+		   datasets.size() >= 1);
+
+	// find Hu dataset
+	Dataset huSet = null;
+	for (Dataset d : datasets) {
+	    if (huKBID1.equals(d.getId()))
+		huSet = d;
+	}
+	assertNotNull("should include Hu 2009 dataset", huSet);
+	
+	Network network = adaptor.buildFirstNeighborNetwork(huSet,
+							    atpA,
+							    Arrays.asList(EdgeType.GENE_GENE));
+	assertNotNull("Should get a network back", network);
+	Graph<Node, Edge> g = network.getGraph();
+	assertNotNull("Network should have graph", g);
+
+	// NetworksUtil.printNetwork(network);
+	
+	/*
+	  bug in database data; uncomment when reloaded
+	  
+	assertEquals("Graph should have 15 nodes",
+		     15,
+		     g.getVertexCount());
+
+	assertEquals("Graph should have 14 edges",
+		     14,
+		     g.getEdgeCount());
+	*/
+    }
+
+    @Test
+	public void testHuTAPMOL() throws AdaptorException {
 	Taxon ecoli = new Taxon(ecoliID);
 	List<Dataset> datasets = adaptor.getDatasets(NetworkType.PROT_PROT_INTERACTION,
 						     DatasetSource.MO,
 						     ecoli);
 	assertNotNull("should return a list of Datasets", datasets);
-	assertEquals("list should contain 2 datasets",
-		     2,
-		     datasets.size());
+	assertTrue("list should contain at least 2 datasets",
+		   datasets.size() >= 2);
 
 	// find Hu dataset
 	Dataset huSet = null;
 	for (Dataset d : datasets) {
-	    if (huKBID.equals(d.getId()))
+	    if (huKBID2.equals(d.getId()))
 		huSet = d;
 	}
 	assertNotNull("should include Hu 2009 dataset", huSet);
@@ -339,7 +382,7 @@ public class PPITest {
 	Graph<Node, Edge> g = network.getGraph();
 	assertNotNull("Network should have graph", g);
 
-	NetworksUtil.printNetwork(network);
+	// NetworksUtil.printNetwork(network);
 	
 	/*
 	  bug in database data; uncomment when reloaded
@@ -383,7 +426,7 @@ public class PPITest {
 
 	// check properties of atpA node
 	/*
-	  not yet implemented in generic adaptor:
+	  not implemented in generic adaptor:
 	  
 	assertNotNull("atpA should be a bait in TAP",
 		      geneNode.getProperty("is_bait"));
