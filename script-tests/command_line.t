@@ -96,21 +96,18 @@ $tes->run(args => "--url=$host 'kb|netdataset.plant.fn.25,kb|netdataset.plant.cn
 ok($? == 0,"Running net_build_first_neighbor_network_limited_by_strength for $kbgene");
 ok(@tem<50 && @tem>5, "Strenth cutoff applied!");
 
-
-my $gene_list='kb|g.3899.locus.10 kb|g.3899.locus.11 kb|g.3899.locus.18543 kb|g.3899.locus.7765  kb|g.3899.locus.2137 kb|g.3899.locus.21155';
+$gene_list='kb|g.3899.locus.10 kb|g.3899.locus.11 kb|g.3899.locus.18543 kb|g.3899.locus.7765  kb|g.3899.locus.2137 kb|g.3899.locus.21155';
 $tes = Test::Cmd->new(prog => "$bin/net_build_internal_network.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
 $tes->run(args => "--url=$host 'kb|netdataset.plant.fn.25,kb|netdataset.plant.cn.6' 'GENE_GENE' ", stdin => "$gene_list");
 ok($? == 0,"Running net_build_internal_network for $gene_list");
 @tem=$tes->stdout;
 ok(@tem > 5, "Internal network has been built!");
 
-
-my $gene_list='kb|g.3899.locus.10 kb|g.3899.locus.11 kb|g.3899.locus.18543 kb|g.3899.locus.7765  kb|g.3899.locus.2137 kb|g.3899.locus.21155';
-$tes = Test::Cmd->new(prog => "$bin/net_build_internal_network.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
-$tes->run(args => "--url=$host 'kb|netdataset.plant.fn.25,kb|netdataset.plant.cn.6' 'GENE_GENE' ", stdin => "$gene_list");
-ok($? == 0,"Running net_build_internal_network for $gene_list");
+$tes = Test::Cmd->new(prog => "$bin/net_build_internal_network_limited_by_strength.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
+$tes->run(args => "--url=$host 'kb|netdataset.plant.fn.25,kb|netdataset.plant.cn.6' 'GENE_GENE' '1' ", stdin => "$gene_list");
+ok($? == 0,"Running net_build_internal_network_limited_by_strength for $gene_list");
 @tem=$tes->stdout;
-ok(@tem > 5, "Internal network has been built!");
+ok(@tem > 1 && @tem <5, "Strength applied for internal network!");
 
 
 
