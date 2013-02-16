@@ -17,10 +17,10 @@ public class AdaptorRepository {
 		// Register all adaptors; property file in the future
 		
 		registerAdaptor(new ModelSEEDAdaptorFactory());		
-		//registerAdaptor(new GenericAdaptorFactory("regprecise.config"));
-		//registerAdaptor(new GenericAdaptorFactory("cmonkey.config"));
-		//registerAdaptor(new GenericAdaptorFactory("mak.config"));
-		//registerAdaptor(new GenericAdaptorFactory("ppi.config"));
+		registerAdaptor(new GenericAdaptorFactory("regprecise.config"));
+		registerAdaptor(new GenericAdaptorFactory("cmonkey.config"));
+		registerAdaptor(new GenericAdaptorFactory("mak.config"));
+		registerAdaptor(new GenericAdaptorFactory("ppi.config"));
 		registerAdaptor(new GenericAdaptorFactory("plant-cc.config"));
 		registerAdaptor(new GenericAdaptorFactory("plant-cn.config"));
 		registerAdaptor(new GenericAdaptorFactory("plant-fn.config"));
