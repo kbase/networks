@@ -97,8 +97,8 @@ public class ModelSEEDTest {
 		assertNotNull("Should get a network back", network);
 		Graph<Node,Edge> g = network.getGraph();
 		assertNotNull("Network should have graph", g);
-		assertEquals("Graph should have 2 edges", 2, g.getEdgeCount());
-		assertEquals("Graph should have 3 nodes", 3, g.getVertexCount());
+		assertEquals("Graph should have 1 edge", 1, g.getEdgeCount());
+		assertEquals("Graph should have 2 nodes", 2, g.getVertexCount());
 	}
 	
 	@Test
@@ -109,9 +109,9 @@ public class ModelSEEDTest {
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
 		Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
 		assertNotNull("Should get a network back", network);
-		Graph<Node,Edge> g = network.getGraph();				
+		Graph<Node,Edge> g = network.getGraph();
 		assertNotNull("Network should have graph", g);
-		assertEquals("Graph should have 16 edges", 16, g.getEdgeCount());
+		assertEquals("Graph should have 5 edges", 5, g.getEdgeCount());
 		assertEquals("Graph should have " + queryGenes.size() + " nodes", queryGenes.size(), g.getVertexCount());
 		
 	}
@@ -140,6 +140,32 @@ public class ModelSEEDTest {
 		assertNotNull("Should get a network back", network);
 		Graph<Node,Edge> g = network.getGraph();
 		assertNotNull("Network should have graph", g);
-		assertEquals("Graph should have 39 nodes", 39, g.getVertexCount());
+		assertEquals("Graph should have 35 nodes", 35, g.getVertexCount());
+	}
+	
+	@Test
+	public void shouldReturnNetworkForEcoliGeneClusterStartWithGene() throws AdaptorException {
+		Taxon ecoli = new Taxon("kb|g.1870");
+		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
+		assertNotNull("should return a list of Datasets", datasets);
+		assertTrue("list should contain at least one dataset", datasets.size() > 0);
+		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), Entity.toEntity("kb|g.1870.peg.1847"), Arrays.asList(EdgeType.GENE_CLUSTER));
+		assertNotNull("Should get a network back", network);
+		Graph<Node,Edge> g = network.getGraph();
+		assertNotNull("Network should have graph", g);
+		assertEquals("Graph should have 8 nodes", 8, g.getVertexCount());
+	}	
+	
+	@Test
+	public void shouldReturnNetworkForEcoliGeneClusterStartWithSubsystem() throws AdaptorException {
+		Taxon ecoli = new Taxon("kb|g.1870");
+		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
+		assertNotNull("should return a list of Datasets", datasets);
+		assertTrue("list should contain at least one dataset", datasets.size() > 0);
+		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), Entity.toEntity("kb|subsystem.Acetyl-CoA fermentation to Butyrate"), Arrays.asList(EdgeType.GENE_CLUSTER));
+		assertNotNull("Should get a network back", network);
+		Graph<Node,Edge> g = network.getGraph();
+		assertNotNull("Network should have graph", g);
+		assertEquals("Graph should have 18 nodes", 18, g.getVertexCount());
 	}
 }

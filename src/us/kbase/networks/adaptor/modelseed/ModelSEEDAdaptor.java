@@ -40,6 +40,7 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 
 	private CDMI_EntityAPI cdmi;
 	private CDMI_API cdmiAPI;
+	private HashSet<String> metabolicSubsystems;
 	public static final String ADAPTOR_PREFIX = "modelseed";
 
 	
@@ -58,6 +59,22 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 			this.cdmiAPI = new CDMI_API("http://bio-data-1.mcs.anl.gov/services/cdmi_api");
 		} catch (MalformedURLException e) {
 			throw new AdaptorException("Unable to initialize CDMI_API", e);
+		}
+		try {
+			metabolicSubsystems = new HashSet<String>();
+			HashSet<String> tempSubsystems = new HashSet<String>();
+			for (List<String> subsystems : cdmiAPI.roles_to_subsystems(cdmiAPI.all_roles_used_in_models()).values()) {
+				tempSubsystems.addAll(subsystems);
+			}
+			Map<String, fields_Subsystem> ssInfo = cdmi.get_entity_Subsystem(Arrays.asList(tempSubsystems.toArray(new String[tempSubsystems.size()])),Arrays.asList("cluster_based","experimental","usable"));
+			for (String ss : ssInfo.keySet()) {
+				fields_Subsystem fs = ssInfo.get(ss);
+				if (fs.usable == 1 && fs.cluster_based == 0 && fs.experimental == 0) {
+					this.metabolicSubsystems.add(ss);
+				}
+			}
+		} catch (Exception e) {
+			throw new AdaptorException("Unable to load metabolic subsystems", e);
 		}
 		super.init();
 	}
@@ -212,7 +229,8 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 				Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), entity.getId(), entity);
 				
 				graph.addVertex(geneNode);
-				for (fields_Subsystem fs : getSubsystemFieldsForGene(entity.getId())) {
+				for (fields_Subsystem fs : getSubsystemFieldsForGene(entity.getId(), dataset.getTaxons().get(0).getGenomeId())) {
+					if (! metabolicSubsystems.contains(fs.id)) continue; // only interested in subsystems used to build models 
 					Node ssNode = Node.buildClusterNode(IdGenerator.Node.nextId(), fs.id, toSubsystemsEntity(fs.id));
 					graph.addVertex(ssNode);
 					Edge edge = new Edge(IdGenerator.Edge.nextId(), "Member of subsystem", dataset);
@@ -225,6 +243,7 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 				for (String geneId : getGenesForSubsystem( toSubsystemsId(entity), dataset.getTaxons().get(0).getGenomeId())) {
 					Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), geneId, toGeneEntity(geneId));
 					Edge edge = new Edge(IdGenerator.Edge.nextId(), "Member of subsystem", dataset);
+					graph.addVertex(geneNode);
 					graph.addEdge(edge, ssNode, geneNode, edu.uci.ics.jung.graph.util.EdgeType.DIRECTED);
 				}	
 			}
@@ -235,7 +254,8 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 			// find genes in same subsystems as this gene
 			graph.addVertex(geneNode);
 			Set<String> geneNbrs = new HashSet<String>();
-			for (fields_Subsystem fs : getSubsystemFieldsForGene(entity.getId())) {
+			for (fields_Subsystem fs : getSubsystemFieldsForGene(entity.getId(), dataset.getTaxons().get(0).getGenomeId())) {
+				if (! metabolicSubsystems.contains(fs.id)) continue; // only interested in subsystems used to build models 
 				geneNbrs.addAll(getGenesForSubsystem(fs.id, dataset.getTaxons().get(0).getGenomeId()));
 			}
 			for (String geneId : geneNbrs) {
@@ -269,7 +289,7 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 		return geneIds;
 	}
 
-	private Collection<fields_Subsystem> getSubsystemFieldsForGene(String geneId) throws AdaptorException {
+	private Collection<fields_Subsystem> getSubsystemFieldsForGene(String geneId, String genomeId) throws AdaptorException {
 		Map<String, fields_Subsystem> fs = new HashMap<String, fields_Subsystem>();
 		try {
 			List<CDMI_EntityAPI_tuple_120> tps = cdmi.get_relationship_HasFunctional(Arrays.asList(geneId), new ArrayList<String>(),
@@ -278,7 +298,10 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 				List<CDMI_EntityAPI_tuple_85> tps2 = cdmi.get_relationship_IsIncludedIn(Arrays.asList(tp.e_3.id), 
 						new ArrayList<String>(), new ArrayList<String>(), Arrays.asList("id")); 
 				for (CDMI_EntityAPI_tuple_85 tp2 : tps2) {
-					fs.put(tp2.e_3.id, tp2.e_3);
+					if (getGenesForSubsystem(tp2.e_3.id, genomeId).contains(geneId)) {
+						// just because ss has role doesn't mean it has gene
+						fs.put(tp2.e_3.id, tp2.e_3);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -323,7 +346,8 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 			
 			graph.addVertex(geneNode);
 
-			for (fields_Subsystem fs : getSubsystemFieldsForGene(geneId)) {
+			for (fields_Subsystem fs : getSubsystemFieldsForGene(geneId, dataset.getTaxons().get(0).getGenomeId())) {
+				if (! metabolicSubsystems.contains(fs.id)) continue; // only interested in subsystems used to build models 
 				List<Node> geneNodes = ssToGeneNodes.get(fs.id);
 				if (geneNodes == null) {
 					geneNodes = new ArrayList<Node>();
