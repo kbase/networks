@@ -54,7 +54,7 @@ ok($? == 0,"Running net_network_type_to_datasets");
 @tem=$tes->stdout;
 ok(@tem > 5, "More than 5 datasets for this type of network has been found!");
 $tm_line=join "\t",@tem;
-ok($tm_line=~/bicolor/ && $tm_line=~/Poplar/ && $tm_line=~/distachyon/, "No missing dataset detected!(randomly check)");
+ok($tm_line=~/bicolor/ && $tm_line=~/trichocarpa/ && $tm_line=~/distachyon/, "No missing dataset detected!(randomly check)");
 
 #5
 my $kbg="kb|g.3907";
