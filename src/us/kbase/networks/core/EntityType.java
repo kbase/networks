@@ -49,8 +49,9 @@ public enum EntityType {
 		} else if (entityId.startsWith("EBI-")){
 			//TODO: better solution should be found....
 			return PPI_COMPLEX;
+		} else if (entityId.contains("complex")) {
+			return PPI_COMPLEX;
 		}
-		
 		
 		return GENE;
 	}
