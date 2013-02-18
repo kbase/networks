@@ -15,6 +15,10 @@ SERVICE_PORT = 7064
 #Apache ANT compiler
 ANT=ant
 
+#java -Xmx option for glassfish
+TARGET_XMX = 2048m
+CURRENT_XMX = `$(GLASSFISH_HOME)/bin/asadmin list-jvm-options | grep Xmx`
+
 # it's in dev_container/bootstrap script, please `source /kb/dev_container/user-env.sh`
 #GLASSFISH_HOME = $(DEPLOY_RUNTIME)/glassfish3 
 
@@ -273,6 +277,8 @@ deploy_config:
 	@DEL_NET='$(shell $(GLASSFISH_HOME)/bin/asadmin delete-network-listener http-listener-1)'
 	@DEL_PROT='$(shell $(GLASSFISH_HOME)/bin/asadmin delete-protocol http-listener-1)'
 	@CRT_LST='$(shell $(GLASSFISH_HOME)/bin/asadmin create-http-listener --default-virtual-server server --listenerport $(SERVICE_PORT) --listeneraddress 0.0.0.0 http-listener-1)'
+	@DEL_XMX='$(shell $(GLASSFISH_HOME)/bin/asadmin  delete-jvm-options $(CURRENT_XMX))'
+	@CRT_XMX='$(shell $(GLASSFISH_HOME)/bin/asadmin  create-jvm-options -Xmx$(TARGET_XMX))'
 
 deploy_war:
 	$(GLASSFISH_HOME)/bin/asadmin deploy --force=true ./dist/KBaseNetworksRPC.war;\
@@ -286,4 +292,3 @@ generate_script:
 clean:
 	cd ./conf; $(ANT) clean	
 	rm -rf $(SERVICE_DIR) 
-
