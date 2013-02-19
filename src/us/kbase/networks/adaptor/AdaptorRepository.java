@@ -16,11 +16,14 @@ public class AdaptorRepository {
 	{
 		// Register all adaptors; property file in the future
 		
-		registerAdaptor(new ModelSEEDAdaptorFactory());		
+		// microbial adaptors
+		registerAdaptor(new ModelSEEDAdaptorFactory());				
 		registerAdaptor(new GenericAdaptorFactory("regprecise.config"));
 		registerAdaptor(new GenericAdaptorFactory("cmonkey.config"));
 		registerAdaptor(new GenericAdaptorFactory("mak.config"));
 		registerAdaptor(new GenericAdaptorFactory("ppi.config"));
+		
+		// plant adaptors
 		registerAdaptor(new GenericAdaptorFactory("plant-cc.config"));
 		registerAdaptor(new GenericAdaptorFactory("plant-cn.config"));
 		registerAdaptor(new GenericAdaptorFactory("plant-fn.config"));
@@ -28,6 +31,12 @@ public class AdaptorRepository {
 		registerAdaptor(new GenericAdaptorFactory("plant-ppip.config"));
 		registerAdaptor(new GenericAdaptorFactory("plant-rn.config"));
 		registerAdaptor(new GenericAdaptorFactory("plant-ppi-ga.config"));
+		
+		// communities adaptors
+		registerAdaptor(new GenericAdaptorFactory("community-cc.config"));
+		registerAdaptor(new GenericAdaptorFactory("community-cn.config"));
+		
+		
 	}
 	
 	public static AdaptorRepository getAdaptorRepository() throws AdaptorException
