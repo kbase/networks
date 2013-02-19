@@ -3,7 +3,9 @@ package us.kbase.networks.core;
 public enum EdgeType {
 	GENE_GENE, GENE_CLUSTER, 
 	PROTEIN_PROTEIN, PROTEIN_CLUSTER,
-	CLUSTER_CLUSTER;
+	CLUSTER_CLUSTER, 
+	
+	SUBSYSTEM_SUBSYSTEM, SUBSYSTEM_CLUSTER;
 	
 	public NodeType nodeType1()
 	{
