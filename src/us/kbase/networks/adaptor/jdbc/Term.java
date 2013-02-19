@@ -30,6 +30,7 @@ public class Term {
 	public static final String Prefix_QueryIndex_SubsystemId = "QIndex.SubsystemId.";
 	public static final String Prefix_QueryIndex_ClusterId = "QIndex.ClusterId.";
 	public static final String Prefix_QueryIndex_BiclusterId = "QIndex.BiclusterId.";	
+	public static final String Prefix_QueryIndex_SubsystemClusterId = "QIndex.SubsystemClusterId.";		
 	public static final String Prefix_QueryIndex_DatasetId = "QIndex.DatasetId.";
 	
 	public static final String[] Prefix_QueryIndexes = new String[]{
@@ -42,7 +43,8 @@ public class Term {
 		Prefix_QueryIndex_RegulomeId,
 		Prefix_QueryIndex_SubsystemId,
 		Prefix_QueryIndex_ClusterId,
-		Prefix_QueryIndex_BiclusterId,		
+		Prefix_QueryIndex_BiclusterId,	
+		Prefix_QueryIndex_SubsystemClusterId,
 		Prefix_QueryIndex_DatasetId
 	};
 	
@@ -56,7 +58,8 @@ public class Term {
 		else if(type == EntityType.REGULOME)	return Prefix_QueryIndex_RegulomeId;
 		else if(type == EntityType.SUBSYSTEM)	return Prefix_QueryIndex_SubsystemId;
 		else if(type == EntityType.CLUSTER)		return Prefix_QueryIndex_ClusterId;
-		else if(type == EntityType.BICLUSTER)	return Prefix_QueryIndex_BiclusterId;		
+		else if(type == EntityType.BICLUSTER)	return Prefix_QueryIndex_BiclusterId;	
+		else if(type == EntityType.SUBSYSTEMCLUSTER) return Prefix_QueryIndex_SubsystemClusterId;
 		
 		return "";
 	}	
