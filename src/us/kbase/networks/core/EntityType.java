@@ -14,6 +14,7 @@ public enum EntityType {
 	
 	CLUSTER(new String[]{"|cluster."}), 
 	BICLUSTER(new String[]{"|bicluster."}), 
+	SUBSYSTEMCLUSTER(new String[]{"|subsystemcluster."}), 
 	UNKNOWN(new String[]{});
 
 	String[] entityIdPrefixes;
