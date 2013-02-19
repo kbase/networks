@@ -32,6 +32,11 @@ public final class Node {
 		return new Node(id, name, entity, NodeType.PROTEIN);
 	}
 	
+	public static Node buildSubsystemNode(String id, String name, Entity entity)
+	{
+		return new Node(id, name, entity, NodeType.SUBSYSTEM);
+	}	
+	
 	public static Node buildClusterNode(String id, String name, Entity entity)
 	{
 		return new Node(id, name, entity, NodeType.CLUSTER);
