@@ -520,6 +520,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 		switch(nt) {
 		case GENE: return Node.buildGeneNode(id, name, entity);
 		case PROTEIN: return Node.buildProteinNode(id, name, entity);
+		case SUBSYSTEM: return Node.buildSubsystemNode(id, name, entity);
 		case CLUSTER: return Node.buildClusterNode(id, name, entity);
 		}
 		return null;
