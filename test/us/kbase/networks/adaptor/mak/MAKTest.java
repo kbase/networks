@@ -176,7 +176,7 @@ public class MAKTest {
         System.out.println("shouldReturnNetworkForSOMR1GenesandBiclusters networkType " +
                 networkType.getDesccription() + "\t" + networkType.getId() + "\t" + networkType.getName());
 
-        Network network = adaptor.buildInternalNetwork(datasets.get(0), queryMixed);//adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
+        Network network = adaptor.buildInternalNetwork(datasets.get(0), queryMixed, Arrays.asList(EdgeType.GENE_CLUSTER));//adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
         assertNotNull("Should get a network back", network);
         Graph<Node, Edge> g = network.getGraph();
         assertNotNull("Network should have graph", g);
