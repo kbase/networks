@@ -154,11 +154,11 @@ public class MAKTest {
         assertNotNull("Should get a network back", network);
         Graph<Node, Edge> g = network.getGraph();
         assertNotNull("Network should have graph", g);
-        assertEquals("Graph should have X edges", 182, g.getEdgeCount());
+        assertEquals("Graph should have X edges", 43, g.getEdgeCount());
         
         // TODO:
         //assertEquals("Graph should have " + queryGenes.size() + " nodes", queryGenes.size(), g.getVertexCount());
-        assertEquals("Graph should have " + queryGenes.size() + " nodes", 22, g.getVertexCount());
+        assertEquals("Graph should have " + queryGenes.size() + " nodes", 16, g.getVertexCount());
     }
 
     @Test
