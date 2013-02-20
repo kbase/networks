@@ -13,7 +13,6 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
