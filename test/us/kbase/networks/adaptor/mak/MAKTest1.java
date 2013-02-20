@@ -24,7 +24,6 @@ import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Taxon;
-import us.kbase.networks.rpc.ClientNetworksUtil;
 
 public class MAKTest1 {
 
