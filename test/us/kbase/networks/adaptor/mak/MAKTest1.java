@@ -36,7 +36,7 @@ public class MAKTest1 {
 	final String badDatasetId = "kb|netdataset.mak.QQQ";
 
 	final String geneId = "kb|g.20848.CDS.1671";
-	final String regulonId = "kb|bicluster.3311";
+	final String biclusterId = "kb|bicluster.3311";
 	
 	
 	final List<String> geneIds = Arrays.asList(
@@ -212,13 +212,13 @@ public class MAKTest1 {
 		assertEquals("network should have 212 edges", 
 				212, network.getGraph().getEdgeCount());			
 
-		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(regulonId), Arrays.asList(EdgeType.GENE_CLUSTER));
+		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(biclusterId), Arrays.asList(EdgeType.GENE_CLUSTER));
 		assertEquals("network should have 107 nodes", 
 				107, network.getGraph().getVertexCount());		
 		assertEquals("network should have 106 edges", 
 				106, network.getGraph().getEdgeCount());
 		
-		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(regulonId), Arrays.asList(EdgeType.GENE_GENE));
+		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(biclusterId), Arrays.asList(EdgeType.GENE_GENE));
 		assertEquals("network should have 0 nodes", 
 				0, network.getGraph().getVertexCount());		
 	}
@@ -302,7 +302,7 @@ public class MAKTest1 {
 					ds.getTaxons().contains(taxon));
 		}	
 		
-		datasets = adaptor.getDatasets(Entity.toEntity(regulonId));
+		datasets = adaptor.getDatasets(Entity.toEntity(biclusterId));
 		assertTrue("should return > 0 datasets", datasets.size() > 0);
 		for(Dataset ds: datasets)
 		{
