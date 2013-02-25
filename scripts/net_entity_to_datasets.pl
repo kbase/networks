@@ -52,9 +52,9 @@ print version information
 use Getopt::Long;
 use Bio::KBase::KBaseNetworksService::Client;
 
-my $usage = "Usage: net_entity_to_datasets [--url=http://kbase.us/services/networks/] < enity_id\n";
+my $usage = "Usage: net_entity_to_datasets [--url=http://kbase.us/services/networks] < enity_id\n";
 
-my $url       = "http://kbase.us/services/networks/";
+my $url       = "http://kbase.us/services/networks";
 my $help       = 0;
 my $version    = 0;
 

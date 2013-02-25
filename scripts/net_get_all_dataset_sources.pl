@@ -51,9 +51,9 @@ print version information
 use Getopt::Long;
 use Bio::KBase::KBaseNetworksService::Client;
 
-my $usage = "Usage: net_get_all_dataset_sources [--url=http://kbase.us/services/networks/]\n";
+my $usage = "Usage: net_get_all_dataset_sources [--url=http://kbase.us/services/networks]\n";
 
-my $url       = "http://kbase.us/services/networks/";
+my $url       = "http://kbase.us/services/networks";
 my $help       = 0;
 my $version    = 0;
 
