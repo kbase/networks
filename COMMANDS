@@ -1,2 +1,2 @@
 #group-name	net	Networks
-#command-set	scripts/(*).pl	net
+#command-set	scripts/(.*).pl	net
