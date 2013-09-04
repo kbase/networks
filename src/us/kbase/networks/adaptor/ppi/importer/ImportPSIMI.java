@@ -13,32 +13,29 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
 
    1) Unique identifiers for Interactors A and B are KBase Feature ids.
 
-   2) Alternate identifiers for Interactors A and B are KBase MD5
-      Protein ids.
-
-   3) When the complex expansion method (the 16th column in the file)
+   2) When the complex expansion method (the 16th column in the file)
       is "spoke expansion" everything about Interactor B is ignored,
       and the data are assumed to refer to a multi-protein complex
       described by multiple lines listing data for Interactor A.
 
-   4) Several pieces of optional metadata are encoded in the "Xref for
+   3) Several pieces of optional metadata are encoded in the "Xref for
       Interactor A" field (the 23rd column in the file):  "dataset:"
       refers to interaction_dataset.description, "dataseturl:" refers to the
       interaction_dataset.data_url, and "url:" refers to interaction.data_url.
 
-   5) We have extended the PSI ontology for interaction detection methods
+   4) We have extended the PSI ontology for interaction detection methods
       (column 7) to include "kb:" methods, which refer to
       interaction_detection_type.description.  If one if these methods
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-   6) We have extended the PSI ontology for source database
+   5) We have extended the PSI ontology for source database
       (column 13) to include "kb:" descriptions, which refer to
       interaction_dataset.data_source.  If one if these methods
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-  @version 2.1, 1/30/13
+  @version 2.2, 6/26/13
   @author JMC
 */
 public class ImportPSIMI {
@@ -311,10 +308,8 @@ public class ImportPSIMI {
 		String featureID1 = st.nextToken();
 		String featureID2 = st.nextToken();
 
-		// protein ids
-		String proteinID1 = st.nextToken();
-		String proteinID2 = st.nextToken();
-		
+		st.nextToken();
+		st.nextToken();
 		st.nextToken();
 		st.nextToken();
 
@@ -519,10 +514,6 @@ public class ImportPSIMI {
 		    featureID1 = featureID2;
 		    featureID2 = tmpS;
 
-		    tmpS = proteinID1;
-		    proteinID1 = proteinID2;
-		    proteinID2 = tmpS;
-		    
 		    int tmpI = stoich1;
 		    stoich1 = stoich2;
 		    stoich2 = tmpI;
@@ -534,23 +525,22 @@ public class ImportPSIMI {
 
 		// add 1st protein
 		stmt2 = PPI.prepareStatement(con,
-					     "insert into interaction_protein values (null, ?, ?, ?, ?, null, ?)",
+					     "insert into interaction_protein values (null, ?, ?, ?, null, ?)",
 					     Statement.RETURN_GENERATED_KEYS);
 		PreparedStatement stmt3 = PPI.prepareStatement(con,
 							       "insert into interaction_data values (null, ?, ?, ?)");
 		stmt2.setInt(1,interactionID);
 		stmt2.setString(2,featureID1);
-		stmt2.setString(3,proteinID1);
 		if (stoich1 > 0)
-		    stmt2.setInt(4,stoich1);
+		    stmt2.setInt(3,stoich1);
 		else
-		    stmt2.setNull(4,Types.INTEGER);
+		    stmt2.setNull(3,Types.INTEGER);
 		int rank = 1;
 		Integer lastRank = interactionRank.get(interactionKey);
 		if (lastRank != null)
 		    rank = lastRank.intValue()+1;
 		interactionRank.put(interactionKey, new Integer(rank));
-		stmt2.setInt(5,rank);
+		stmt2.setInt(4,rank);
 		stmt2.executeUpdate();
 		ResultSet rs = stmt2.getGeneratedKeys();
 		rs.next();
@@ -565,14 +555,13 @@ public class ImportPSIMI {
 		if (!isSpoke) {
 		    // add 2nd protein
 		    stmt2.setString(2,featureID2);
-		    stmt2.setString(3,proteinID2);
 		    if (stoich2 > 0)
-			stmt2.setInt(4,stoich2);
+			stmt2.setInt(3,stoich2);
 		    else
-			stmt2.setNull(4,Types.INTEGER);
+			stmt2.setNull(3,Types.INTEGER);
 		    rank++;
 		    interactionRank.put(interactionKey, new Integer(rank));
-		    stmt2.setInt(5,rank);
+		    stmt2.setInt(4,rank);
 		    stmt2.executeUpdate();
 		    rs = stmt2.getGeneratedKeys();
 		    rs.next();

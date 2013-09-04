@@ -1,6 +1,8 @@
 # temporary protein interaction schema,
 # awaiting integration into CDM
 #
+# 6/26/13 - don't store ProteinID, since Shinjae says alt isoforms of
+#           proteins get separate FeatureIDs
 # 1/30/13 - store both ProteinID and FeatureID, since ProteinID is ambiguous
 #           also, add interaction_dataset_genome table to simplify retrieval
 # 10/25/12 - changed to point to ProteinSequences in CS instead of Features
@@ -64,14 +66,12 @@ create table if not exists interaction_protein (
        id integer unsigned not null auto_increment,
        interaction_id integer unsigned not null,
        feature_id varchar(250) not null,
-       protein_id varchar(250) not null,
        stoichiometry integer unsigned comment 'if applicable',
        strength double comment 'optional numeric measure of strength',
        rank integer unsigned comment 'numbered starting with 1 within interaction, if proteins are ordered',
        primary key (id),
        foreign key (interaction_id) references interaction(id) on delete cascade on update cascade
        # foreign key (feature_id) references Feature(id) on delete cascade on update cascade,
-       # foreign key (protein_id) references ProteinSequence(id) on delete cascade on update cascade,
 ) comment='Link betweeen Proteins and Interactions' engine=innodb;
 
 create table if not exists interaction_data (

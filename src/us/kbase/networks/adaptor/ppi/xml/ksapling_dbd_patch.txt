@@ -1,0 +1,178 @@
+--- old/KSaplingDBD.xml	2013-08-28 23:26:18.671984961 +0000
++++ new/KSaplingDBD.xml	2013-08-28 23:34:51.367926882 +0000
+@@ -46,6 +46,10 @@
+       <Notes>The Strain region contains data modeling strains of organisms derived
+       from a parent genome and their relationships.</Notes>
+     </Region>
++    <Region name="Interactions">
++      <Notes>The Interactions region currently contains data about
++      physical interactions between proteins.</Notes>
++    </Region>
+   </Regions>
+   <Diagram height="800" width="700" ratio="0.7" size="90"
+     fontSize="12" editable="1" />
+@@ -559,6 +563,7 @@
+       <DisplayInfo theme="green">
+         <RegionInfo name="" row="1" col="1" />
+         <RegionInfo name="Experiment" row="1" col="5" />
++        <RegionInfo name="Interactions" row="2" col="3" />
+       </DisplayInfo>
+       <Notes>Experimenters attach publications to experiments and
+       protocols. Annotators attach publications to ProteinSequences.
+@@ -764,6 +769,7 @@
+         <RegionInfo name="GenoPheno" row="1" col="4" />
+         <RegionInfo name="Strain" row="5" col="1" />
+         <RegionInfo name="Alignments" row="6" col="6" />
++        <RegionInfo name="Interactions" row="1" col="3" />
+       </DisplayInfo>
+       <Notes>The Kbase houses a large and growing set of genomes.  We
+       often have multiple genomes that have identical DNA.  These usually
+@@ -1073,6 +1079,7 @@
+         <RegionInfo name="Strain" row="1" col="1" />
+         <RegionInfo name="Experiment" row="7" col="7" />
+         <RegionInfo name="Models" row="3" col="5" />
++        <RegionInfo name="Interactions" row="3" col="3" />
+       </DisplayInfo>
+       <Notes>A feature (sometimes also called a gene) is a part of a
+       genome that is of special interest. Features may be spread across
+@@ -2008,6 +2015,75 @@
+       <Notes>A parameter is the name of some quantity that has a value.
+       </Notes>
+     </Entity>
++    <Entity name="InteractionDataset" keyType="string">
++      <DisplayInfo theme="navy">
++        <RegionInfo name="Interactions" row="1" col="1"
++		    caption="Interaction\nDataset" />
++      </DisplayInfo>
++      <Notes>An Interaction Dataset is a collection of PPI
++      data imported from a single database or publication.
++      </Notes>
++      <Fields>
++        <Field name="description" type="string">
++          <Notes>This is a description of the dataset.</Notes>
++        </Field>
++        <Field name="data-source" type="string">
++          <Notes>Optional external source for this dataset; e.g.,
++          another database.</Notes>
++        </Field>
++        <Field name="url" type="string">
++          <Notes>Optional URL for more info about this dataset.</Notes>
++        </Field>
++      </Fields>
++    </Entity>
++    <Entity name="Interaction" keyType="string">
++      <DisplayInfo theme="navy">
++        <RegionInfo name="Interactions" row="3" col="1"
++		    caption="Interaction" />
++      </DisplayInfo>
++      <Notes>An Interaction represents a protein complex or a pairwise
++      (binary) physical interaction between proteins.
++      </Notes>
++      <Fields>
++        <Field name="description" type="string">
++          <Notes>This is a description of this interaction.  If the
++          protein complex has a name, this should be it.
++	  </Notes>
++        </Field>
++        <Field name="directional" type="boolean">
++          <Notes>True for directional binary interactions (e.g., those
++          detected by a pulldown experiment), false for
++          non-directional binary interactions and complexes.
++          Bidirectional interactions (e.g., interactions detected by
++          reciprocal pulldown experiments) should be encoded as 2
++          separate binary interactions.
++          </Notes>
++        </Field>
++        <Field name="confidence" type="float">
++          <Notes>Optional numeric estimate of confidence in the interaction.
++          Recommended to use a 0-100 scale.
++          </Notes>
++        </Field>
++        <Field name="url" type="string">
++          <Notes>Optional URL for more info about this complex.</Notes>
++        </Field>
++      </Fields>
++    </Entity>
++    <Entity name="InteractionDetectionType" keyType="string">
++      <DisplayInfo theme="navy">
++        <RegionInfo name="Interactions" row="5" col="1"
++		    caption="Interaction\nDetection Type" />
++      </DisplayInfo>
++      <Notes>This documents methods by which interactions are detected
++      or annotated.
++      </Notes>
++      <Fields>
++        <Field name="description" type="string">
++          <Notes>This is a brief description of this detection method.
++          </Notes>
++        </Field>
++      </Fields>
++    </Entity>
+   </Entities>
+   <Relationships>
+     <Relationship name="ImplementsReaction" from="Feature" to="ReactionInstance"
+@@ -3570,6 +3646,64 @@
+         </Field>
+       </Fields>
+     </Relationship>
++    <Relationship name="IsDatasetFor" from="InteractionDataset"
++      to="Genome" arity="MM" converse="HasInteractionDataset">
++      <DisplayInfo theme="navy">
++        <RegionInfo name="Interactions" caption="IsDatasetFor"/>
++      </DisplayInfo>
++      <Notes>The IsDatasetFor relationship describes which genomes
++      are covered by particular interaction datasets.</Notes>
++    </Relationship>
++    <Relationship name="IsGroupingOf" from="InteractionDataset"
++      to="Interaction" arity="1M" converse="InInteractionDataset">
++      <DisplayInfo theme="navy">
++        <RegionInfo name="Interactions" caption="IsGroupingOf"/>
++      </DisplayInfo>
++      <Notes>The IsGroupingOf relationship describes which
++      interactions are part of a particular interaction
++      dataset.</Notes>
++    </Relationship>
++    <Relationship name="DetectedWithMethod" from="InteractionDetectionType"
++      to="Interaction" arity="1M" converse="DetectedBy">
++      <DisplayInfo theme="navy">
++        <RegionInfo name="Interactions" caption="DetectedBy"/>
++      </DisplayInfo>
++      <Notes>The DetectedWithMethod relationship describes which
++      protein-protein interactions were detected or annotated by
++      particular methods</Notes>
++    </Relationship>
++    <Relationship name="PublishedInteraction" from="Publication"
++      to="Interaction" arity="1M" converse="InteractionPublishedIn">
++      <DisplayInfo theme="navy">
++        <RegionInfo name="Interactions" caption="PublishedInteraction"/>
++      </DisplayInfo>
++      <Notes>The PublishedInteraction relationship links interactions
++      to the manuscript they are published in.</Notes>
++    </Relationship>
++    <Relationship name="InteractionProtein" from="Interaction"
++                  to="Feature" arity="MM" converse="ProteinInteractsIn">
++      <DisplayInfo theme="navy">
++        <RegionInfo name="Interactions" caption="InteractionProtein"/>
++      </DisplayInfo>
++      <Notes>The InteractionProtein relationship links interactions to
++      the features that encode their component proteins.</Notes>
++      <Fields>
++        <Field name="stoichiometry" type="int">
++          <Notes>Stoichiometry, if applicable (e.g., for a curated
++          complex.</Notes>
++        </Field>
++        <Field name="strength" type="float">
++          <Notes>Optional numeric measure of strength of the interaction
++          (e.g., kD or relative estimate of binding affinity)</Notes>
++        </Field>
++        <Field name="rank" type="int">
++          <Notes>Numbered starting at 1 within an Interaction, if
++          directional.  Meaning is method-dependent; e.g., for
++          interactions derived from pulldown data, rank 1 should be
++          assigned to the bait.</Notes>
++        </Field>
++      </Fields>
++    </Relationship>
+   </Relationships>
+   <Shapes>
+     <Shape type="diamond" name="BelongsToVariant" from="Role" to="Variant">

@@ -13,32 +13,29 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
 
    1) Unique identifiers for Interactors A and B are KBase Feature ids.
    
-   2) Alternate identifiers for Interactors A and B are KBase MD5
-      Protein ids.
-
-   3) When the complex expansion method (the 16th column in the file)
+   2) When the complex expansion method (the 16th column in the file)
       is "spoke expansion" everything about Interactor B is ignored,
       and the data are assumed to refer to a multi-protein complex
       described by multiple lines listing data for Interactor A.
 
-   4) Several pieces of optional metadata are encoded in the "Xref for
+   3) Several pieces of optional metadata are encoded in the "Xref for
       Interactor A" field (the 23rd column in the file):  "dataset:"
       refers to interaction_dataset.description, "dataseturl:" refers to the
       interaction_dataset.data_url, and "url:" refers to interaction.data_url.
 
-   5) We have extended the PSI ontology for interaction detection methods
+   4) We have extended the PSI ontology for interaction detection methods
       (column 7) to include "kb:" methods, which refer to
       interaction_detection_type.description.  If one if these methods
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-   6) We have extended the PSI ontology for source database
+   5) We have extended the PSI ontology for source database
       (column 13) to include "kb:" descriptions, which refer to
       interaction_dataset.data_source.  If one if these methods
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-  @version 2.1, 1/30/13
+  @version 2.2, 6/26/13
   @author JMC
 */
 public class ExportPSIMI {
@@ -133,17 +130,15 @@ public class ExportPSIMI {
 
 		    // if doing spoke expansion use first component as hub:
 		    String firstComponent = null;
-		    String firstProtein = null;
 		    int firstStoichiometry = 0;
 		    String firstXrefs = null;
 
 		    // get components in order
-		    rs = stmt.executeQuery("select id, feature_id, protein_id, stoichiometry from interaction_protein where interaction_id="+interactionID+" order by rank asc");
+		    rs = stmt.executeQuery("select id, feature_id, stoichiometry from interaction_protein where interaction_id="+interactionID+" order by rank asc");
 		    while (rs.next()) {
 			int interactionProteinID = rs.getInt(1);
 			String featureID = rs.getString(2);
-			String proteinID = rs.getString(3);
-			int stoichiometry = rs.getInt(4);
+			int stoichiometry = rs.getInt(3);
 
 			String xrefs = encodeXrefs(interactionProteinID,
 						   datasetName,
@@ -152,7 +147,6 @@ public class ExportPSIMI {
 			
 			if ((firstComponent==null) && (isSpoke)) {
 			    firstComponent = featureID;
-			    firstProtein = proteinID;
 			    firstStoichiometry = stoichiometry;
 			    firstXrefs = xrefs;
 			}
@@ -167,7 +161,6 @@ public class ExportPSIMI {
 			if (stoichiometry > 0)
 			    sto1 = ""+stoichiometry;
 			String sto2 = "-";
-			String pid2 = null;
 			String fid2 = null;
 			int pos = featureID.indexOf(".",5);
 			String genome1 = featureID.substring(0,pos);
@@ -176,7 +169,6 @@ public class ExportPSIMI {
 
 			if (isSpoke) {
 			    fid2 = firstComponent;
-			    pid2 = firstProtein;
 			    pos = fid2.indexOf(".",5);
 			    genome2 = fid2.substring(0,pos);
 			    if (firstStoichiometry > 0)
@@ -187,7 +179,6 @@ public class ExportPSIMI {
 			    rs.next();
 			    int interactionProteinID2 = rs.getInt(1);
 			    fid2 = rs.getString(2);
-			    pid2 = rs.getString(3);
 			    int stoichiometry2 = rs.getInt(4);
 
 			    pos = fid2.indexOf(".",5);
@@ -200,7 +191,7 @@ public class ExportPSIMI {
 						 url);
 			}
 
-			System.out.println(proteinID+"\t"+pid2+"\t"+featureID+"\t"+fid2+"\t-\t-\t"+method+"\t-\t"+publication+"\t"+genome1+"\t"+genome2+"\tpsi-mi:\"MI:0915\"(physical association)\t"+datasetSource+"\t"+interaction+"\t"+confidenceStr+"\t"+expansionMethod+"\t-\t-\t"+role1+"\t"+role2+"\t-\t-\t"+xrefs+"\t"+xrefs2+"\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t"+sto1+"\t"+sto2+"\t-\t-");
+			System.out.println(featureID+"\t"+fid2+"\t-\t-\t-\t-\t"+method+"\t-\t"+publication+"\t"+genome1+"\t"+genome2+"\tpsi-mi:\"MI:0915\"(physical association)\t"+datasetSource+"\t"+interaction+"\t"+confidenceStr+"\t"+expansionMethod+"\t-\t-\t"+role1+"\t"+role2+"\t-\t-\t"+xrefs+"\t"+xrefs2+"\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t"+sto1+"\t"+sto2+"\t-\t-");
 		    }
 		    rs.close();
 		}
