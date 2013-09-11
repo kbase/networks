@@ -3,15 +3,20 @@ package us.kbase.networks.adaptor.ppi.importer;
 import java.sql.*;
 import java.io.*;
 import java.util.*;
+import java.text.*;
 import org.strbio.util.*;
+import org.strbio.net.PubMed;
 import org.strbio.IO;
+import org.strbio.io.*;
 import us.kbase.networks.adaptor.ppi.local.PPI;
 
 /**
    Import PPI data from a PSI-MI TAB 2.7 file, with KBase format
    modifications described below:
 
-   1) Unique identifiers for Interactors A and B are KBase Feature ids.
+   1) Unique identifiers for Interactors A and B are KBase Feature ids
+      or other ids that are convertible to Feature IDs by the KBase ID
+      server.
 
    2) When the complex expansion method (the 16th column in the file)
       is "spoke expansion" everything about Interactor B is ignored,
@@ -35,184 +40,341 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-  @version 2.2, 6/26/13
+  @version 3.0, 9/4/13
   @author JMC
 */
 public class ImportPSIMI {
+    // cache sets of what's already stored in tables
+    static HashSet <Integer> pubSet = new HashSet<Integer>();
+    static HashSet <String> dsGenomeSet = new HashSet<String>();
+    
     // cache DB lookups:
-    static HashMap <Integer,String> pubMap = new HashMap<Integer,String>();
-    static HashMap <String,Integer> dsMap = new HashMap<String,Integer>();
-    static HashMap <String,Integer> methodMap = new HashMap<String,Integer>();
-    static HashMap <String,Integer> intMap = new HashMap<String,Integer>();
+    static HashMap <String,String> dsMap = new HashMap<String,String>();
+    static HashMap <String,String> methodMap = new HashMap<String,String>();
+    static HashMap <String,String> intMap = new HashMap<String,String>();
+
+    // cache max current assigned ids for each prefix type
+    static HashMap <String,Integer> maxID = new HashMap<String,Integer>();
+
+    final public static SimpleDateFormat medlineDateFormat1 =
+	new SimpleDateFormat ("yyyy MMM d");
+    final public static SimpleDateFormat medlineDateFormat2 =
+	new SimpleDateFormat ("yyyy MMM");
+
+    /**
+       find max ids already in table
+    */
+    final public static int getMaxID(String prefix,
+				     String tableName) throws Exception {
+	PPI.connectRW();
+	Connection con = PPI.getConnection();
+	Statement stmt = PPI.createStatement(con);
+	int prefixLength = prefix.length()+5; // for 'kb|' and dots
+	ResultSet rs = stmt.executeQuery("select max(convert(substr(id,"+prefixLength+"),unsigned integer)) from "+tableName);
+	int rv = 0;
+	if (rs.next())
+	    rv = rs.getInt(1);
+	rs.close();
+	stmt.close();
+	con.close();
+	return rv;
+    }
+
+    /**
+       find max ids already in tables for all PPI datatypes
+    */
+    final public static void getMaxIDs() throws Exception {
+	int id = getMaxID("ppi","Interaction");
+	maxID.put("ppi",new Integer(id));
+	id = getMaxID("ppid","InteractionDataset");
+	maxID.put("ppid",new Integer(id));
+	id = getMaxID("ppim","InteractionDetectionType");
+	maxID.put("ppim",new Integer(id));
+    }
+
+    /**
+       assign next ID for a given prefix, and increment the
+       cached max ID
+    */
+    final public static String getNextID(String prefix) throws Exception {
+	Integer id = maxID.get(prefix);
+	id++;
+	maxID.put(prefix,id);
+	return("kb|"+prefix+"."+id);
+    }
+
+    /**
+       read multi-line text data from a MEDLINE text format record.
+    */
+    final public static String readPubmedTag(BufferedReader infile) throws IOException
+    {
+	String buffer = infile.readLine();
+	String rv = buffer.substring(6);
+	do {
+	    infile.mark(16384);
+	    buffer=infile.readLine();
+	    if ((buffer==null) ||
+		(buffer.indexOf("      ")!=0)) {
+		infile.reset();
+	    }
+	    else {
+		rv += "\n"+buffer.substring(6);
+	    }
+	} while ((buffer!=null) &&
+		 (buffer.indexOf("      ")==0));
+	if (rv.length() == 0) rv = null;
+	return rv;
+    }
+
+    /**
+       Parse publication data in MEDLINE format returned by
+       NCBI PubMed server.
+    */
+    final public static String[] parsePubmedData(BufferedReader infile)
+	throws IOException {
+	String[] rv = new String[2]; // title, publication date
+	
+	String buffer=infile.readLine();
+	do {
+	    if (buffer.indexOf("TI  - ")==0) {
+		infile.reset();
+		rv[0] = readPubmedTag(infile);
+	    }
+	    else if (buffer.indexOf("DP  - ")==0) {
+		rv[1] = buffer.substring(6);
+	    }
+	    infile.mark(16384);
+	    buffer=infile.readLine();
+	    if (buffer==null) {
+		infile.reset();
+		return rv;
+	    }
+	} while (true);
+    }
+
+    /**
+       retrieve PubMed data required to populate Publication record
+       from NCBI server
+    */
+    final public static String[] getPubmedData(int pubmedID) throws Exception {
+	String[] rv = new String[2];
+	
+	String data = PubMed.search(pubmedID,null);
+	String[] relevantFields = parsePubmedData(new BufferedReader(new EOFStringReader(data)));
+
+	if ((relevantFields[0]==null) ||
+	    (relevantFields[1]==null))
+	    throw new Exception("Couldn't get data for "+pubmedID);
+	
+	java.util.Date d = null;
+	try {
+	    d = medlineDateFormat1.parse(relevantFields[1]);
+	}
+	catch (Exception e) {
+	    d = medlineDateFormat2.parse(relevantFields[1]);
+	}
+	rv[0] = relevantFields[0];
+	rv[1] = Long.toString(d.getTime());
+	return rv;
+    }
     
     /**
        Looks up a publication by its pubmed id, or creates one if it
        doesn't already exist in the (standin) publication table.
-
-       This function should be replaced by something that interacts
-       with the real publications in the CS.
     */
     final public static String lookupOrCreatePublication(int pubmedID) throws Exception {
-	String kbID = pubMap.get(new Integer(pubmedID));
-	if (kbID != null)
-	    return kbID;
+	Integer intID = new Integer(pubmedID);
+	String strID = intID.toString();
+	
+	if (pubSet.contains(intID))
+	    return new String(strID);
 	
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
 	Statement stmt = PPI.createStatement(con);
-	ResultSet rs = stmt.executeQuery("select id from tmp_publication where link=\"pubmed:"+pubmedID+"\"");
+	ResultSet rs = stmt.executeQuery("select id from Publication where id=\""+pubmedID+"\"");
 	if (rs.next()) {
-	    kbID = rs.getString(1);
-	    pubMap.put(new Integer(pubmedID), kbID);
+	    pubSet.add(intID);
 	    rs.close();
 	    stmt.close();
 	    con.close();
-	    return kbID;
+	    return strID;
 	}
 	rs.close();
-	stmt.executeUpdate("insert into tmp_publication values (\"jmc|pub."+pubmedID+"\", null, \"pubmed:"+pubmedID+"\")");
 	stmt.close();
+	String[] pubmedData = getPubmedData(pubmedID);
+	
+
+	PreparedStatement stmt2 = PPI.prepareStatement(con,
+						       "insert into Publication values (?, ?, ?, ?)");	
+	stmt2.setString(1,strID);
+	stmt2.setInt(2,StringUtil.atoi(pubmedData[1]));	
+	stmt2.setString(3,"http://www.ncbi.nlm.nih.gov/pubmed/"+strID);
+	stmt2.setString(4,pubmedData[0]);
+	stmt2.executeUpdate();
+	stmt2.close();
 	con.close();
 	
-	kbID = "jmc|pub."+pubmedID;
-	pubMap.put(new Integer(pubmedID), kbID);
-	return kbID;
+	pubSet.add(intID);
+	return strID;
     }
 
     /**
        Look up an interaction dataset by its description, or create
-       one if it doesn't already exist
+       one if it doesn't already exist.  Returns dataset id.
     */
-    final public static int lookupOrCreateDataset(String description) throws Exception {
-	Integer kbID = dsMap.get(description);
+    final public static String lookupOrCreateDataset(String description) throws Exception {
+	String kbID = dsMap.get(description);
 	if (kbID != null)
-	    return kbID.intValue();
+	    return kbID;
 	
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
 	PreparedStatement stmt = PPI.prepareStatement(con,
-						      "select id from interaction_dataset where description=?");
+						      "select id from InteractionDataset where description=?");
 	stmt.setString(1,description);
 	ResultSet rs = stmt.executeQuery();
 	if (rs.next()) {
-	    int rv = rs.getInt(1);
+	    String rv = rs.getString(1);
 	    rs.close();
 	    stmt.close();
 	    con.close();
-	    dsMap.put(description, new Integer(rv));
+	    dsMap.put(description, rv);
 	    return rv;
 	}
 	rs.close();
 	stmt.close();
 	stmt = PPI.prepareStatement(con,
-				    "insert into interaction_dataset values (null, ?, null, null)",
-				    Statement.RETURN_GENERATED_KEYS);
-	stmt.setString(1,description);
+				    "insert into InteractionDataset values (?, ?, ?, ?)");
+	String rv = getNextID("ppid");
+	stmt.setString(1,rv);
+	stmt.setString(2,"");
+	stmt.setString(3,description);
+	stmt.setString(4,"");
 	stmt.executeUpdate();
-	rs = stmt.getGeneratedKeys();
-	rs.next();
-	int rv = rs.getInt(1);
-	rs.close();
 	stmt.close();
 	con.close();
-	dsMap.put(description, new Integer(rv));
+	dsMap.put(description, rv);
 	return rv;
     }
 
     /**
        Look up an interaction detection type by its description, or return
-       0 if it doesn't exist.
+       null if it doesn't exist.
     */
-    final public static int lookupMethod(String description) throws Exception {
+    final public static String lookupMethod(String description) throws Exception {
 	if (description==null)
-	    return 0;
+	    return null;
 
-	Integer kbID = methodMap.get(description);
+	String kbID = methodMap.get(description);
 	if (kbID != null)
-	    return kbID.intValue();
+	    return kbID;
 	
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
 	PreparedStatement stmt = PPI.prepareStatement(con,
-						      "select id from interaction_detection_type where description=?");
+						      "select id from InteractionDetectionType where description=?");
 	stmt.setString(1,description);
 	ResultSet rs = stmt.executeQuery();
 	if (rs.next()) {
-	    int rv = rs.getInt(1);
+	    String rv = rs.getString(1);
 	    rs.close();
 	    stmt.close();
 	    con.close();
-	    methodMap.put(description, new Integer(rv));
+	    methodMap.put(description, rv);
 	    return rv;
 	}
 	rs.close();
 	stmt.close();
 	con.close();
-	return 0;
+	return null;
     }
     
     /**
        Create an interaction detection type using its description, and
        return its id.
     */
-    final public static int createMethod(String description) throws Exception {
+    final public static String createMethod(String description) throws Exception {
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
 	PreparedStatement stmt = PPI.prepareStatement(con,
-						      "insert into interaction_detection_type values (null, ?)",
-						      Statement.RETURN_GENERATED_KEYS);
-	stmt.setString(1,description);
+						      "insert into InteractionDetectionType values (?, ?)");
+	String rv = getNextID("ppim");
+	stmt.setString(1,rv);
+	stmt.setString(2,description);
 	stmt.executeUpdate();
-	ResultSet rs = stmt.getGeneratedKeys();
-	rs.next();
-	int rv = rs.getInt(1);
-	rs.close();
 	stmt.close();
 	con.close();
-	methodMap.put(description, new Integer(rv));
+	methodMap.put(description, rv);
 	return rv;
     }
 
     /**
-       Look up an interaction dataset by its description, or create
+       Look up an interaction by its description and dataset, or create
        one if it doesn't already exist
     */
-    final public static int lookupOrCreateInteraction(int datasetID,
-						      String description) throws Exception {
-	Integer kbID = intMap.get(datasetID+"_"+description);
+    final public static String lookupOrCreateInteraction(String datasetID,
+							 String description) throws Exception {
+	String kbID = intMap.get(datasetID+"_"+description);
 	if (kbID != null)
-	    return kbID.intValue();
+	    return kbID;
 	
 	PPI.connectRW();
 	Connection con = PPI.getConnection();
 	PreparedStatement stmt = PPI.prepareStatement(con,
-						      "select id from interaction where interaction_dataset_id=? and description=?");
-	stmt.setInt(1,datasetID);
+						      "select i.id from Interaction i, IsGroupingOf m where i.id=m.to_link and m.from_link=? and description=?");
+	stmt.setString(1,datasetID);
 	stmt.setString(2,description);
 	ResultSet rs = stmt.executeQuery();
 	if (rs.next()) {
-	    int rv = rs.getInt(1);
+	    String rv = rs.getString(1);
 	    rs.close();
 	    stmt.close();
 	    con.close();
-	    intMap.put(datasetID+"_"+description, new Integer(rv));
+	    intMap.put(datasetID+"_"+description, rv);
 	    return rv;
 	}
 	rs.close();
 	stmt.close();
 	stmt = PPI.prepareStatement(con,
-				    "insert into interaction values (null, ?, ?, false, null, null, null, null)",
-				    Statement.RETURN_GENERATED_KEYS);
-	stmt.setInt(1,datasetID);
-	stmt.setString(2,description);
+				    "insert into Interaction values (?, ?, ?, ?, ?)");
+	String rv = getNextID("ppi");
+	stmt.setString(1,rv);
+	stmt.setDouble(2,0.0);
+	stmt.setInt(3,0);
+	stmt.setString(4,description);
+	stmt.setString(5,"");
 	stmt.executeUpdate();
-	rs = stmt.getGeneratedKeys();
-	rs.next();
-	int rv = rs.getInt(1);
+	stmt.close();
+	con.close();
+	intMap.put(datasetID+"_"+description, rv);
+	return rv;
+    }
+
+    /**
+       Get the genome id corresponding to a feature id, or
+       null if error
+    */
+    final public static String getGenomeFor(String featureID) throws Exception {
+	int pos = featureID.indexOf('.');
+	int pos2 = featureID.indexOf('.',pos+1);
+
+	if ((pos > 0) && (pos2 > pos))
+	    return featureID.substring(0,pos);
+
+	// otherwise, do slow sql lookup
+	PPI.connectRW();
+	Connection con = PPI.getConnection();
+	PreparedStatement stmt = PPI.prepareStatement(con,
+						      "select from_link from IsOwnerOf where to_link=? limit 1");
+	stmt.setString(1,featureID);
+	ResultSet rs = stmt.executeQuery();
+	String rv = null;
+	if (rs.next())
+	    rv = rs.getString(1);
 	rs.close();
 	stmt.close();
 	con.close();
-	intMap.put(datasetID+"_"+description, new Integer(rv));
 	return rv;
     }
 
@@ -291,7 +453,7 @@ public class ImportPSIMI {
 	    // map interactions to metadata
 	    HashSet<String> directionalInteractions = new HashSet<String>();
 	    HashMap<String,Double> interactionConfidence = new HashMap<String,Double>();
-	    HashMap<String,Integer> interactionMethod = new HashMap<String,Integer>();
+	    HashMap<String,String> interactionMethod = new HashMap<String,String>();
 	    HashMap<String,String> interactionURL = new HashMap<String,String>();
 	    HashMap<String,String> interactionPublication = new HashMap<String,String>();
 	    HashMap<String,Integer> interactionRank = new HashMap<String,Integer>();
@@ -315,10 +477,10 @@ public class ImportPSIMI {
 
 		// experiment/annotation method
 		String method = parseKBField(st.nextToken());
-		int methodID = 0;
+		String methodID = null;
 		if (method != null) {
 		    methodID = lookupMethod(method);
-		    if (methodID==0) {
+		    if (methodID==null) {
 			// throw new Exception("Must create method '"+method+"'");
 			methodID = createMethod(method);
 		    }
@@ -428,13 +590,43 @@ public class ImportPSIMI {
 		// insert data in this row
 		if (datasetName==null)
 		    throw new Exception("Need dataset name for row '"+buffer+"'");
-		int datasetID = lookupOrCreateDataset(datasetName);
+		String datasetID = lookupOrCreateDataset(datasetName);
 
 		// if this is the first time seeing this dataset
-		// in this file, clear out old data
+		// in this file, clear out any old data
 		if (!seenDatasets.contains(datasetName)) {
 		    seenDatasets.add(datasetName);
-		    stmt.executeUpdate("delete from interaction where interaction_dataset_id="+datasetID);
+		    stmt2 = PPI.prepareStatement(con,
+						 "delete from IsDatasetFor where from_link=?");
+		    stmt2.setString(1,datasetID);
+		    stmt2.executeUpdate();
+		    stmt2.close();
+		    
+		    stmt2 = PPI.prepareStatement(con,
+						 "delete dwm from DetectedWithMethod dwm join Interaction i on (i.id=dwm.from_id) join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
+		    stmt2.setString(1,datasetID);
+		    stmt2.executeUpdate();
+		    stmt2.close();
+		    stmt2 = PPI.prepareStatement(con,
+						 "delete pi from PublishedInteraction pi join Interaction i on (i.id=pi.to_id) join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
+		    stmt2.setString(1,datasetID);
+		    stmt2.executeUpdate();
+		    stmt2.close();
+		    stmt2 = PPI.prepareStatement(con,
+						 "delete ip from InteractionProtein ip join Interaction i on (i.id=ip.from_id) join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
+		    stmt2.setString(1,datasetID);
+		    stmt2.executeUpdate();
+		    stmt2.close();
+		    stmt2 = PPI.prepareStatement(con,
+						 "delete i from Interaction i join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
+		    stmt2.setString(1,datasetID);
+		    stmt2.executeUpdate();
+		    stmt2.close();
+		    stmt2 = PPI.prepareStatement(con,
+						 "delete from IsGroupingOf where from_link=?");
+		    stmt2.setString(1,datasetID);
+		    stmt2.executeUpdate();
+		    stmt2.close();
 		}
 
 		// update URL, source if different
@@ -442,9 +634,9 @@ public class ImportPSIMI {
 		    (!datasetURL.equals(datasetURLMap.get(datasetName)))) {
 		    datasetURLMap.put(datasetName, datasetURL);
 		    stmt2 = PPI.prepareStatement(con,
-						 "update interaction_dataset set data_url=? where id=?");
+						 "update InteractionDataset set url=? where id=?");
 		    stmt2.setString(1,datasetURL);
-		    stmt2.setInt(2,datasetID);
+		    stmt2.setString(2,datasetID);
 		    stmt2.executeUpdate();
 		    stmt2.close();
 		}
@@ -452,22 +644,26 @@ public class ImportPSIMI {
 		    (!sourceDB.equals(datasetSourceMap.get(datasetName)))) {
 		    datasetSourceMap.put(datasetName, sourceDB);
 		    stmt2 = PPI.prepareStatement(con,
-						 "update interaction_dataset set data_source=? where id=?");
+						 "update InteractionDataset set data_source=? where id=?");
 		    stmt2.setString(1,sourceDB);
-		    stmt2.setInt(2,datasetID);
+		    stmt2.setString(2,datasetID);
 		    stmt2.executeUpdate();
 		    stmt2.close();
 		}
 
 		// set up interaction
-		int interactionID = lookupOrCreateInteraction(datasetID,
-							      interaction);
+		String interactionID = lookupOrCreateInteraction(datasetID,
+								 interaction);
 		String interactionKey = datasetID+"_"+interactionID;
 		// update metadata if different
 		if (isDirectional &&
 		    (!directionalInteractions.contains(interactionKey))) {
 		    directionalInteractions.add(interactionKey);
-		    stmt.executeUpdate("update interaction set is_directional=true where id="+interactionID);
+		    stmt2 = PPI.prepareStatement(con,
+						 "update Interaction set directional=1 where id=?");
+		    stmt2.setString(1,interactionID);
+		    stmt2.executeUpdate();
+		    stmt2.close();
 		}
 		if (!Double.isNaN(confidence)) {
 		    Double oldConf = interactionConfidence.get(interactionKey);
@@ -475,25 +671,40 @@ public class ImportPSIMI {
 			(oldConf.doubleValue() != confidence)) {
 			interactionConfidence.put(interactionKey,
 						  new Double(confidence));
-			stmt.executeUpdate("update interaction set confidence="+confidence+" where id="+interactionID);
+			stmt2 = PPI.prepareStatement(con,
+						     "update Interaction set confidence=? where id=?");
+			stmt2.setDouble(1,confidence);
+			stmt2.setString(2,interactionID);
+			stmt2.executeUpdate();
+			stmt2.close();
 		    }
 		}
-		if (methodID > 0) {
-		    Integer oldMethod = interactionMethod.get(interactionKey);
+		if (methodID != null) {
+		    String oldMethod = interactionMethod.get(interactionKey);
 		    if ((oldMethod == null) ||
-			(oldMethod.intValue() != methodID)) {
+			(!oldMethod.equals(methodID))) {
 			interactionMethod.put(interactionKey,
-					      new Integer(methodID));
-			stmt.executeUpdate("update interaction set detection_method_id="+methodID+" where id="+interactionID);
+					      methodID);
+			stmt2 = PPI.prepareStatement(con,
+						     "delete from DetectedWithMethod where from_link = ?");
+			stmt2.setString(1,interactionID);
+			stmt2.executeUpdate();
+			stmt2.close();
+			stmt2 = PPI.prepareStatement(con,
+						     "insert into DetectedWithMethod values (?, ?)");
+			stmt2.setString(1,interactionID);
+			stmt2.setString(2,methodID);
+			stmt2.executeUpdate();
+			stmt2.close();
 		    }
 		}
 		if ((url != null) &&
 		    (!url.equals(interactionURL.get(interactionKey)))) {
 		    interactionURL.put(interactionKey,url);
 		    stmt2 = PPI.prepareStatement(con,
-						 "update interaction set data_url=? where id=?");
+						 "update Interaction set url=? where id=?");
 		    stmt2.setString(1,url);
-		    stmt2.setInt(2,interactionID);
+		    stmt2.setString(2,interactionID);
 		    stmt2.executeUpdate();
 		    stmt2.close();
 		}
@@ -501,9 +712,14 @@ public class ImportPSIMI {
 		    (!publicationID.equals(interactionPublication.get(interactionKey)))) {
 		    interactionPublication.put(interactionKey,publicationID);
 		    stmt2 = PPI.prepareStatement(con,
-						 "update interaction set citation_id=? where id=?");
+						 "delete from PublishedInteraction where to_link = ?");
+		    stmt2.setString(1,interactionID);
+		    stmt2.executeUpdate();
+		    stmt2.close();
+		    stmt2 = PPI.prepareStatement(con,
+						 "insert into PublishedInteraction values (?, ?)");
 		    stmt2.setString(1,publicationID);
-		    stmt2.setInt(2,interactionID);
+		    stmt2.setString(2,interactionID);
 		    stmt2.executeUpdate();
 		    stmt2.close();
 		}
@@ -525,71 +741,43 @@ public class ImportPSIMI {
 
 		// add 1st protein
 		stmt2 = PPI.prepareStatement(con,
-					     "insert into interaction_protein values (null, ?, ?, ?, null, ?)",
-					     Statement.RETURN_GENERATED_KEYS);
-		PreparedStatement stmt3 = PPI.prepareStatement(con,
-							       "insert into interaction_data values (null, ?, ?, ?)");
-		stmt2.setInt(1,interactionID);
+					     "insert into InteractionProtein values (?, ?, ?, ?, ?)");
+		stmt2.setString(1,interactionID);
 		stmt2.setString(2,featureID1);
-		if (stoich1 > 0)
-		    stmt2.setInt(3,stoich1);
-		else
-		    stmt2.setNull(3,Types.INTEGER);
 		int rank = 1;
 		Integer lastRank = interactionRank.get(interactionKey);
 		if (lastRank != null)
 		    rank = lastRank.intValue()+1;
 		interactionRank.put(interactionKey, new Integer(rank));
-		stmt2.setInt(4,rank);
+		stmt2.setInt(3,rank);
+		stmt2.setInt(4,stoich1);
+		stmt2.setDouble(5,0.0);
 		stmt2.executeUpdate();
-		ResultSet rs = stmt2.getGeneratedKeys();
-		rs.next();
-		stmt3.setInt(1,rs.getInt(1));
-		rs.close();
-		for (String key : xrefs1.keySet()) {
-		    stmt3.setString(2,key);
-		    stmt3.setString(3,xrefs1.get(key));
-		    stmt3.executeUpdate();
-		}
 
 		if (!isSpoke) {
 		    // add 2nd protein
 		    stmt2.setString(2,featureID2);
-		    if (stoich2 > 0)
-			stmt2.setInt(3,stoich2);
-		    else
-			stmt2.setNull(3,Types.INTEGER);
 		    rank++;
 		    interactionRank.put(interactionKey, new Integer(rank));
-		    stmt2.setInt(4,rank);
+		    stmt2.setInt(3,rank);
+		    stmt2.setInt(4,stoich2);
 		    stmt2.executeUpdate();
-		    rs = stmt2.getGeneratedKeys();
-		    rs.next();
-		    stmt3.setInt(1,rs.getInt(1));
-		    rs.close();
-		    for (String key : xrefs1.keySet()) {
-			stmt3.setString(2,key);
-			stmt3.setString(3,xrefs1.get(key));
-			stmt3.executeUpdate();
-		    }
 		}
 		stmt2.close();
-		stmt3.close();
+
+		// add genome link (must be same for both proteins)
+		String genomeID = getGenomeFor(featureID1);
+		if (!dsGenomeSet.contains(datasetID+"_"+genomeID)) {
+		    stmt2 = PPI.prepareStatement(con,
+						 "insert into IsDatasetFor values (?, ?)");
+		    stmt2.setString(1,datasetID);
+		    stmt2.setString(2,genomeID);
+		    stmt2.executeUpdate();
+		    stmt2.close();
+		    dsGenomeSet.add(datasetID+"_"+genomeID);
+		}
 	    }
 
-	    // fill in the interaction_dataset_genome table
-	    stmt.executeUpdate("truncate table interaction_dataset_genome");
-	    stmt2 = PPI.prepareStatement(con,
-					 "insert into interaction_dataset_genome values (?, ?)");
-	    ResultSet rs = stmt.executeQuery("select i.interaction_dataset_id, substring_index(p.feature_id, '.',2) as g from interaction i, interaction_protein p where p.interaction_id=i.id group by i.interaction_dataset_id,g");
-	    while (rs.next()) {
-		stmt2.setInt(1,rs.getInt(1));
-		stmt2.setString(2,rs.getString(2));
-		stmt2.executeUpdate();
-	    }
-	    rs.close();
-	    
-	    stmt2.close();
 	    stmt.close();
 	    con.close();
 	}
