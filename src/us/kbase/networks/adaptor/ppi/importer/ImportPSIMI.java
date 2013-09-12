@@ -174,13 +174,14 @@ public class ImportPSIMI {
 	    d = medlineDateFormat2.parse(relevantFields[1]);
 	}
 	rv[0] = relevantFields[0];
-	rv[1] = Long.toString(d.getTime());
+	// assume bigint pubdate in Publication table is Unix timestamp
+	rv[1] = Long.toString(d.getTime()/1000);
 	return rv;
     }
     
     /**
        Looks up a publication by its pubmed id, or creates one if it
-       doesn't already exist in the (standin) publication table.
+       doesn't already exist in the Publication table.
     */
     final public static String lookupOrCreatePublication(int pubmedID) throws Exception {
 	Integer intID = new Integer(pubmedID);
@@ -208,7 +209,7 @@ public class ImportPSIMI {
 	PreparedStatement stmt2 = PPI.prepareStatement(con,
 						       "insert into Publication values (?, ?, ?, ?)");	
 	stmt2.setString(1,strID);
-	stmt2.setInt(2,StringUtil.atoi(pubmedData[1]));	
+	stmt2.setLong(2,StringUtil.atol(pubmedData[1]));	
 	stmt2.setString(3,"http://www.ncbi.nlm.nih.gov/pubmed/"+strID);
 	stmt2.setString(4,pubmedData[0]);
 	stmt2.executeUpdate();
@@ -443,6 +444,9 @@ public class ImportPSIMI {
 	    Statement stmt = PPI.createStatement(con);
 	    PreparedStatement stmt2;
 
+	    // set up local PPI ID generator cache
+	    getMaxIDs();
+
 	    // keep track of what datasets we've seen in this file
 	    HashSet<String> seenDatasets = new HashSet<String>();
 
@@ -463,6 +467,7 @@ public class ImportPSIMI {
 	    String buffer;
 	    while ((buffer=infile.readLine()) != null) {
 		// System.out.println(buffer);
+		// System.out.flush();
 		
 		StringTokenizer st = new StringTokenizer(buffer,"\t");
 
@@ -603,17 +608,17 @@ public class ImportPSIMI {
 		    stmt2.close();
 		    
 		    stmt2 = PPI.prepareStatement(con,
-						 "delete dwm from DetectedWithMethod dwm join Interaction i on (i.id=dwm.from_id) join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
+						 "delete dwm from DetectedWithMethod dwm join Interaction i on (i.id=dwm.to_link) join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
 		    stmt2.setString(1,datasetID);
 		    stmt2.executeUpdate();
 		    stmt2.close();
 		    stmt2 = PPI.prepareStatement(con,
-						 "delete pi from PublishedInteraction pi join Interaction i on (i.id=pi.to_id) join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
+						 "delete pi from PublishedInteraction pi join Interaction i on (i.id=pi.to_link) join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
 		    stmt2.setString(1,datasetID);
 		    stmt2.executeUpdate();
 		    stmt2.close();
 		    stmt2 = PPI.prepareStatement(con,
-						 "delete ip from InteractionProtein ip join Interaction i on (i.id=ip.from_id) join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
+						 "delete ip from InteractionProtein ip join Interaction i on (i.id=ip.from_link) join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
 		    stmt2.setString(1,datasetID);
 		    stmt2.executeUpdate();
 		    stmt2.close();
@@ -686,14 +691,14 @@ public class ImportPSIMI {
 			interactionMethod.put(interactionKey,
 					      methodID);
 			stmt2 = PPI.prepareStatement(con,
-						     "delete from DetectedWithMethod where from_link = ?");
+						     "delete from DetectedWithMethod where to_link = ?");
 			stmt2.setString(1,interactionID);
 			stmt2.executeUpdate();
 			stmt2.close();
 			stmt2 = PPI.prepareStatement(con,
 						     "insert into DetectedWithMethod values (?, ?)");
-			stmt2.setString(1,interactionID);
-			stmt2.setString(2,methodID);
+			stmt2.setString(1,methodID);
+			stmt2.setString(2,interactionID);
 			stmt2.executeUpdate();
 			stmt2.close();
 		    }
