@@ -118,7 +118,7 @@ public class ImportPSIMI {
 		infile.reset();
 	    }
 	    else {
-		rv += "\n"+buffer.substring(6);
+		rv += " "+buffer.substring(6);
 	    }
 	} while ((buffer!=null) &&
 		 (buffer.indexOf("      ")==0));
