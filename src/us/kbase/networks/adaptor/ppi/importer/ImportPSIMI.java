@@ -40,7 +40,7 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-  @version 3.02, 9/18/13
+  @version 3.03, 9/19/13
   @author JMC
 */
 public class ImportPSIMI {
@@ -426,6 +426,14 @@ public class ImportPSIMI {
 	stmt.setString(5,"");
 	stmt.executeUpdate();
 	stmt.close();
+
+	stmt = PPI.prepareStatement(con,
+				    "insert into IsGroupingOf values (?, ?)");
+	stmt.setString(1,datasetID);
+	stmt.setString(2,rv);
+	stmt.executeUpdate();
+	stmt.close();
+
 	con.close();
 	intMap.put(datasetID+"_"+description, rv);
 	return rv;
