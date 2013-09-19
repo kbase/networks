@@ -40,7 +40,7 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-  @version 3.03, 9/19/13
+  @version 3.04, 9/19/13
   @author JMC
 */
 public class ImportPSIMI {
@@ -55,6 +55,7 @@ public class ImportPSIMI {
     static HashMap <String,String> methodMap = new HashMap<String,String>();
     static HashMap <String,String> intMap = new HashMap<String,String>();
     static HashMap <String,String> proteinMap = new HashMap<String,String>();
+    static HashMap <String,String> encodeMap = new HashMap<String,String>();
 
     // cache max current assigned ids for each prefix type
     static HashMap <String,Integer> maxID = new HashMap<String,Integer>();
@@ -256,6 +257,46 @@ public class ImportPSIMI {
 	con.close();
 	proteinMap.put(featureID,proteinID);
 	return proteinID;
+    }
+
+    /**
+       find feature that actually includes protein, or throw exception
+       if none
+    */
+    final public static String findEncoding(String featureID) throws Exception {
+	String rv = encodeMap.get(featureID);
+	if (rv != null)
+	    return rv;
+
+	// if this feature encodes protein, we're done
+	String proteinID = getProtein(featureID);
+	if (proteinID != null) {
+	    encodeMap.put(featureID, featureID);
+	    return featureID;
+	}
+
+	// otherwise, use Encoding relationship
+	PPI.connectRW();
+	Connection con = PPI.getConnection();
+	PreparedStatement stmt = PPI.prepareStatement(con,
+						      "select from_link from Encompasses where to_link=? limit 1");
+	stmt.setString(1,featureID);
+	ResultSet rs = stmt.executeQuery();
+	if (rs.next())
+	    rv = rs.getString(1);
+	rs.close();
+	stmt.close();
+	con.close();
+
+	// if this feature encodes protein, we're done
+	proteinID = getProtein(rv);
+	if (proteinID != null) {
+	    encodeMap.put(featureID, rv);
+	    return rv;
+	}
+
+	// otherwise, give up
+	throw new Exception("Can't find any protein encoded by "+featureID);
     }
     
     /**
@@ -566,6 +607,10 @@ public class ImportPSIMI {
 		// feature ids
 		String featureID1 = st.nextToken();
 		String featureID2 = st.nextToken();
+
+		// find feature that actually encodes protein
+		featureID1 = findEncoding(featureID1);
+		featureID2 = findEncoding(featureID2);
 
 		// check that they're valid
 		if (!isValidFeature(featureID1))
