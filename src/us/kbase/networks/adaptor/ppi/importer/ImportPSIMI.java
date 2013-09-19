@@ -414,7 +414,7 @@ public class ImportPSIMI {
 	int pos2 = featureID.indexOf('.',pos+1);
 
 	if ((pos > 0) && (pos2 > pos))
-	    return featureID.substring(0,pos);
+	    return featureID.substring(0,pos2);
 
 	// otherwise, do slow sql lookup
 	PPI.connectRW();
