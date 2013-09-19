@@ -515,6 +515,11 @@ public class ImportPSIMI {
 	    HashMap<String,String> interactionPublication = new HashMap<String,String>();
 	    HashMap<String,Integer> interactionRank = new HashMap<String,Integer>();
 
+	    // dataset name
+	    String defaultDatasetName = null;
+	    if (argv.length > 1)
+		defaultDatasetName = argv[1];
+
 	    // read in file line by line
 	    BufferedReader infile = IO.openReader(argv[0]);
 	    String buffer;
@@ -652,6 +657,9 @@ public class ImportPSIMI {
 		st.nextToken();
 
 		// insert data in this row
+		if (datasetName==null)
+		    datasetName = defaultDatasetName;
+			
 		if (datasetName==null)
 		    throw new Exception("Need dataset name for row '"+buffer+"'");
 		String datasetID = lookupOrCreateDataset(datasetName);
