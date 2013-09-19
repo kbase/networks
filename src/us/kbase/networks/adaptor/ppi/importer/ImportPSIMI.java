@@ -40,7 +40,7 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-  @version 3.01, 9/18/13
+  @version 3.02, 9/18/13
   @author JMC
 */
 public class ImportPSIMI {
@@ -54,6 +54,7 @@ public class ImportPSIMI {
     static HashMap <String,String> dsMap = new HashMap<String,String>();
     static HashMap <String,String> methodMap = new HashMap<String,String>();
     static HashMap <String,String> intMap = new HashMap<String,String>();
+    static HashMap <String,String> proteinMap = new HashMap<String,String>();
 
     // cache max current assigned ids for each prefix type
     static HashMap <String,Integer> maxID = new HashMap<String,Integer>();
@@ -230,6 +231,31 @@ public class ImportPSIMI {
 	    featureSet.add(featureID);
 	}
 	return rv;
+    }
+    
+    /**
+       get protein for feature
+    */
+    final public static String getProtein(String featureID) throws Exception {
+	boolean rv = true;
+
+	String proteinID = proteinMap.get(featureID);
+	if (proteinID != null)
+	    return proteinID;
+
+	PPI.connectRW();
+	Connection con = PPI.getConnection();
+	PreparedStatement stmt = PPI.prepareStatement(con,
+						      "select from_link from IsProteinFor where to_link=? limit 1");
+	stmt.setString(1,featureID);
+	ResultSet rs = stmt.executeQuery();
+	if (rs.next())
+	    proteinID = rs.getString(1);
+	rs.close();
+	stmt.close();
+	con.close();
+	proteinMap.put(featureID,proteinID);
+	return proteinID;
     }
     
     /**
@@ -825,6 +851,17 @@ public class ImportPSIMI {
 		stmt2.setInt(4,stoich1);
 		stmt2.setDouble(5,0.0); // no current way to encode strength
 		stmt2.executeUpdate();
+		
+		// add 1st protein
+		PreparedStatement stmt3 = PPI.prepareStatement(con,
+							       "insert into InteractionProtein values (?, ?, ?, ?, ?)");
+		stmt3.setString(1,interactionID);
+		String proteinID1 = getProtein(featureID1);
+		stmt3.setString(2,proteinID1);
+		stmt3.setInt(3,rank);
+		stmt3.setInt(4,stoich1);
+		stmt3.setDouble(5,0.0); // no current way to encode strength
+		stmt3.executeUpdate();
 
 		if (!isSpoke) {
 		    // add feature that encodes 2nd protein
@@ -834,8 +871,16 @@ public class ImportPSIMI {
 		    stmt2.setInt(3,rank);
 		    stmt2.setInt(4,stoich2);
 		    stmt2.executeUpdate();
+
+		    // add 2nd protein
+		    String proteinID2 = getProtein(featureID2);
+		    stmt3.setString(2,featureID2);
+		    stmt3.setInt(3,rank);
+		    stmt3.setInt(4,stoich2);
+		    stmt3.executeUpdate();
 		}
 		stmt2.close();
+		stmt3.close();
 
 		// add genome link (must be same for both features)
 		String genomeID = getGenomeFor(featureID1);
