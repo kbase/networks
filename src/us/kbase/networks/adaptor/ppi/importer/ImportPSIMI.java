@@ -874,7 +874,7 @@ public class ImportPSIMI {
 
 		    // add 2nd protein
 		    String proteinID2 = getProtein(featureID2);
-		    stmt3.setString(2,featureID2);
+		    stmt3.setString(2,proteinID2);
 		    stmt3.setInt(3,rank);
 		    stmt3.setInt(4,stoich2);
 		    stmt3.executeUpdate();
