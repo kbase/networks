@@ -3680,12 +3680,12 @@
       <Notes>The PublishedInteraction relationship links interactions
       to the manuscript they are published in.</Notes>
     </Relationship>
-    <Relationship name="InteractionProtein" from="Interaction"
-                  to="Feature" arity="MM" converse="ProteinInteractsIn">
+    <Relationship name="InteractionFeature" from="Interaction"
+                  to="Feature" arity="MM" converse="FeatureInteractsIn">
       <DisplayInfo theme="navy">
-        <RegionInfo name="Interactions" caption="InteractionProtein"/>
+        <RegionInfo name="Interactions" caption="InteractionFeature"/>
       </DisplayInfo>
-      <Notes>The InteractionProtein relationship links interactions to
+      <Notes>The InteractionFeature relationship links interactions to
       the features that encode their component proteins.</Notes>
       <Fields>
         <Field name="stoichiometry" type="int">

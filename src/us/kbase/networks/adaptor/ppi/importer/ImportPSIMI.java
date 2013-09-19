@@ -15,8 +15,8 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
    modifications described below:
 
    1) Unique identifiers for Interactors A and B are KBase Feature ids
-      or other ids that are convertible to Feature IDs by the KBase ID
-      server.
+      [planned for future but not yet working: or other ids that are
+      convertible to Feature IDs by a KBase service]
 
    2) When the complex expansion method (the 16th column in the file)
       is "spoke expansion" everything about Interactor B is ignored,
@@ -25,28 +25,30 @@ import us.kbase.networks.adaptor.ppi.local.PPI;
 
    3) Several pieces of optional metadata are encoded in the "Xref for
       Interactor A" field (the 23rd column in the file):  "dataset:"
-      refers to interaction_dataset.description, "dataseturl:" refers to the
-      interaction_dataset.data_url, and "url:" refers to interaction.data_url.
+      refers to InteractionDataset.description, "dataseturl:" refers to the
+      InteractionDataset.url, and "url:" refers to Interaction.url.
 
    4) We have extended the PSI ontology for interaction detection methods
       (column 7) to include "kb:" methods, which refer to
-      interaction_detection_type.description.  If one if these methods
+      InteractionDetectionType.description.  If one if these methods
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
    5) We have extended the PSI ontology for source database
       (column 13) to include "kb:" descriptions, which refer to
-      interaction_dataset.data_source.  If one if these methods
+      InteractionDataset.data-source.  If one if these methods
       is listed, the psi-mi: method is ignored.  If there is no "kb:"
       method, the text of the "psi-mi:" ontology is used instead.
 
-  @version 3.0, 9/4/13
+  @version 3.01, 9/18/13
   @author JMC
 */
 public class ImportPSIMI {
     // cache sets of what's already stored in tables
     static HashSet <Integer> pubSet = new HashSet<Integer>();
     static HashSet <String> dsGenomeSet = new HashSet<String>();
+    static HashSet <String> genomeSet = new HashSet<String>();
+    static HashSet <String> featureSet = new HashSet<String>();
     
     // cache DB lookups:
     static HashMap <String,String> dsMap = new HashMap<String,String>();
@@ -60,6 +62,8 @@ public class ImportPSIMI {
 	new SimpleDateFormat ("yyyy MMM d");
     final public static SimpleDateFormat medlineDateFormat2 =
 	new SimpleDateFormat ("yyyy MMM");
+    final public static SimpleDateFormat medlineDateFormat3 =
+	new SimpleDateFormat ("yyyy");
 
     /**
        find max ids already in table
@@ -171,11 +175,60 @@ public class ImportPSIMI {
 	    d = medlineDateFormat1.parse(relevantFields[1]);
 	}
 	catch (Exception e) {
-	    d = medlineDateFormat2.parse(relevantFields[1]);
+	    try {
+		d = medlineDateFormat2.parse(relevantFields[1]);
+	    }
+	    catch (Exception e2) {
+		d = medlineDateFormat3.parse(relevantFields[1]);
+	    }
 	}
 	rv[0] = relevantFields[0];
 	// assume bigint pubdate in Publication table is Unix timestamp
 	rv[1] = Long.toString(d.getTime()/1000);
+	return rv;
+    }
+
+    /**
+       check whether we have a valid genome
+    */
+    final public static boolean isValidGenome(String genomeID) throws Exception {
+	boolean rv = true;
+	if (!genomeSet.contains(genomeID)) {
+	    PPI.connectRW();
+	    Connection con = PPI.getConnection();
+	    PreparedStatement stmt = PPI.prepareStatement(con,
+							  "select id from Genome where id=?");
+	    stmt.setString(1,genomeID);
+	    ResultSet rs = stmt.executeQuery();
+	    if (!rs.next())
+		rv = false;
+	    rs.close();
+	    stmt.close();
+	    con.close();
+	    genomeSet.add(genomeID);
+	}
+	return rv;
+    }
+    
+    /**
+       check whether we have a valid feature
+    */
+    final public static boolean isValidFeature(String featureID) throws Exception {
+	boolean rv = true;
+	if (!featureSet.contains(featureID)) {
+	    PPI.connectRW();
+	    Connection con = PPI.getConnection();
+	    PreparedStatement stmt = PPI.prepareStatement(con,
+							  "select id from Feature where id=?");
+	    stmt.setString(1,featureID);
+	    ResultSet rs = stmt.executeQuery();
+	    if (!rs.next())
+		rv = false;
+	    rs.close();
+	    stmt.close();
+	    con.close();
+	    featureSet.add(featureID);
+	}
 	return rv;
     }
     
@@ -475,6 +528,12 @@ public class ImportPSIMI {
 		String featureID1 = st.nextToken();
 		String featureID2 = st.nextToken();
 
+		// check that they're valid
+		if (!isValidFeature(featureID1))
+		    throw new Exception ("KBase doesn't have feature "+featureID1);
+		if (!isValidFeature(featureID2))
+		    throw new Exception ("KBase doesn't have feature "+featureID2);
+
 		st.nextToken();
 		st.nextToken();
 		st.nextToken();
@@ -618,7 +677,7 @@ public class ImportPSIMI {
 		    stmt2.executeUpdate();
 		    stmt2.close();
 		    stmt2 = PPI.prepareStatement(con,
-						 "delete ip from InteractionProtein ip join Interaction i on (i.id=ip.from_link) join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
+						 "delete ip from InteractionFeature ip join Interaction i on (i.id=ip.from_link) join IsGroupingOf igo on (i.id=igo.to_link and igo.from_link=?)");
 		    stmt2.setString(1,datasetID);
 		    stmt2.executeUpdate();
 		    stmt2.close();
@@ -729,7 +788,7 @@ public class ImportPSIMI {
 		    stmt2.close();
 		}
 
-		// add protein(s)
+		// add feature(s)
 		if (reverseIDs && !isSpoke) {
 		    String tmpS = featureID1;
 		    featureID1 = featureID2;
@@ -744,9 +803,9 @@ public class ImportPSIMI {
 		    xrefs2 = tmpH;
 		}
 
-		// add 1st protein
+		// add feature that encodes 1st protein
 		stmt2 = PPI.prepareStatement(con,
-					     "insert into InteractionProtein values (?, ?, ?, ?, ?)");
+					     "insert into InteractionFeature values (?, ?, ?, ?, ?)");
 		stmt2.setString(1,interactionID);
 		stmt2.setString(2,featureID1);
 		int rank = 1;
@@ -756,11 +815,11 @@ public class ImportPSIMI {
 		interactionRank.put(interactionKey, new Integer(rank));
 		stmt2.setInt(3,rank);
 		stmt2.setInt(4,stoich1);
-		stmt2.setDouble(5,0.0);
+		stmt2.setDouble(5,0.0); // no current way to encode strength
 		stmt2.executeUpdate();
 
 		if (!isSpoke) {
-		    // add 2nd protein
+		    // add feature that encodes 2nd protein
 		    stmt2.setString(2,featureID2);
 		    rank++;
 		    interactionRank.put(interactionKey, new Integer(rank));
@@ -770,8 +829,10 @@ public class ImportPSIMI {
 		}
 		stmt2.close();
 
-		// add genome link (must be same for both proteins)
+		// add genome link (must be same for both features)
 		String genomeID = getGenomeFor(featureID1);
+		if (!isValidGenome(genomeID))
+		    throw new Exception ("KBase doesn't have genome "+genomeID);
 		if (!dsGenomeSet.contains(datasetID+"_"+genomeID)) {
 		    stmt2 = PPI.prepareStatement(con,
 						 "insert into IsDatasetFor values (?, ?)");
