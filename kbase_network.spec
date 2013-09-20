@@ -25,7 +25,7 @@ module KBaseNetworks : KBaseNetworks
 	/* Type of node in a network */
 	typedef string NodeType;
 	
-	/* Type of edge in a network */
+	/* Type of edge in a network: The edge types are GENE_GENE, GENE_CLUSTER, PROTEIN_PROTEIN, PROTEIN_CLUSTER, CLUSTER_CLUSTER, SUBSYSTEM_SUBSYSTEM, SUBSYSTEM_CLUSTER */
 	typedef string EdgeType;
 	
 	/* NCBI taxonomy id */	
