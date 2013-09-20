@@ -82,7 +82,7 @@ print "           STDOUT.\n";
 print "\n";
 print "PARAMETERS: \n";
 print "--url             The URL of the service, --url=http://kbase.us/services/networks, required.\n";
-print "--help            Display help message to standard out and exit with error code zero;                                                    \n";
+print "--help            Display help message to standard out and exit with error code zero; \n";
 print "                  ignore all other command-line arguments.   \n";
 print "--version         Print the version information.\n";
 print "  \n";

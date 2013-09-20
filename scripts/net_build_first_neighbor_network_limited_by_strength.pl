@@ -101,7 +101,7 @@ print "cut_off           The edge strength cut off threshold (xx.yy).\n";
 print "\n";
 print "--url             The URL of the service, --url=http://kbase.us/services/networks, required.\n";
 print "\n";
-print "--help            Display help message to standard out and exit with error code zero;                                                    \n";
+print "--help            Display help message to standard out and exit with error code zero;\n";
 print "                  ignore all other command-line arguments.  \n";
 print "\n";
 print "--version         Print version information. \n";

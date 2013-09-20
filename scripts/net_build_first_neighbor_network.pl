@@ -97,7 +97,7 @@ print "                  Interested edge types (comma separated, xxx,yyy,zzz,...
 print "\n";
 print "--url             The URL of the service, --url=http://kbase.us/services/networks.\n";
 print "\n";
-print "--help            Display help message to standard out and exit with error code zero;                                                    \n";
+print "--help            Display help message to standard out and exit with error code zero; \n";
 print "                  ignore all other command-line arguments.  \n";
 print "--version         Print version information. \n";
 print "\n";
