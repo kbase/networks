@@ -60,7 +60,38 @@ my $version    = 0;
 GetOptions("help"       => \$help,
            "version"    => \$version,
            "url=s"     => \$url) or die $usage;
-
+if($help){
+print "NAME\n";
+print "net_get_all_dataset_sources -- This command retrieves all sources of data for the service.\n";
+print "\n";
+print "VERSION\n";
+print "1.0\n";
+print "\n";
+print "SYNOPSIS\n";
+print "\n";
+print "net_get_all_dataset_sources <--url URL>\n";
+print "\n";
+print "DESCRIPTION\n";
+print "INPUT:     This command requires the URL of the service as input.\n";
+print "\n";
+print "OUTPUT:    The output file of this command includes the KBase data source ID, original database and its description.\n";
+print "\n";
+print "PARAMETERS: \n";
+print "--url             The URL of the service, --url=http://kbase.us/services/networks, required. \n";
+print "\n";
+print "--help            Display help message to standard out and exit with error code zero;                                                    \n";
+print "                  ignore all other command-line arguments.  \n";
+print "--version         Print version information.\n";
+print "   \n";
+print "\n";
+print "EXAMPLES \n";
+print "net_get_all_dataset_sources\n";
+print "\n";
+print "This example will list all the sources of data for the service. \n";
+print "   \n";
+print "\n";
+exit(0);
+}
 if($help)
 {
 	print "$usage\n";

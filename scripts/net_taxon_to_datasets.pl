@@ -61,7 +61,38 @@ my $version    = 0;
 GetOptions("help"       => \$help,
            "version"    => \$version,
            "url=s"     => \$url) or die $usage;
-
+if($help){
+print "NAME\n";
+print "net_taxon_to_datasets  -- This command retrieves a list of datasets for input taxon_id. \n";
+print "VERSION\n";
+print "1.0\n";
+print "\n";
+print "SYNOPSIS\n";
+print "net_taxon_to_datasets <--url URL> < taxon_id\n";
+print "\n";
+print "DESCRIPTION\n";
+print "INPUT:     The input for this command is a KBase genome ID (taxon_id) read from STDIN and the URL of the service.\n";
+print "\n";
+print "OUTPUT:    The output file of this command is a list of datasets for a specific organism.\n";
+print "\n";
+print "PARAMETERS:\n";
+print "\n";
+print "--url             The URL of the service, --url=http://kbase.us/services/networks, required.\n";
+print "\n";
+print "--help            Display help message to standard out and exit with error code zero;                                                    \n";
+print "                  ignore all other command-line arguments.  \n";
+print "--version         Print version information. \n";
+print "\n";
+print "\n";
+print "\n";
+print "EXAMPLES \n";
+print "echo 'kb|g.3899' | net_taxon_to_datasets\n";
+print "\n";
+print "This example will list the datasets for a specific organism with taxon_id =kb|g.3899.\n";
+print "\n";
+print "\n";
+exit(0);
+}
 if($help)
 {
 	print "$usage\n";

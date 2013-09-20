@@ -61,7 +61,38 @@ my $version    = 0;
 GetOptions("help"       => \$help,
            "version"    => \$version,
            "url=s"     => \$url) or die $usage;
-
+if($help){
+print "NAME\n";
+print "net_entity_to_datasets  -- This command will retrieve all datasets containing the input gene. \n";
+print "\n";
+print "VERSION\n";
+print "1.0\n";
+print "\n";
+print "SYNOPSIS\n";
+print "\n";
+print "USAGE:  net_entity_to_datasets <--url URL> < entity_id\n";
+print "\n";
+print "DESCRIPTION\n";
+print "INPUT:     The input for this command includes the URL of the service (required) and the entity_id read from STDIN.\n";
+print "\n";
+print "OUTPUT:    The output file for this command will include a list of dataset containing the input gene.\n";
+print "\n";
+print "PARAMETERS:\n";
+print "--url             The URL of the service, --url=http://kbase.us/services/networks.\n";
+print "\n";
+print "--help            Display help message to standard out and exit with error code zero;                                                    \n";
+print "                  ignore all other command-line arguments.  \n";
+print "--version         Print version information. \n";
+print "\n";
+print "\n";
+print "EXAMPLES\n";
+print "echo 'kb|g.3899.locus.10' | net_entity_to_datasets\n";
+print "\n";
+print "This command will retrieve a dataset which contains the input gene. \n";
+print "\n";
+print "\n";
+exit(0);
+}
 if($help)
 {
     print "$usage\n";

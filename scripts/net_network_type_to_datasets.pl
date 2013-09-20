@@ -61,7 +61,42 @@ my $version    = 0;
 GetOptions("help"       => \$help,
            "version"    => \$version,
            "url=s"     => \$url) or die $usage;
+if($help){
+print "NAME\n";
+print "net_network_type_to_datasets  -- This command lists the datasets for a given data type. A list of network types are \n";
+print "                                 produced by running the net_get_all_network_types command.  \n";
+print "\n";
+print "VERSION\n";
+print "1.0\n";
+print "\n";
+print "SYNOPSIS\n";
+print "net_network_type_to_datasets <--url URL> < FILE\n";
+print " \n";
+print "DESCRIPTION\n";
+print "INPUT:     The input file for this command is the network type read from STDIN. This command requires the URL of the \n";
+print "           service.\n";
+print "\n";
+print "OUTPUT:    The output file for this command will contain a list of datasets for the given \n";
+print "           data type, which includes the KBase dataset ID, data source and reference, written to \n";
+print "           STDOUT.\n";
+print "\n";
+print "PARAMETERS: \n";
+print "--url             The URL of the service, --url=http://kbase.us/services/networks, required.\n";
+print "--help            Display help message to standard out and exit with error code zero;                                                    \n";
+print "                  ignore all other command-line arguments.   \n";
+print "--version         Print the version information.\n";
+print "  \n";
+print "\n";
+print "EXAMPLES \n";
+print "echo 'PROT_PROT_INTERACTION' | net_network_type_to_datasets\n";
+print "\n";
+print "This command lists the datasets for the data type of 'PROT_PROT_INTERACTION', which means protein-protein interaction data.\n";
+print "\n";
+print "\n";
+exit(0);
 
+
+}
 if($help)
 {
     print "$usage\n";

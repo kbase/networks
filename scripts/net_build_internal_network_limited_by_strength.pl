@@ -70,7 +70,58 @@ my $version    = 0;
 GetOptions("help"       => \$help,
            "version"    => \$version,
            "url=s"     => \$url) or die $usage;
-
+if($help){
+print "NAME\n";
+print "net_build_internal_network_limited_by_strength -- This command produces a list of network edges. \n";
+print "\n";
+print "VERSION\n";
+print "1.0\n";
+print "\n";
+print "SYNOPSIS\n";
+print "net_build_internal_network_limited_by_strength <--url URL> dataset_ids edge_types cut_off < query_entity_ids\n";
+print "\n";
+print "DESCRIPTION\n";
+print "INPUT:     This command requires the URL of the service, the dataset_ids, edge_types, cutoff and the \n";
+print "           query_entity_ids read from STDIN.\n";
+print "\n";
+print "OUTPUT:    The output file of this command is a list of network edges;\n";
+print "           The first column of the output is the input gene;\n";
+print "	   The second column of the output is the interacting neighbor of input gene;\n";
+print "	   The third column of the output is the confidence score;\n";
+print "	   The fourth column of the output is the dataset;\n";
+print "	  \n";
+print "\n";
+print "The value/score for each edge is defined by the original method applied. The users should consider it as a relative evaluation of the confidence of the network edge.\n";
+print "\n";
+print "The edge types are GENE_GENE, GENE_CLUSTER, PROTEIN_PROTEIN, PROTEIN_CLUSTER, CLUSTER_CLUSTER, SUBSYSTEM_SUBSYSTEM, SUBSYSTEM_CLUSTER.\n";
+print "\n";
+print "PARAMETERS:\n";
+print "query_entity_ids  A KBase internal ID for entity types including a gene locus, protein, subsystem and clusters.\n";
+print "\n";
+print "dataset_ids       Dataset_ids can be retrieved by running the  net_get_all_datasets command. \n";
+print " \n";
+print "edge_types        Edge_types are defined in the API documentation. Edge_type is string value.\n";
+print "                  Edge_types can also be found on http://kbase.us/developer-zone/documentation/networks-service/.\n";
+print "\n";
+print "cut_off           The edge strength cut off threshold (xx.yy).\n";
+print "\n";
+print "--url             The URL of the service, --url=http://kbase.us/services/networks, required.\n";
+print "\n";
+print "--help            Display help message to standard out and exit with error code zero;                                                    \n";
+print "                  ignore all other command-line arguments.  \n";
+print "--version         Print version information.  \n";
+print "\n";
+print "                                 \n";
+print "\n";
+print "EXAMPLES \n";
+print "echo 'kb|g.3899.locus.33447 kb|g.3899.locus.2366 kb|g.3899.locus.21632 kb|g.3899.locus.30194 kb|g.3899.locus.10 kb|g.3899.locus.11' | net_build_internal_network_limited_by_strength 'kb|netdataset.plant.fn.25,kb|netdataset.plant.cn.6' 'GENE_GENE' 0.9\n";
+print "\n";
+print "This example will retrieve the network edges among a given list of genes, according to the specified cutoff score.\n";
+print "\n";
+print "\n";
+exit(0);
+}
+		   
 if($help)
 {
     print "$usage\n";

@@ -67,7 +67,54 @@ my $version    = 0;
 GetOptions("help"       => \$help,
            "version"    => \$version,
            "url=s"     => \$url) or die $usage;
+if($help){
+print "NAME\n";
+print "net_build_internal_network  -- This service will retrieve a list of network edges among the input genes. \n";
+print "\n";
+print "VERSION\n";
+print "1.0\n";
+print "\n";
+print "SYNOPSIS\n";
+print "net_build_internal_network <--url URL> dataset_ids edge_types < query_entity_ids\n";
+print "\n";
+print "DESCRIPTION\n";
+print "INPUT:    This input for this command requires the URL of the service, the dataset_ids, edge_types and the      \n";
+print "          query_entity_ids read from STDIN.\n";
+print "\n";
+print "OUTPUT:   The output file for this command is a list of network edges;\n";
+print "	  The first and second column of the output are two nodes for an edge;\n";
+print "	  The third column of the output is the confidence score.\n";
+print "\n";
+print "\n";
+print "PARAMETERS:\n";
+print "query_entity_ids  A KBase internal ID for entity types including a gene locus, protein, or clusters.\n";
+print "\n";
+print "\n";
+print "dataset_ids       Dataset_ids can be retrieved by running the  net_get_all_datasets command. \n";
+print "                  Dataset ID list (comma separated, xxx,yyy,zzz,...)\n";
+print " \n";
+print "edge_types        Edge_types are defined in the API documentation. Edge_type is string value.\n";
+print "                  Edge_types can also be found on http://kbase.us/developer-zone/documentation/networks-service/.\n";
+print "                  Interested edge types (comma separated, xxx,yyy,zzz,...)\n";
+print "\n";
+print "--url             The URL of the service, --url=http://kbase.us/services/networks.\n";
+print "\n";
+print "--help            Display help message to standard out and exit with error code zero;                                                    \n";
+print "                  ignore all other command-line arguments.  \n";
+print "--version         Print version information. \n";
+print "\n";
+print "\n";
+print "\n";
+print "\n";
+print "EXAMPLES \n";
+print "echo 'kb|g.3899.locus.33447 kb|g.3899.locus.2366 kb|g.3899.locus.21632 kb|g.3899.locus.30194 kb|g.3899.locus.10 kb|g.3899.locus.11' | net_build_internal_network 'kb|netdataset.plant.fn.25,kb|netdataset.plant.cn.6' 'GENE_GENE' \n";
+print "\n";
+print "This command will retrieve the network edges among a given list of genes.\n";
+print "\n";
+print "\n";
+exit(0);
 
+}
 if($help)
 {
     print "$usage\n";
