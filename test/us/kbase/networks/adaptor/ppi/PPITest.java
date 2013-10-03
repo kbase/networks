@@ -27,12 +27,7 @@ public class PPITest {
     final String ecoliID = "kb|g.1870";
 
     // dataset records for Hu 2009 TAP data
-    // 1st is ENIGMA dataset; 2nd is MOL dataset
-    final String huID1 = "1";
-    final String huKBID1 = "kb|netdataset.ppi."+huID1;
-
-    final String huID2 = "7";
-    final String huKBID2 = "kb|netdataset.ppi."+huID2;
+    final String huKBID = "kb|ppid.4";
 
     final Entity atpA = new Entity("kb|g.1870.peg.3693",
 				   EntityType.GENE);
@@ -40,13 +35,12 @@ public class PPITest {
     final Entity atpE = new Entity("kb|g.1870.peg.3980",
 				   EntityType.GENE);
 
-    final Entity atpSynthase = new Entity("kb|ppi.19381",
+    final Entity atpSynthase = new Entity("kb|ppi.5567",
 					  EntityType.PPI_COMPLEX);
     
     @Before
 	public void setup() throws Exception {
-    	// adaptor = new PPIAdaptorFactory().buildAdaptor();
-	adaptor = new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("ppi.config").buildAdaptor();	
+	adaptor = new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("ppi-cs.config").buildAdaptor();
     }
 
     @Test
@@ -155,9 +149,9 @@ public class PPITest {
 		assertEquals("Edge should be named correctly",
 			     clusterName+"_"+atpE.getId(),
 			     e.getName());
-		assertTrue("Edge should NOT have is_directional property (or must be 0)",
-			   ((e.getProperty("is_directional") == null) ||
-			    (e.getProperty("is_directional").equals("0"))));
+		assertTrue("Edge should NOT have directional property (or must be 0)",
+			   ((e.getProperty("directional") == null) ||
+			    (e.getProperty("directional").equals("0"))));
 		assertEquals("Edge should be directed",
 			     edu.uci.ics.jung.graph.util.EdgeType.DIRECTED,
 			     g.getEdgeType(e));
@@ -318,7 +312,7 @@ public class PPITest {
 
 
     @Test
-	public void testHuTAPENIGMA() throws AdaptorException {
+	public void testHuTAP() throws AdaptorException {
 	Taxon ecoli = new Taxon(ecoliID);
 	List<Dataset> datasets = adaptor.getDatasets(NetworkType.PROT_PROT_INTERACTION,
 						     DatasetSource.PPI,
@@ -330,47 +324,7 @@ public class PPITest {
 	// find Hu dataset
 	Dataset huSet = null;
 	for (Dataset d : datasets) {
-	    if (huKBID1.equals(d.getId()))
-		huSet = d;
-	}
-	assertNotNull("should include Hu 2009 dataset", huSet);
-	
-	Network network = adaptor.buildFirstNeighborNetwork(huSet,
-							    atpA,
-							    Arrays.asList(EdgeType.GENE_GENE));
-	assertNotNull("Should get a network back", network);
-	Graph<Node, Edge> g = network.getGraph();
-	assertNotNull("Network should have graph", g);
-
-	// NetworksUtil.printNetwork(network);
-	
-	/*
-	  bug in database data; uncomment when reloaded
-	  
-	assertEquals("Graph should have 15 nodes",
-		     15,
-		     g.getVertexCount());
-
-	assertEquals("Graph should have 14 edges",
-		     14,
-		     g.getEdgeCount());
-	*/
-    }
-
-    @Test
-	public void testHuTAPMOL() throws AdaptorException {
-	Taxon ecoli = new Taxon(ecoliID);
-	List<Dataset> datasets = adaptor.getDatasets(NetworkType.PROT_PROT_INTERACTION,
-						     DatasetSource.MO,
-						     ecoli);
-	assertNotNull("should return a list of Datasets", datasets);
-	assertTrue("list should contain at least 2 datasets",
-		   datasets.size() >= 2);
-
-	// find Hu dataset
-	Dataset huSet = null;
-	for (Dataset d : datasets) {
-	    if (huKBID2.equals(d.getId()))
+	    if (huKBID.equals(d.getId()))
 		huSet = d;
 	}
 	assertNotNull("should include Hu 2009 dataset", huSet);
@@ -384,17 +338,13 @@ public class PPITest {
 
 	// NetworksUtil.printNetwork(network);
 	
-	/*
-	  bug in database data; uncomment when reloaded
-	  
-	assertEquals("Graph should have 15 nodes",
-		     15,
+	assertEquals("Graph should have 20 nodes",
+		     20,
 		     g.getVertexCount());
 
-	assertEquals("Graph should have 14 edges",
-		     14,
+	assertEquals("Graph should have 19 edges",
+		     19,
 		     g.getEdgeCount());
-	*/
 
 	// should be one node with entity type GENE
 	Collection<Node> allNodes = g.getVertices();
@@ -412,11 +362,9 @@ public class PPITest {
 
 	// that node should have incoming edges from every other node
 	Collection<Edge> inEdges = g.getInEdges(geneNode);
-	/*
-	assertEquals("Graph should have 15 incoming edges to atpA",
-		     15,
+	assertEquals("Graph should have 19 incoming edges to atpA",
+		     19,
 		     inEdges.size());
-	*/
 
 	// no outgoing edges from gene
 	Collection<Edge> outEdges = g.getOutEdges(geneNode);
@@ -444,15 +392,16 @@ public class PPITest {
 		assertEquals("Edge should be named correctly",
 			     clusterName+"_"+atpA.getId(),
 			     e.getName());
-		assertNotNull("Edge should have is_directional property",
-			      e.getProperty("is_directional"));
-		assertTrue("Edge should have is_directional property == 1",
-			   e.getProperty("is_directional").equals("1"));
+		assertNotNull("Edge should have directional property",
+			      e.getProperty("directional"));
+		assertTrue("Edge should have directional property == 1",
+			   e.getProperty("directional").equals("1"));
 		assertEquals("Edge should be directed",
 			     edu.uci.ics.jung.graph.util.EdgeType.DIRECTED,
 			     g.getEdgeType(e));
-		assertNull("Edge should NOT have stoichiometry",
-			   e.getProperty("stoichiometry"));
+		assertTrue("Edge should NOT have stoichiometry (or must be 0)",
+			   ((e.getProperty("stoichiometry") == null) ||
+			    (e.getProperty("stoichiometry").equals("0"))));
 		assertNotNull("Edge should have rank property",
 			      e.getProperty("rank"));
 		int rank = StringUtil.atoi(e.getProperty("rank"));
