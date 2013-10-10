@@ -185,7 +185,7 @@ public class MAKTest1 {
 				0, network.getGraph().getVertexCount());		
 	}
 
-	@Test
+	//@Test
 	public void testBuildFirstNeighborNetworkDatasetEntity() throws AdaptorException {
 		Dataset ds = adaptor.getDataset(datasetId);
 
@@ -196,12 +196,12 @@ public class MAKTest1 {
 				2, network.getGraph().getEdgeCount());		
 	}
 
-	@Test
+	//@Test
 	public void testBuildFirstNeighborNetworkDatasetEntityListOfEdgeType() throws AdaptorException {
 		Dataset ds = adaptor.getDataset(datasetId);
 
 		Network network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(geneId), Arrays.asList(EdgeType.GENE_CLUSTER));
-		assertEquals("network should have 3 nodes", 
+		assertEquals("network should have 8 nodes", 
 				3, network.getGraph().getVertexCount());		
 		assertEquals("network should have 3 edges", 
 				2, network.getGraph().getEdgeCount());	
@@ -223,7 +223,7 @@ public class MAKTest1 {
 				0, network.getGraph().getVertexCount());		
 	}
 
-	@Test
+	//@Test
 	public void testBuildInternalNetworkDatasetListOfEntity() throws AdaptorException {
 		Dataset ds = adaptor.getDataset(datasetId);
 				
@@ -245,8 +245,9 @@ public class MAKTest1 {
 				4, network.getGraph().getEdgeCount());
 		
 	}
+	
 
-	@Test
+	//@Test
 	public void testBuildInternalNetworkDatasetListOfEntityListOfEdgeType() throws AdaptorException {
 
 		Dataset ds = adaptor.getDataset(datasetId);
@@ -292,7 +293,7 @@ public class MAKTest1 {
 				11, network.getGraph().getEdgeCount());		
 	}
 
-	@Test
+	//@Test
 	public void testGetDatasetsEntity() throws AdaptorException {
 		List<Dataset> datasets = adaptor.getDatasets(Entity.toEntity(geneId));
 		assertTrue("should return > 0 datasets", datasets.size() > 0);
