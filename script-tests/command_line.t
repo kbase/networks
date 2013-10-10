@@ -36,7 +36,7 @@ ok($tes, "creating Test::Cmd object for net_get_all_datasets");
 $tes->run(args => "--url=$host");
 ok($? == 0,"Running net_get_all_datasets"); 
 @tem=$tes->stdout;
-ok($#tem > 5000 , "More than 5000 dataset detected!");
+ok($#tem > 2000 , "More than 2000 dataset detected!");
 
 #3
 $tes = Test::Cmd->new(prog => "$bin/net_get_all_network_types.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
