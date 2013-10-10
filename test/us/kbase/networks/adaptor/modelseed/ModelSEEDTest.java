@@ -27,6 +27,8 @@ import edu.uci.ics.jung.graph.Graph;
 public class ModelSEEDTest {
 	static Adaptor adaptor;
 	
+	final String tmpGenomeId = "kb|g.185";
+	
 	final String genomeId = "kb|g.0";
 //	final String genomeId = "kb|g.21765";
 	
@@ -64,6 +66,20 @@ public class ModelSEEDTest {
 	}
 	
 	@Test
+	public void shouldReturnDataSetForDermacoccus() throws AdaptorException {
+		Taxon dg = new Taxon(tmpGenomeId);
+		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, dg);
+		NetworksUtil.printDatasets("", datasets);
+		assertNotNull("should return a list of Datasets", datasets);
+		assertTrue("list should contain at least one dataset", datasets.size() > 0);
+		for (Dataset dataset : datasets) {
+			assertTrue("dataset taxons should contain Dermacoccus sp. Ellin185", dataset.getTaxons().contains(dg));
+		}
+			
+	}	
+	
+	
+	//@Test
 	public void shouldReturnDataSetForEcoli() throws AdaptorException {
 		Taxon ecoli = new Taxon(genomeId);
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
@@ -76,7 +92,7 @@ public class ModelSEEDTest {
 		
 	}
 	
-	@Test
+	//@Test
 	public void shouldReturnDataSetForEcoliGene() throws AdaptorException {
 		List<Dataset> datasets = adaptor.getDatasets(queryGene);
 		assertNotNull("should return a list of Datasets", datasets);
@@ -87,7 +103,7 @@ public class ModelSEEDTest {
 		
 	}
 	
-	@Test
+	//@Test
 	public void shouldReturnNetworkForEcoliGene() throws AdaptorException {
 		Taxon ecoli = new Taxon(genomeId);
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
@@ -101,7 +117,7 @@ public class ModelSEEDTest {
 		assertEquals("Graph should have 2 nodes", 2, g.getVertexCount());
 	}
 	
-	@Test
+	//@Test
 	public void shouldReturnNetworkForEcoliGenes() throws AdaptorException {
 		Taxon ecoli = new Taxon(genomeId);
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
@@ -116,7 +132,7 @@ public class ModelSEEDTest {
 		
 	}
 	
-	@Test
+	//@Test
 	public void shouldReturnNetworkForEcoliSubsystem() throws AdaptorException {
 		Taxon ecoli = new Taxon(genomeId);
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
@@ -130,7 +146,7 @@ public class ModelSEEDTest {
 		assertEquals("Graph should have 32 nodes", 32, g.getVertexCount());
 	}
 	
-	@Test
+	//@Test
 	public void shouldReturnNetworkForEcoliGenesInSameSubsystems() throws AdaptorException {
 		Taxon ecoli = new Taxon(genomeId);
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
@@ -143,7 +159,7 @@ public class ModelSEEDTest {
 		assertEquals("Graph should have 35 nodes", 35, g.getVertexCount());
 	}
 	
-	@Test
+	//@Test
 	public void shouldReturnNetworkForEcoliGeneClusterStartWithGene() throws AdaptorException {
 		Taxon ecoli = new Taxon("kb|g.1870");
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
@@ -156,7 +172,7 @@ public class ModelSEEDTest {
 		assertEquals("Graph should have 8 nodes", 8, g.getVertexCount());
 	}	
 	
-	@Test
+	//@Test
 	public void shouldReturnNetworkForEcoliGeneClusterStartWithSubsystem() throws AdaptorException {
 		Taxon ecoli = new Taxon("kb|g.1870");
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
