@@ -13,8 +13,12 @@
 	   For example: buildFirstNeighborNetwork(), buildInternalNetwork()
 */
 
-module Networks : Networks
+module Networks 
 {
+
+
+        /* A boolean. 0 = false, other = true. */
+        typedef int boolean;
 
 	/* The name of a dataset that can be accessed as a source for creating a network */
 	typedef string dataset_source_ref;
@@ -30,7 +34,11 @@ module Networks : Networks
 	
 	/* NCBI taxonomy id */	
 	typedef string taxon;
-		
+	
+
+	
+
+	
 	/* Provides detailed information about the source of a dataset.
 		string id - A unique  identifier of a dataset source
 		string name - A name of a dataset source
@@ -90,7 +98,7 @@ module Networks : Networks
     	    	string name - String representation of an edge. It should be a concise but informative representation that is easy for a person to read.
     	    	string node_id1 - Identifier of the first node (source node, if the edge is directed) connected by a given edge 
     	    	string node_id2 - Identifier of the second node (target node, if the edge is directed) connected by a given edge
-    	    	Boolean	directed - Specify whether the edge is directed or not. "true" if it is directed, "false" if it is not directed
+    	    	boolean	directed - Specify whether the edge is directed or not. 1 if it is directed, 0 if it is not directed
     	    	float confidence - Value from 0 to 1 representing a probability that the interaction represented by a given edge is a true interaction
     	    	float strength - Value from 0 to 1 representing a strength of an interaction represented by a given edge
     	    	string dataset_id - The identifier of a dataset that provided an interaction represented by a given edge
@@ -130,6 +138,65 @@ module Networks : Networks
 		mapping<string,string> user_annotations;  
   	} Network;
   
+
+
+	/* Represents a single entity-entity interaction
+		string id - id of interaction
+       	string entity1_id - entity1 identifier
+       	string entity2_id - entity2 identifier
+		string type	  - type of interaction
+		float strength	  - strength of interaction
+		float confidence  - confidence of interaction
+
+		mapping<string,float> scores - various types of scores. 
+			Known score types: 
+
+				GENE_DISTANCE - distance between genes on a chromosome 
+				CONSERVATION_SCORE - conservation, ranging from 0 (not conserved) to 1 (100% conserved)
+				GO_SCORE - Smallest shared GO category, as a fraction of the genome, or missing if one of the genes is not characterized
+				STRING_SCORE - STRING score
+				COG_SIM	- whether the genes share (1) a COG category or not (0)
+				EXPR_SIM - correlation of expression patterns
+				SAME_OPERON - whether the pair is predicted to lie (1) in the same operon or not (0)
+				SAME_OPERON_PROB - estimated probability that the pair is in the same operon. Values near 1 or 0 are confident predictions of being in the same operon or not, while values near 0.5 are low-confidence predictions.
+
+
+
+       	@optional id type strength confidence scores
+   	*/
+   	typedef structure{
+		string id;
+       	string entity1_id;
+       	string entity2_id;
+		string type;
+		float strength;
+		float confidence;
+		mapping<string,float> scores;
+
+   	} Interaction;
+
+
+
+   	/* Represents a set of interactions
+	    	string id - interaction set identifier
+    		string name - interaction set name
+		string type - interaction set type. If specified, all interactions are expected to be of the same type.
+\		string description - interaction set description
+		DatasetSource source - source
+		list<taxon> taxons - taxons
+	      list<Interaction> interactions - list of interactions
+
+       	@optional description type taxons
+   	*/
+   	typedef structure{
+	    	string id;
+    		string name;
+		string description;
+		string type;
+		DatasetSource source;
+		list<taxon> taxons;
+	      list<Interaction> interactions;
+   	} InteractionSet;
 
 
 
