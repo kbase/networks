@@ -88,6 +88,7 @@ foreach (keys %no_node){
 	$density->{$_}=sprintf "%.2f",($no_edge{$_}*2)/$no_node{$_};
 }
 #start to generate core-table for narrative2 
+print "Dataset\tNo. of nodes\tNo. of edges\tdensity\tDescription\tType\tSource\n";
 foreach (sort {$no_node{$b} <=> $no_node{$a} } keys %no_node){
 
 #col1
