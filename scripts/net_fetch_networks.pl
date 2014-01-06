@@ -11,8 +11,8 @@ use Bio::KBase::KBaseNetworksService::Client;
 
 
 
-my $time= localtime;
-print "start at $time\n";
+#my $time= localtime;
+#print "start at $time\n";
 
 my $url="http://140.221.85.171:7064/KBaseNetworksRPC/networks";
 #http://140.221.85.171:7064/KBaseNetworksRPC/networks  is the VM from Shinjae.
@@ -45,8 +45,8 @@ my $results = $oc->buildFirstNeighborNetwork(\@datasetIds, \@input, \@edgeTypes)
 #print "@datasetIds\n\n";
 #print Dumper($results);
 
-$time= localtime;
-print "end at $time\n";
+#$time= localtime;
+#print "end at $time\n";
 #die;
 my %nodes = ();
 foreach my $hr (@{$results->{'nodes'}}) {
