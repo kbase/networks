@@ -9,12 +9,42 @@ use Bio::KBase::KBaseNetworksService::Client;
 #example:
 #grep 'kb' genelistfile|perl /kb/dev_container/modules/networks/scripts/net_fetch_internal_networks.pl 'kb|g.3899'
 
+my $url="http://140.221.85.171:7064/KBaseNetworksRPC/networks";
+my $usage = "Usage: echo genelist |net_fetch_internal_networks 'kb|g.3899'\n";
+my $help       = 0;
+my $version    = 0;
+GetOptions("help"       => \$help,
+           "version"    => \$version,
+	   ) or die $usage;
+
+if($help){
+print "This command is used to query the internal networks for a list of genes.\nThe genes should be KBase gene loucs ID\n";
+print "We suggest the number of genes is less than 30 due to a large collection of network datasets\n";
+print "\nUsage:\n";
+print "echo genelist |net_fetch_internal_networks 'kb|g.3899'\n\n";
+print "genelist is a list of genes, such as:'kb|g.3899.locus.534' 'kb|g.3899.locus.19668' 'kb|g.3899.locus.6286' 'kb|g.3899.locus.13048' 'kb|g.3899.locus.23790'\n";
+print "Contact: Fei He\n";
+exit(0);
+}
+
+if($version)
+{
+    print "net_fetch_internal_network version 1.0\n";
+    print "Copyright (C) 2012 KBase Network Team\n";
+    print "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n";
+    print "This is free software: you are free to change and redistribute it.\n";
+    print "There is NO WARRANTY, to the extent permitted by law.\n";
+    print "\n";
+    print "Written by Shinjae Yoo\n";
+    exit(0);
+}
+
+die $usage if @ARGV == 0;
 
 
 #my $time= localtime;
 #print "start at $time\n";
 
-my $url="http://140.221.85.171:7064/KBaseNetworksRPC/networks";
 #http://140.221.85.171:7064/KBaseNetworksRPC/networks  is the VM from Shinjae.
 my $oc = Bio::KBase::KBaseNetworksService::Client->new($url);
 my $species=$ARGV[0];
