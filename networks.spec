@@ -17,8 +17,8 @@ module Networks
 {
 
 
-        /* A boolean. 0 = false, other = true. */
-        typedef int boolean;
+    /* A boolean. 0 = false, other = true. */
+    typedef string boolean;
 
 	/* The name of a dataset that can be accessed as a source for creating a network */
 	typedef string dataset_source_ref;
@@ -66,10 +66,10 @@ module Networks
     	    	mapping<string,string> properties - Other properties  		  		
   	*/
  	typedef structure {
-	    	string id;
-    		string name;
+	    string id;
+    	string name;
 		string description;
-		network_type type;
+		network_type network_type;
 		dataset_source_ref source_ref;
 		list<taxon> taxons;
 		mapping<string,string> properties;
@@ -203,42 +203,42 @@ module Networks
  	/* 
 	   Returns a list of all datasets that can be used to create a network 
 	*/
-	funcdef all_Datasets() returns(list<Dataset> datasets);
+	funcdef all_datasets() returns(list<Dataset> datasets);
     
    	/* 
 	   Returns a list of all dataset sources available in  via Networks API 
 	*/  
-	funcdef all_DatasetSources() returns(list<DatasetSource> datasetSources);
+	funcdef all_dataset_sources() returns(list<DatasetSource> datasetSources);
 	
  	/* 
 	   Returns a list of all types of networks that can be created 
 	*/	
-	funcdef allnetwork_types() returns(list<network_type> networkTypes);
+	funcdef all_network_types() returns(list<network_type> networkTypes);
 
    	/* 
 	   Returns a list of all datasets from a given dataset source   		
 	   	   dataset_source_ref datasetSourceRef - A reference to a dataset source   		   		
    	*/
-  	funcdef get_DatasetSource2Datasets(dataset_source_ref source_ref) returns(list<Dataset> datasets);
+  	funcdef dataset_source2datasets(dataset_source_ref source_ref) returns(list<Dataset> datasets);
   	
   	/*
 	   Returns a list of all datasets that can be used to build a network for a particular genome represented by NCBI taxonomy id. 
   		taxon taxon - NCBI taxonomy id
   	*/
-  	funcdef get_taxon2Datasets(taxon taxid) returns(list<Dataset> datasets);
+  	funcdef taxon2datasets(taxon taxid) returns(list<Dataset> datasets);
   	
   	/*
 	   Returns a list of all datasets that can be used to build a network of a given type.
   	   	network_type networkType - The type of network
   	
   	*/
-  	funcdef get_network_type2Datasets(network_type net_type) returns(list<Dataset> datasets);
+  	funcdef network_type2datasets(network_type net_type) returns(list<Dataset> datasets);
   	
 	/*
 	   Returns a list of all datasets that have at least one interaction for a given  entity
 		
 	*/  	
-  	funcdef get_entity2Datasets(string entity_id) returns(list<Dataset> datasets);
+  	funcdef entity2datasets(string entity_id) returns(list<Dataset> datasets);
 
   
 	/*
@@ -249,7 +249,7 @@ module Networks
   		list<string> entity_ids - List of entity identifiers to be used as source nodes
   	   	list<edge_type> edge_types - List of possible edge types to be considered for building a network
 	*/    
-  	funcdef build_first_neighbor_Network(list<string> dataset_ids, list<string> entity_ids, list<edge_type> edge_types) returns(Network network);
+  	funcdef build_first_neighbor_network(list<string> dataset_ids, list<string> entity_ids, list<edge_type> edge_types) returns(Network network);
   	
 	/*
 	   Returns a "first-neighbor" network constructed basing on a given list of datasets. First-neighbor network contains 
@@ -262,7 +262,7 @@ module Networks
   	   	float cutOff - The threshold on the strength of edges to be considered for building a network
   	   			
 	*/  	  	
-  	funcdef build_first_neighbor_Network_limted_by_strength(list<string> dataset_ids, list<string> entity_ids, list<edge_type> edge_types, float cutOff) returns(Network network);
+  	funcdef build_first_neighbor_network_limted_by_strength(list<string> dataset_ids, list<string> entity_ids, list<edge_type> edge_types, float cutOff) returns(Network network);
   	
   	
 	/*
@@ -274,7 +274,7 @@ module Networks
   	   	list<edge_type> edge_types - List of possible edge types to be considered for building a network
   	   			
 	*/    	
-  	funcdef build_internal_Network(list<string> dataset_ids, list<string> gene_ids, list<edge_type> edge_types) returns(Network network);
+  	funcdef build_internal_network(list<string> dataset_ids, list<string> gene_ids, list<edge_type> edge_types) returns(Network network);
   	
   	
 	/*
@@ -288,6 +288,6 @@ module Networks
  	   	float cutOff - The threshold on the strength of edges to be considered for building a network
   	   			
 	*/     	
-  	funcdef build_internal_Network_limited_by_strength(list<string> dataset_ids, list<string> gene_ids, list<edge_type> edge_types, float cutOff) returns(Network network);
+  	funcdef build_internal_network_limited_by_strength(list<string> dataset_ids, list<string> gene_ids, list<edge_type> edge_types, float cutOff) returns(Network network);
 
 };

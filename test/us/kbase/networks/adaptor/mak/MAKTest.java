@@ -10,10 +10,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import us.kbase.networks.core.*;
 import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
-import us.kbase.networks.core.*;
+import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
 import edu.uci.ics.jung.graph.Graph;
 
 /**
@@ -24,7 +25,7 @@ import edu.uci.ics.jung.graph.Graph;
  */
 public class MAKTest {
 
-    static Adaptor adaptor = new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("mak.config").buildAdaptor();
+    static Adaptor adaptor = new GenericAdaptorFactory("mak.config").buildAdaptor();
 
     //	final String genomeId = "kb|g.0";
     final String genomeId = "kb|g.20848";//g.21765";
@@ -150,7 +151,7 @@ public class MAKTest {
         System.out.println("shouldReturnNetworkForSOMR1Genes networkType " +
                 networkType.getDesccription() + "\t" + networkType.getId() + "\t" + networkType.getName());
 
-        Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes, Arrays.asList(EdgeType.GENE_GENE));//adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
+        Network network = adaptor.buildInternalNetwork(datasets.get(0), queryGenes, Arrays.asList(NodeType.EDGE_GENE_GENE));//adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
         assertNotNull("Should get a network back", network);
         Graph<Node, Edge> g = network.getGraph();
         assertNotNull("Network should have graph", g);
@@ -176,7 +177,7 @@ public class MAKTest {
         System.out.println("shouldReturnNetworkForSOMR1GenesandBiclusters networkType " +
                 networkType.getDesccription() + "\t" + networkType.getId() + "\t" + networkType.getName());
 
-        Network network = adaptor.buildInternalNetwork(datasets.get(0), queryMixed, Arrays.asList(EdgeType.GENE_CLUSTER));//adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
+        Network network = adaptor.buildInternalNetwork(datasets.get(0), queryMixed, Arrays.asList(NodeType.EDGE_GENE_CLUSTER));//adaptor.buildInternalNetwork(datasets.get(0), queryGenes);
         assertNotNull("Should get a network back", network);
         Graph<Node, Edge> g = network.getGraph();
         assertNotNull("Network should have graph", g);

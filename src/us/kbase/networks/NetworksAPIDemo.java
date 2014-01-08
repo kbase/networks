@@ -3,16 +3,16 @@ package us.kbase.networks;
 import java.util.Arrays;
 import java.util.List;
 
-import us.kbase.networks.adaptor.Adaptor;
-import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.Edge;
-import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.Node;
+import us.kbase.networks.core.NodeType;
 import us.kbase.networks.core.Taxon;
+import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AdaptorException;
 
 public class NetworksAPIDemo {
 
@@ -31,35 +31,35 @@ public class NetworksAPIDemo {
 
 
 		// Ecoli: three adaptors work together (ModelSEED, PPI, RegPrecise)
-//		test_buildFirstNeighborNetwork("kb|g.21765", "kb|g.21765.CDS.543", Arrays.asList(EdgeType.GENE_CLUSTER));
+//		test_buildFirstNeighborNetwork("kb|g.21765", "kb|g.21765.CDS.543", Arrays.asList(GENE_CLUSTER_EDGE));
 
 		// Shewnalla: two adapters work together (RegPrecise, MAK)
-//		test_buildFirstNeighborNetwork("kb|g.20848", "kb|g.20848.CDS.1671", Arrays.asList(EdgeType.GENE_CLUSTER));
+/*		
+//		test_buildFirstNeighborNetwork("kb|g.20848", "kb|g.20848.CDS.1671", Arrays.asList(GENE_CLUSTER_EDGE));
 		test_buildInternalNetwork("kb|g.20848",
 //				Arrays.asList("kb|g.20848.CDS.1671", "kb|g.20848.CDS.141", "kb|g.20848.CDS.3397", "kb|g.20848.CDS.972", "kb|g.20848.CDS.960", "kb|g.20848.CDS.1846"
 //					,"kb|bicluster.110"),
 				Arrays.asList("kb|g.20848.CDS.1454", "kb|g.20848.CDS.868", "kb|g.20848.CDS.1671","kb|g.20848.CDS.2554", "kb|g.20848.CDS.1031",
 						"kb|g.20848.regulon.33", "kb|g.20848.regulon.2", "kb|g.20848.regulon.54", "kb|g.20848.regulon.29", "kb|g.20848.regulon.48", "kb|g.20848.regulon.169", "kb|g.20848.regulon.171"
 						,"kb|bicluster.110"),
-				Arrays.asList(EdgeType.GENE_CLUSTER));
-
+				Arrays.asList(GENE_CLUSTER_EDGE));
+*/
 
 		// Shewnalla:
 /*		
 		test_buildInternalNetwork("kb|g.21765",
 				Arrays.asList("kb|g.21765.CDS.543", "kb|g.21765.CDS.544", "kb|g.21765.CDS.545"),
-				Arrays.asList(EdgeType.GENE_GENE));
-		
+				Arrays.asList(GENE_GENE_EDGE));
+*/		
 		test_buildInternalNetwork("kb|g.20848",
 				Arrays.asList("kb|g.20848.CDS.1671", "kb|g.20848.CDS.1454", "kb|g.20848.CDS.2811"),
-				Arrays.asList(EdgeType.GENE_GENE));
-*/
+				Arrays.asList(NodeType.EDGE_GENE_GENE));
 
 
 
 	}
 
-	private void test_buildInternalNetwork(String genomeId, List<String> geneIds, List<EdgeType> edgeTypes) throws AdaptorException {
+	private void test_buildInternalNetwork(String genomeId, List<String> geneIds, List<String> edgeTypes) throws AdaptorException {
 		Taxon taxon = new Taxon(genomeId);
 
 		List<Dataset> datasets = api.getDatasets(taxon);
@@ -70,7 +70,7 @@ public class NetworksAPIDemo {
 		NetworksUtil.visualizeNetwork(network.getGraph());
 	}
 
-	private void test_buildFirstNeighborNetwork(String genomeId, String geneId, List<EdgeType> edgeTypes) throws AdaptorException
+	private void test_buildFirstNeighborNetwork(String genomeId, String geneId, List<String> edgeTypes) throws AdaptorException
 	{
 		Taxon taxon = new Taxon(genomeId);
 
@@ -91,7 +91,7 @@ public class NetworksAPIDemo {
 		NetworksUtil.visualizeNetwork(network.getGraph());
 	}
 
-	private void testAdaptor_buildFirstNeighborNetwork(Adaptor adaptor,String genomeId, String geneId, List<EdgeType> edgeTypes) throws AdaptorException
+	private void testAdaptor_buildFirstNeighborNetwork(Adaptor adaptor,String genomeId, String geneId, List<String> edgeTypes) throws AdaptorException
 	{
 		Taxon taxon = new Taxon(genomeId);
 		List<Dataset> datasets = adaptor.getDatasets(taxon);

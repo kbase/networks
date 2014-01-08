@@ -1,18 +1,24 @@
 package us.kbase.networks.integrated;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import us.kbase.networks.NetworksAPI;
 import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
-import us.kbase.networks.adaptor.modelseed.ModelSEEDAdaptorFactory;
-import us.kbase.networks.core.*;
+import us.kbase.networks.core.Dataset;
+import us.kbase.networks.core.Edge;
+import us.kbase.networks.core.Entity;
+import us.kbase.networks.core.EntityType;
+import us.kbase.networks.core.Network;
+import us.kbase.networks.core.Node;
+import us.kbase.networks.core.NodeType;
+import us.kbase.networks.core.Taxon;
 
 public class IntegratedNetworksAPITest {
 
@@ -20,19 +26,19 @@ public class IntegratedNetworksAPITest {
 
     String genomeId1 = "kb|g.21765";
     String genes1 = "kb|g.21765.CDS.543";
-    List<EdgeType> edgeTypes1 = Arrays.asList(EdgeType.GENE_CLUSTER);
+    List<String> edgeTypes1 = Arrays.asList(NodeType.EDGE_GENE_CLUSTER);
 
 
     String genomeId2 = "kb|g.20848";
     List genes2 = Arrays.asList("kb|g.20848.CDS.1454", "kb|g.20848.CDS.868", "kb|g.20848.CDS.1671", "kb|g.20848.CDS.2554", "kb|g.20848.CDS.1031",
             "kb|g.20848.regulon.33", "kb|g.20848.regulon.2", "kb|g.20848.regulon.54", "kb|g.20848.regulon.29", "kb|g.20848.regulon.48", "kb|g.20848.regulon.169", "kb|g.20848.regulon.171"
             , "kb|bicluster.110");
-    List edgeTypes2 = Arrays.asList(EdgeType.GENE_CLUSTER);
+    List edgeTypes2 = Arrays.asList(NodeType.EDGE_GENE_CLUSTER);
 
 
     String genomeId3 = "kb|g.20848";
     String geneIds3 = "kb|g.20848.CDS.1671";
-    List edgeTypes3 = Arrays.asList(EdgeType.GENE_GENE);
+    List edgeTypes3 = Arrays.asList(NodeType.EDGE_GENE_GENE);
 
 
     List<String> datasetsIntegrate = Arrays.asList(

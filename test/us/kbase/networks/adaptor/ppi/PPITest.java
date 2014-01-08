@@ -13,12 +13,12 @@ import java.util.Vector;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.strbio.util.StringUtil;
 
+import us.kbase.networks.core.*;
 import us.kbase.networks.NetworksUtil;
 import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.adaptor.AdaptorException;
-import us.kbase.networks.core.*;
+import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
 import edu.uci.ics.jung.graph.Graph;
 
 public class PPITest {
@@ -46,7 +46,7 @@ public class PPITest {
     @Before
 	public void setup() throws Exception {
     	// adaptor = new PPIAdaptorFactory().buildAdaptor();
-	adaptor = new us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory("ppi.config").buildAdaptor();	
+	adaptor = new GenericAdaptorFactory("ppi.config").buildAdaptor();	
     }
 
     @Test
@@ -99,7 +99,7 @@ public class PPITest {
 		   datasets.size() > 0);
 	Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0),
 							    atpE,
-							    Arrays.asList(EdgeType.GENE_CLUSTER));
+							    Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 	assertNotNull("Should get a network back", network);
 	Graph<Node, Edge> g = network.getGraph();
 	assertNotNull("Network should have graph", g);
@@ -180,7 +180,7 @@ public class PPITest {
 		     datasets.size());
 	Network network = adaptor.buildInternalNetwork(datasets.get(0),
 						       Arrays.asList(atpE, atpA),
-						       Arrays.asList(EdgeType.GENE_GENE));
+						       Arrays.asList(NodeType.EDGE_GENE_GENE));
 	assertNotNull("Should get a network back", network);
 	Graph<Node, Edge> g = network.getGraph();
 	assertNotNull("Network should have graph", g);
@@ -199,7 +199,7 @@ public class PPITest {
 		     2,
 		     g.getVertexCount());
 	for (Node n : allNodes) {
-	    int stoichiometry = StringUtil.atoi(n.getProperty("stoichiometry"));
+	    int stoichiometry = Integer.parseInt(n.getProperty("stoichiometry"));
 	    String nodeGeneID = n.getName();
 	    if (atpE.equals(nodeGeneID))
 		assertEquals("atpE should have stoichiometry 10",
@@ -229,7 +229,7 @@ public class PPITest {
 		     datasets.size());
 	Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0),
 							    atpSynthase,
-							    Arrays.asList(EdgeType.GENE_CLUSTER));
+							    Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 	assertNotNull("Should get a network back", network);
 	Graph<Node, Edge> g = network.getGraph();
 	assertNotNull("Network should have graph", g);
@@ -245,7 +245,7 @@ public class PPITest {
 	    String s = n.getProperty("stoichiometry");
 	    int stoichiometry = 0;
 	    if (s != null)
-		stoichiometry = StringUtil.atoi(s);
+		stoichiometry = Integer.parseInt(s); 
 	    
 	    String nodeGeneID = n.getName();
 	    if (atpE.equals(nodeGeneID))
@@ -271,7 +271,7 @@ public class PPITest {
 	}
 	network = adaptor.buildInternalNetwork(datasets.get(0),
 					       atpGenes,
-					       Arrays.asList(EdgeType.GENE_GENE));
+					       Arrays.asList(NodeType.EDGE_GENE_GENE));
 	// NetworksUtil.visualizeNetwork(network.getGraph());
 	// try {
 	// Thread.sleep(100000);
@@ -300,7 +300,7 @@ public class PPITest {
 		     g.getEdgeCount());
 	
 	for (Node n : g.getVertices()) {
-	    int stoichiometry = StringUtil.atoi(n.getProperty("stoichiometry"));
+	    int stoichiometry = Integer.parseInt(n.getProperty("stoichiometry")); 
 	    String nodeGeneID = n.getName();
 	    if (atpE.equals(nodeGeneID))
 		assertEquals("atpE should have stoichiometry 10",
@@ -337,7 +337,7 @@ public class PPITest {
 	
 	Network network = adaptor.buildFirstNeighborNetwork(huSet,
 							    atpA,
-							    Arrays.asList(EdgeType.GENE_GENE));
+							    Arrays.asList(NodeType.EDGE_GENE_GENE));
 	assertNotNull("Should get a network back", network);
 	Graph<Node, Edge> g = network.getGraph();
 	assertNotNull("Network should have graph", g);
@@ -377,7 +377,7 @@ public class PPITest {
 	
 	Network network = adaptor.buildFirstNeighborNetwork(huSet,
 							    atpA,
-							    Arrays.asList(EdgeType.GENE_CLUSTER));
+							    Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 	assertNotNull("Should get a network back", network);
 	Graph<Node, Edge> g = network.getGraph();
 	assertNotNull("Network should have graph", g);
@@ -455,7 +455,7 @@ public class PPITest {
 			   e.getProperty("stoichiometry"));
 		assertNotNull("Edge should have rank property",
 			      e.getProperty("rank"));
-		int rank = StringUtil.atoi(e.getProperty("rank"));
+		int rank = Integer.parseInt(e.getProperty("rank"));
 		String complexID = e.getProperty("interaction_id");
 		assertNotNull("Edge should have interaction_id property",
 			      complexID);

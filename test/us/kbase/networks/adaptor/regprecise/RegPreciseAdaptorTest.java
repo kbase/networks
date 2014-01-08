@@ -13,16 +13,16 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import us.kbase.networks.adaptor.Adaptor;
-import us.kbase.networks.adaptor.AdaptorException;
-import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
-import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
+import us.kbase.networks.core.NodeType;
 import us.kbase.networks.core.Taxon;
+import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
 
 public class RegPreciseAdaptorTest {
 
@@ -191,7 +191,7 @@ public class RegPreciseAdaptorTest {
 	public void testBuildNetworkDatasetListOfEdgeType() throws AdaptorException {
 		Dataset ds = adaptor.getDataset(datasetId);
 		
-		Network network = adaptor.buildNetwork(ds, Arrays.asList(EdgeType.GENE_CLUSTER));
+		Network network = adaptor.buildNetwork(ds, Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("method is not implemented yet; should have 0 nodes", 
 				0, network.getGraph().getVertexCount());		
 	}
@@ -211,25 +211,25 @@ public class RegPreciseAdaptorTest {
 	public void testBuildFirstNeighborNetworkDatasetEntityListOfEdgeType() throws AdaptorException {
 		Dataset ds = adaptor.getDataset(datasetId);
 
-		Network network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(geneId), Arrays.asList(EdgeType.GENE_CLUSTER));
+		Network network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(geneId), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("network should have 6 nodes", 
 				6, network.getGraph().getVertexCount());		
 		assertEquals("network should have 5 edges", 
 				5, network.getGraph().getEdgeCount());		
 		
-		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(geneId), Arrays.asList(EdgeType.GENE_GENE));
+		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(geneId), Arrays.asList(NodeType.EDGE_GENE_GENE));
 		assertEquals("network should have 98 nodes", 
 				98, network.getGraph().getVertexCount());		
 		assertEquals("network should have 123 edges", 
 				123, network.getGraph().getEdgeCount());			
 
-		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(regulonId), Arrays.asList(EdgeType.GENE_CLUSTER));
+		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(regulonId), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("network should have 31 nodes", 
 				31, network.getGraph().getVertexCount());		
 		assertEquals("network should have 30 edges", 
 				30, network.getGraph().getEdgeCount());
 		
-		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(regulonId), Arrays.asList(EdgeType.GENE_GENE));
+		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(regulonId), Arrays.asList(NodeType.EDGE_GENE_GENE));
 		assertEquals("network should have 0 nodes", 
 				0, network.getGraph().getVertexCount());		
 	}
@@ -262,41 +262,41 @@ public class RegPreciseAdaptorTest {
 
 		Dataset ds = adaptor.getDataset(datasetId);
 		
-		Network network = adaptor.buildInternalNetwork(ds, Entity.toEntities(geneIds), Arrays.asList(EdgeType.GENE_GENE));
+		Network network = adaptor.buildInternalNetwork(ds, Entity.toEntities(geneIds), Arrays.asList(NodeType.EDGE_GENE_GENE));
 		assertEquals("network should have 5 nodes", 
 				5, network.getGraph().getVertexCount());		
 		assertEquals("network should have 17 edges", 
 				17, network.getGraph().getEdgeCount());
 				
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(geneIds), Arrays.asList(EdgeType.GENE_CLUSTER));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(geneIds), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("network should have 0 nodes", 
 				0, network.getGraph().getVertexCount());		
 
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(regulonIds), Arrays.asList(EdgeType.GENE_CLUSTER));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(regulonIds), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("network should have 0 nodes", 
 				0, network.getGraph().getVertexCount());		
 		
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(regulonIds), Arrays.asList(EdgeType.CLUSTER_CLUSTER));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(regulonIds), Arrays.asList(NodeType.EDGE_CLUSTER_CLUSTER));
 		assertEquals("not impelemnted yet; network should have 0 nodes", 
 				0, network.getGraph().getVertexCount());		
 
 		List<String> entityIds = new ArrayList<String>();
 		entityIds.addAll(geneIds);
 		entityIds.addAll(regulonIds);
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(EdgeType.GENE_CLUSTER));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("network should have 10 nodes", 
 				10, network.getGraph().getVertexCount());		
 		assertEquals("network should have 15 edges", 
 				15, network.getGraph().getEdgeCount());
 		
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(EdgeType.GENE_GENE));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(NodeType.EDGE_GENE_GENE));
 		assertEquals("network should have 5 nodes", 
 				5, network.getGraph().getVertexCount());		
 		assertEquals("network should have 17 edges", 
 				17, network.getGraph().getEdgeCount());
 
 		
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(EdgeType.GENE_CLUSTER, EdgeType.GENE_GENE));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(NodeType.EDGE_GENE_CLUSTER, NodeType.EDGE_GENE_GENE));
 		assertEquals("network should have 10 nodes", 
 				10, network.getGraph().getVertexCount());		
 		assertEquals("network should have 17 edges", 

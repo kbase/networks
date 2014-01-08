@@ -17,7 +17,6 @@ import us.kbase.networks.adaptor.IdGenerator;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
-import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
@@ -163,7 +162,7 @@ public class NetworksAPI {
 	}
 	
 	public Network buildFirstNeighborNetwork(List<String> datasetIds, List<Entity> entitis,
-			List<EdgeType> edgeTypes) throws AdaptorException 
+			List<String> edgeTypes) throws AdaptorException 
 	{		
 		List<Network> networks = new Vector<Network>();
 		for(String datasetId: datasetIds)
@@ -191,7 +190,7 @@ public class NetworksAPI {
 	
 	
 	public Network buildFirstNeighborNetwork(List<String> datasetIds, Entity entity,
-			List<EdgeType> edgeTypes) throws AdaptorException 
+			List<String> edgeTypes) throws AdaptorException 
 	{		
 		List<Network> networks = new Vector<Network>();
 		for(String datasetId: datasetIds)
@@ -214,7 +213,7 @@ public class NetworksAPI {
 	}
 
 	public Network buildInternalNetwork(List<String> datasetIds, List<Entity> entities,
-			List<EdgeType> edgeTypes) throws AdaptorException 
+			List<String> edgeTypes) throws AdaptorException 
 	{		
 		List<Network> networks = new Vector<Network>();
 		
@@ -311,27 +310,27 @@ public class NetworksAPI {
 	}
 
 	public Network buildFirstNeighborNetwork(List<String> datasetIds,
-			Entity entity, List<EdgeType> edgeTypes, float cutOff) throws AdaptorException {
+			Entity entity, List<String> edgeTypes, float cutOff) throws AdaptorException {
 		Network network = buildFirstNeighborNetwork(datasetIds, entity, edgeTypes);
     	cutOffNetwork(network, cutOff);
 		return network;
 	}
 	
 	public Network buildFirstNeighborNetwork(List<String> datasetIds,
-			List<Entity> entities, List<EdgeType> edgeTypes, float cutOff) throws AdaptorException {
+			List<Entity> entities, List<String> edgeTypes, double cutOff) throws AdaptorException {
 		Network network = buildFirstNeighborNetwork(datasetIds, entities, edgeTypes);
     	cutOffNetwork(network, cutOff);
 		return network;
 	}	
 
 	public Network buildInternalNetwork(List<String> datasetIds,
-			List<Entity> entities, List<EdgeType> edgeTypes, float cutOff) throws AdaptorException {
+			List<Entity> entities, List<String> edgeTypes, double cutOff) throws AdaptorException {
 		Network network = buildInternalNetwork(datasetIds, entities, edgeTypes);
     	cutOffNetwork(network, cutOff);
 		return network;
 	}	
 	
-    private void cutOffNetwork(us.kbase.networks.core.Network network, float cutOff) {
+    private void cutOffNetwork(us.kbase.networks.core.Network network, double cutOff) {
     	Graph<Node,Edge> graph = network.getGraph();
     	List<Edge> deletedEdges = new ArrayList<Edge>();
     	for( Edge e : network.getGraph().getEdges()) {

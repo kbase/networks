@@ -15,15 +15,15 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import us.kbase.networks.adaptor.Adaptor;
-import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
-import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Taxon;
+import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
 
 public class GenericAdaptorTest {
 
@@ -32,7 +32,7 @@ public class GenericAdaptorTest {
   
   static Taxon taxon = null;
   static NetworkType nt = null;
-  static EdgeType et = null;
+  static String et = null;
   static DatasetSource dsrc = null;
   static String entityId1 = "";
   static String entityId2 = "";
@@ -95,7 +95,7 @@ public class GenericAdaptorTest {
     entityId2 = conf.getString(TST_ENTITY_ID2, "");
     entityIds1 = Arrays.asList(conf.getStringArray(TST_ENTITY_IDS1));
     entityIds2 = Arrays.asList(conf.getStringArray(TST_ENTITY_IDS2));
-    et = Enum.valueOf(EdgeType.class,conf.getString(TST_EDGE_TYPE));
+    et = conf.getString(TST_EDGE_TYPE);
   }
 
   @Test

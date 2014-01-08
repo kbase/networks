@@ -26,7 +26,7 @@ public final class DatasetSourceSerializer extends JsonSerializer<DatasetSource>
 		jg.writeStringField("name", dsSource.getName());		
 		jg.writeStringField("reference", dsSource.toString());				
 		jg.writeStringField("description", dsSource.getDescription());
-		jg.writeStringField("resourceURL", dsSource.getResourceURL());
+		jg.writeStringField("resource_url", dsSource.getResourceURL());
 		
 		jg.writeEndObject();
 	}  

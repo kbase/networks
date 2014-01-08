@@ -52,7 +52,7 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 						jg.writeStringField("id", node.getEntityId());
 					jg.writeEndObject();
 */					
-					jg.writeStringField("entityId", node.getEntityId());
+					jg.writeStringField("entity_id", node.getEntityId());
 					
 					jg.writeStringField("type", node.getType().toString());
 					
@@ -69,7 +69,7 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 						}
 					jg.writeEndObject();
 					
-					jg.writeFieldName("userAnnotations");
+					jg.writeFieldName("user_annotations");
 					jg.writeStartObject();
 						Set<String> uan = node.getUserAnnotationNames();
 						for(Iterator<String> pit = uan.iterator();pit.hasNext(); ) {
@@ -95,13 +95,13 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 					jg.writeStringField("id", edge.getId());
 					jg.writeStringField("name", edge.getName());
 					if(graph.getEdgeType(edge) == edu.uci.ics.jung.graph.util.EdgeType.DIRECTED) {
-						jg.writeStringField("nodeId1", graph.getSource(edge).getId());
-						jg.writeStringField("nodeId2", graph.getDest(edge).getId());
+						jg.writeStringField("node_id1", graph.getSource(edge).getId());
+						jg.writeStringField("node_id2", graph.getDest(edge).getId());
 					}
 					else {
 						Pair<Node> nodePair = graph.getEndpoints(edge);
-						jg.writeStringField("nodeId1", nodePair.getFirst().getId());
-						jg.writeStringField("nodeId2", nodePair.getSecond().getId());
+						jg.writeStringField("node_id1", nodePair.getFirst().getId());
+						jg.writeStringField("node_id2", nodePair.getSecond().getId());
 					}
 
 					jg.writeStringField("directed", "" +(graph.getEdgeType(edge) == edu.uci.ics.jung.graph.util.EdgeType.DIRECTED));
@@ -110,7 +110,7 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 					jg.writeNumberField("confidence", edge.getConfidence());
 
 					datasetList.add(edge.getDataset());
-					jg.writeStringField("datasetId", edge.getDataset().getId());
+					jg.writeStringField("dataset_id", edge.getDataset().getId());
 		
 					jg.writeFieldName("properties");
 					jg.writeStartObject();
@@ -121,7 +121,7 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 						}
 					jg.writeEndObject();
 					
-					jg.writeFieldName("userAnnotations");
+					jg.writeFieldName("user_annotations");
 					jg.writeStartObject();
 						Set<String> uan = edge.getUserAnnotationNames();
 						for(Iterator<String> pit = uan.iterator();pit.hasNext(); ) {
@@ -148,7 +148,7 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 	
 			jg.writeFieldName("properties");
 			jg.writeStartObject();
-			jg.writeStringField("graphType", graph.getClass().getName());
+			jg.writeStringField("graph_type", graph.getClass().getName());
 			Set<String> pn = network.getPropertyNames();
 			for(Iterator<String> pit = pn.iterator();pit.hasNext(); ) {
 				String key = pit.next();
@@ -156,7 +156,7 @@ public final class NetworkSerializer extends JsonSerializer<Network> {
 			}
 			jg.writeEndObject();
 	
-			jg.writeFieldName("userAnnotations");
+			jg.writeFieldName("user_annotations");
 			jg.writeStartObject();
 			Set<String> uan = network.getUserAnnotationNames();
 			for(Iterator<String> pit = uan.iterator();pit.hasNext(); ) {

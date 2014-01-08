@@ -20,19 +20,19 @@ import us.kbase.CDMI.CDMI_EntityAPI_tuple_85;
 import us.kbase.CDMI.fields_Model;
 import us.kbase.CDMI.fields_Subsystem;
 import us.kbase.CDMI.row;
-import us.kbase.networks.adaptor.AbstractAdaptor;
-import us.kbase.networks.adaptor.AdaptorException;
-import us.kbase.networks.adaptor.IdGenerator;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
-import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
+import us.kbase.networks.core.NodeType;
 import us.kbase.networks.core.Taxon;
+import us.kbase.networks.adaptor.AbstractAdaptor;
+import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.adaptor.IdGenerator;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 
@@ -42,6 +42,7 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 	private CDMI_API cdmiAPI;
 	private HashSet<String> metabolicSubsystems;
 	public static final String ADAPTOR_PREFIX = "modelseed";
+	
 
 	
 	public ModelSEEDAdaptor() throws AdaptorException {
@@ -207,22 +208,22 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 	}
 
 	@Override
-	public Network buildNetwork(Dataset dataset, List<EdgeType> edgeTypes) {
+	public Network buildNetwork(Dataset dataset, List<String> edgeTypes) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity) throws AdaptorException {
-		return buildFirstNeighborNetwork(dataset, entity, Arrays.asList(EdgeType.GENE_CLUSTER));
+		return buildFirstNeighborNetwork(dataset, entity, Arrays.asList(NodeType.toEdgeType(NodeType.GENE, NodeType.CLUSTER)));
 	}
 
 	@Override
-	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity, List<EdgeType> edgeTypes) throws AdaptorException {
+	public Network buildFirstNeighborNetwork(Dataset dataset, Entity entity, List<String> edgeTypes) throws AdaptorException {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
 		Network network = new Network(IdGenerator.Network.nextId(), "", graph);	
-
-		if(edgeTypes.contains(EdgeType.GENE_CLUSTER)) {
+		
+		if(edgeTypes.contains(NodeType.EDGE_GENE_CLUSTER)) {
 			if (entity.getType() == EntityType.GENE) {
 				// PSN: Entity is immutable class
 				//Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), entity.getId(), new Entity(entity.getId(), EntityType.GENE));
@@ -248,7 +249,7 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 				}	
 			}
 		}
-		else if (edgeTypes.contains(EdgeType.GENE_GENE) && entity.getType() == EntityType.GENE) {
+		else if (edgeTypes.contains(NodeType.EDGE_GENE_GENE) && entity.getType() == EntityType.GENE) {
 			Node geneNode = Node.buildGeneNode(IdGenerator.Node.nextId(), entity.getId(), entity);
 
 			// find genes in same subsystems as this gene
@@ -314,18 +315,18 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities) throws AdaptorException {
 		// PSN: the way you construct network, it should be GENE_GENE
 		//return buildInternalNetwork(dataset, entities, Arrays.asList(EdgeType.GENE_CLUSTER));
-		return buildInternalNetwork(dataset, entities, Arrays.asList(EdgeType.GENE_GENE));
+		return buildInternalNetwork(dataset, entities, Arrays.asList(NodeType.EDGE_GENE_GENE));
 	}
 
 	@Override
 	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities,
-			List<EdgeType> edgeTypes) throws AdaptorException {
+			List<String> edgeTypes) throws AdaptorException {
 		Graph<Node, Edge> graph = new SparseMultigraph<Node, Edge>();
 		Network network = new Network(IdGenerator.Network.nextId(), "", graph);	
 		
 		// PSN: the way you construct network, it should be GENE_GENE
 		//if( !edgeTypes.contains(EdgeType.GENE_CLUSTER) )
-		if( !edgeTypes.contains(EdgeType.GENE_GENE) )
+		if( !edgeTypes.contains(NodeType.EDGE_GENE_GENE) )
 		{
 			return network;
 		}

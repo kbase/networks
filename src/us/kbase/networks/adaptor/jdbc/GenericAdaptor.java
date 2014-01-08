@@ -11,13 +11,9 @@ import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
 
-import us.kbase.networks.adaptor.AbstractAdaptor;
-import us.kbase.networks.adaptor.AdaptorException;
-import us.kbase.networks.adaptor.IdGenerator;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
-import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.EntityType;
 import us.kbase.networks.core.Network;
@@ -25,6 +21,9 @@ import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
 import us.kbase.networks.core.NodeType;
 import us.kbase.networks.core.Taxon;
+import us.kbase.networks.adaptor.AbstractAdaptor;
+import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.adaptor.IdGenerator;
 
 import com.mchange.v2.c3p0.C3P0ProxyConnection;
 
@@ -149,14 +148,14 @@ public class GenericAdaptor extends AbstractAdaptor{
 	public Network buildNetwork(Dataset dataset) throws AdaptorException {
 		if( !hasDataset(dataset.getId())) return null;
 
-		List<EdgeType> edgeTypes = getEdgeTypes(Term.DefaultEdgeTypes);
+		List<String> edgeTypes = getEdgeTypes(Term.DefaultEdgeTypes);
 		if(edgeTypes.size() == 0) return null;
 		
 		return buildNetwork(dataset, edgeTypes);
 	}
 
 	@Override
-	public Network buildNetwork(Dataset dataset, List<EdgeType> queryEdgeTypes)
+	public Network buildNetwork(Dataset dataset, List<String> queryEdgeTypes)
 			throws AdaptorException {
 		
 		String methodName = "buildNetwork";			
@@ -179,7 +178,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 			throws AdaptorException {
 		if( !hasDataset(dataset.getId())) return null;
 		
-		List<EdgeType> edgeTypes = getEdgeTypes(Term.DefaultEdgeTypes);
+		List<String> edgeTypes = getEdgeTypes(Term.DefaultEdgeTypes);
 		if(edgeTypes.size() == 0) return null;
 		
 		return buildFirstNeighborNetwork(dataset, entity, edgeTypes);
@@ -187,7 +186,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 	
 	@Override
 	public Network buildFirstNeighborNetwork(Dataset dataset, final Entity entity,
-			List<EdgeType> queryEdgeTypes) throws AdaptorException {
+			List<String> queryEdgeTypes) throws AdaptorException {
 
 		String methodName = "buildFirstNeighborNetwork";
 		MethodProperties methodProperties = new MethodProperties(methodName){
@@ -208,7 +207,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 			throws AdaptorException {
 		if( !hasDataset(dataset.getId())) return null;
 
-		List<EdgeType> edgeTypes = getEdgeTypes(Term.DefaultEdgeTypes);
+		List<String> edgeTypes = getEdgeTypes(Term.DefaultEdgeTypes);
 		if(edgeTypes.size() == 0) return null;
 		
 		return buildInternalNetwork(dataset, entities, edgeTypes);
@@ -216,7 +215,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 	@Override
 	public Network buildInternalNetwork(Dataset dataset, List<Entity> entities,
-			List<EdgeType> queryEdgeTypes) throws AdaptorException {
+			List<String> queryEdgeTypes) throws AdaptorException {
 		
 		String methodName = "buildInternalNetwork";
 		MethodProperties methodProperties = new MethodProperties(methodName){
@@ -242,7 +241,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 	
 	private Network buildNetwork(Dataset dataset, 
 			MethodProperties methodProperties,
-			List<EdgeType> queryEdgeTypes,
+			List<String> queryEdgeTypes,
 			QueryPropertyArguments ... propertiesArguments) throws AdaptorException
 	{
 		if( !hasDataset(dataset.getId())) return null;
@@ -254,12 +253,12 @@ public class GenericAdaptor extends AbstractAdaptor{
 				graph);
 
 		
-		List<EdgeType> edgeTypes = getEdgeTypes(Term.SupportedEdgeTypes, queryEdgeTypes);
+		List<String> edgeTypes = getEdgeTypes(Term.SupportedEdgeTypes, queryEdgeTypes);
 		if(edgeTypes.isEmpty()) return network;
 
 		try {
 			Hashtable<String,Node> nodeId2NodeHash = new Hashtable<String,Node>(); 
-			for(EdgeType et : edgeTypes) {
+			for(String et : edgeTypes) {
 				methodProperties.prepareEdgeType(et);
 				populateGraph(graph, dataset, methodProperties, 
 						nodeId2NodeHash, propertiesArguments);
@@ -274,7 +273,7 @@ public class GenericAdaptor extends AbstractAdaptor{
 
 	private abstract class MethodProperties{
 		String methodName;
-		EdgeType edgeType;
+		String edgeType;
 		NodeType nt1;
 		NodeType nt2;
 		EntityType et1;
@@ -285,11 +284,11 @@ public class GenericAdaptor extends AbstractAdaptor{
 			this.methodName = methodName;
 		}
 		
-		public void prepareEdgeType(EdgeType edgeType) throws AdaptorException{
+		public void prepareEdgeType(String edgeType) throws AdaptorException{
 			this.edgeType = edgeType;
 			assertEdgeTypeMapping();
-			this.nt1 = edgeType.nodeType1();
-			this.nt2 = edgeType.nodeType2();
+			this.nt1 = NodeType.nodeType1(edgeType);
+			this.nt2 = NodeType.nodeType2(edgeType);
 			this.et1 = toEntityType(Term.Node1_Type_Mapping_Prefix, nt1);
 			this.et2 = toEntityType(Term.Node2_Type_Mapping_Prefix, nt2);
 		}
@@ -298,8 +297,8 @@ public class GenericAdaptor extends AbstractAdaptor{
 		
 		private void assertEdgeTypeMapping() throws AdaptorException {
 			
-			if( !config.containsKey(Term.Node1_Type_Mapping_Prefix + edgeType.nodeType1().name())  || 
-				!config.containsKey(Term.Node2_Type_Mapping_Prefix + edgeType.nodeType2().name()) 	)
+			if( !config.containsKey(Term.Node1_Type_Mapping_Prefix + NodeType.nodeType1(edgeType))  || 
+				!config.containsKey(Term.Node2_Type_Mapping_Prefix + NodeType.nodeType2(edgeType)) 	)
 				
 				throw new AdaptorException("Couldn't find proper EdgeType to Node EntityType Mapping: " + 
 						edgeType.toString());	
@@ -443,24 +442,24 @@ public class GenericAdaptor extends AbstractAdaptor{
 		return type2EntitiesHash;
 	}
 
-	private List<EdgeType> getEdgeTypes(String edgeTypesPrefix)
+	private List<String> getEdgeTypes(String edgeTypesPrefix)
 	{
-		List<EdgeType> edgeTypes = new ArrayList<EdgeType>();
+		List<String> edgeTypes = new ArrayList<String>();
 		
 		String edgeTypesValue = config.getString(edgeTypesPrefix);
 		if(edgeTypesValue != null && edgeTypesValue.trim().length() > 0)
 		{
 			for(String edgeTypeStr:  edgeTypesValue.split(":") )
 			{
-				edgeTypes.add(Enum.valueOf(EdgeType.class, edgeTypeStr));
+				edgeTypes.add(edgeTypeStr);
 			}
 		}
 		return edgeTypes;	
 	}	
 	
-	private List<EdgeType> getEdgeTypes(String edgeTypesPrefix, List<EdgeType> queryEdgeTypes)
+	private List<String> getEdgeTypes(String edgeTypesPrefix, List<String> queryEdgeTypes)
 	{
-		List<EdgeType> dsEdgeTypes = getEdgeTypes(edgeTypesPrefix);
+		List<String> dsEdgeTypes = getEdgeTypes(edgeTypesPrefix);
 		dsEdgeTypes.retainAll(queryEdgeTypes);		
 		return dsEdgeTypes;
 	}	

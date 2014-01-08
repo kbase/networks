@@ -13,16 +13,16 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import us.kbase.networks.adaptor.Adaptor;
-import us.kbase.networks.adaptor.AdaptorException;
-import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
-import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
+import us.kbase.networks.core.NodeType;
 import us.kbase.networks.core.Taxon;
+import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.adaptor.jdbc.GenericAdaptorFactory;
 
 public class MAKTest1 {
 
@@ -180,7 +180,7 @@ public class MAKTest1 {
 	public void testBuildNetworkDatasetListOfEdgeType() throws AdaptorException {
 		Dataset ds = adaptor.getDataset(datasetId);
 		
-		Network network = adaptor.buildNetwork(ds, Arrays.asList(EdgeType.GENE_CLUSTER));
+		Network network = adaptor.buildNetwork(ds, Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("method is not implemented yet; should have 0 nodes", 
 				0, network.getGraph().getVertexCount());		
 	}
@@ -200,25 +200,25 @@ public class MAKTest1 {
 	public void testBuildFirstNeighborNetworkDatasetEntityListOfEdgeType() throws AdaptorException {
 		Dataset ds = adaptor.getDataset(datasetId);
 
-		Network network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(geneId), Arrays.asList(EdgeType.GENE_CLUSTER));
+		Network network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(geneId), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("network should have 3 nodes", 
 				3, network.getGraph().getVertexCount());		
 		assertEquals("network should have 3 edges", 
 				2, network.getGraph().getEdgeCount());	
 				
-		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(geneId), Arrays.asList(EdgeType.GENE_GENE));
+		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(geneId), Arrays.asList(NodeType.EDGE_GENE_GENE));
 		assertEquals("network should have 183 nodes", 
 				183, network.getGraph().getVertexCount());		
 		assertEquals("network should have 212 edges", 
 				212, network.getGraph().getEdgeCount());			
 
-		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(biclusterId), Arrays.asList(EdgeType.GENE_CLUSTER));
+		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(biclusterId), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("network should have 107 nodes", 
 				107, network.getGraph().getVertexCount());		
 		assertEquals("network should have 106 edges", 
 				106, network.getGraph().getEdgeCount());
 		
-		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(biclusterId), Arrays.asList(EdgeType.GENE_GENE));
+		network = adaptor.buildFirstNeighborNetwork(ds, Entity.toEntity(biclusterId), Arrays.asList(NodeType.EDGE_GENE_GENE));
 		assertEquals("network should have 0 nodes", 
 				0, network.getGraph().getVertexCount());		
 	}
@@ -251,41 +251,41 @@ public class MAKTest1 {
 
 		Dataset ds = adaptor.getDataset(datasetId);
 		
-		Network network = adaptor.buildInternalNetwork(ds, Entity.toEntities(geneIds), Arrays.asList(EdgeType.GENE_GENE));
+		Network network = adaptor.buildInternalNetwork(ds, Entity.toEntities(geneIds), Arrays.asList(NodeType.EDGE_GENE_GENE));
 		assertEquals("network should have 4 nodes", 
 				4, network.getGraph().getVertexCount());		
 		assertEquals("network should have 7 edges", 
 				7, network.getGraph().getEdgeCount());
 				
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(geneIds), Arrays.asList(EdgeType.GENE_CLUSTER));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(geneIds), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("network should have 0 nodes", 
 				0, network.getGraph().getVertexCount());		
 
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(biclusterIds), Arrays.asList(EdgeType.GENE_CLUSTER));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(biclusterIds), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("network should have 0 nodes", 
 				0, network.getGraph().getVertexCount());		
 		
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(biclusterIds), Arrays.asList(EdgeType.CLUSTER_CLUSTER));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(biclusterIds), Arrays.asList(NodeType.EDGE_CLUSTER_CLUSTER));
 		assertEquals("not impelemnted yet; network should have 0 nodes", 
 				0, network.getGraph().getVertexCount());		
 
 		List<String> entityIds = new ArrayList<String>();
 		entityIds.addAll(geneIds);
 		entityIds.addAll(biclusterIds);
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(EdgeType.GENE_CLUSTER));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertEquals("network should have 4 nodes", 
 				4, network.getGraph().getVertexCount());		
 		assertEquals("network should have 4 edges", 
 				4, network.getGraph().getEdgeCount());
 		
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(EdgeType.GENE_GENE));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(NodeType.EDGE_GENE_GENE));
 		assertEquals("network should have 4 nodes", 
 				4, network.getGraph().getVertexCount());		
 		assertEquals("network should have 7 edges", 
 				7, network.getGraph().getEdgeCount());
 
 		
-		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(EdgeType.GENE_CLUSTER, EdgeType.GENE_GENE));
+		network = adaptor.buildInternalNetwork(ds, Entity.toEntities(entityIds), Arrays.asList(NodeType.EDGE_GENE_CLUSTER, NodeType.EDGE_GENE_GENE));
 		assertEquals("network should have 6 nodes", 
 				6, network.getGraph().getVertexCount());		
 		assertEquals("network should have 11 edges", 

@@ -28,8 +28,8 @@ public final class DatasetSerializer extends JsonSerializer<Dataset> {
 		jg.writeStringField("id", ds.getId());
 		jg.writeStringField("name", ds.getName());
 		jg.writeStringField("description", ds.getDescription());
-		jg.writeStringField("networkType", ds.getNetworkType().toString());
-		jg.writeStringField("sourceReference", ds.getDatasetSource().toString());
+		jg.writeStringField("network_type", ds.getNetworkType().toString());
+		jg.writeStringField("source_ref", ds.getDatasetSource().toString());
 
 		// TODO: make taxon to be object list instead of string list
 		jg.writeFieldName("taxons");

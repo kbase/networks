@@ -19,7 +19,7 @@ public final class DatasetDeserializer extends JsonDeserializer<Dataset> {
 		JsonNode nameNode = root.path("name");
 		JsonNode descNode = root.path("description");
 		JsonNode networkTypeNode = root.path("networkType");
-		JsonNode datasetSourceNode = root.path("sourceReference");
+		JsonNode datasetSourceNode = root.path("sourceRef");
 		JsonNode taxonNode = root.path("taxons");
 		JsonNode propertiesNode = root.path("properties");
 		List<Taxon> tl = new ArrayList<Taxon>();

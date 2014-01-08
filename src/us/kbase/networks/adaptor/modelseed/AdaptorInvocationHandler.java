@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import us.kbase.networks.adaptor.Adaptor;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.Node;
 import us.kbase.networks.core.Taxon;
+import us.kbase.networks.adaptor.Adaptor;
 
 public class AdaptorInvocationHandler implements InvocationHandler{
 	private final String SOURCE_GENOME_ID = "kb|g.21765";

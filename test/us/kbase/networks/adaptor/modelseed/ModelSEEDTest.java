@@ -10,18 +10,19 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import us.kbase.networks.NetworksUtil;
-import us.kbase.networks.adaptor.Adaptor;
-import us.kbase.networks.adaptor.AdaptorException;
 import us.kbase.networks.core.Dataset;
 import us.kbase.networks.core.DatasetSource;
 import us.kbase.networks.core.Edge;
-import us.kbase.networks.core.EdgeType;
 import us.kbase.networks.core.Entity;
 import us.kbase.networks.core.Network;
 import us.kbase.networks.core.NetworkType;
 import us.kbase.networks.core.Node;
+import us.kbase.networks.core.NodeType;
 import us.kbase.networks.core.Taxon;
+import us.kbase.networks.NetworksUtil;
+import us.kbase.networks.adaptor.Adaptor;
+import us.kbase.networks.adaptor.AdaptorException;
+import us.kbase.networks.adaptor.modelseed.ModelSEEDAdaptorFactory;
 import edu.uci.ics.jung.graph.Graph;
 
 public class ModelSEEDTest {
@@ -136,7 +137,7 @@ public class ModelSEEDTest {
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
-		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), Entity.toEntity("kb|g.0.peg.3750"), Arrays.asList(EdgeType.GENE_GENE));
+		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), Entity.toEntity("kb|g.0.peg.3750"), Arrays.asList(NodeType.EDGE_GENE_GENE));
 		assertNotNull("Should get a network back", network);
 		Graph<Node,Edge> g = network.getGraph();
 		assertNotNull("Network should have graph", g);
@@ -149,7 +150,7 @@ public class ModelSEEDTest {
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
-		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), Entity.toEntity("kb|g.1870.peg.1847"), Arrays.asList(EdgeType.GENE_CLUSTER));
+		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), Entity.toEntity("kb|g.1870.peg.1847"), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertNotNull("Should get a network back", network);
 		Graph<Node,Edge> g = network.getGraph();
 		assertNotNull("Network should have graph", g);
@@ -162,7 +163,7 @@ public class ModelSEEDTest {
 		List<Dataset> datasets = adaptor.getDatasets(NetworkType.METABOLIC_SUBSYSTEM, DatasetSource.MODELSEED, ecoli);
 		assertNotNull("should return a list of Datasets", datasets);
 		assertTrue("list should contain at least one dataset", datasets.size() > 0);
-		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), Entity.toEntity("kb|subsystem.Acetyl-CoA fermentation to Butyrate"), Arrays.asList(EdgeType.GENE_CLUSTER));
+		Network network = adaptor.buildFirstNeighborNetwork(datasets.get(0), Entity.toEntity("kb|subsystem.Acetyl-CoA fermentation to Butyrate"), Arrays.asList(NodeType.EDGE_GENE_CLUSTER));
 		assertNotNull("Should get a network back", network);
 		Graph<Node,Edge> g = network.getGraph();
 		assertNotNull("Network should have graph", g);

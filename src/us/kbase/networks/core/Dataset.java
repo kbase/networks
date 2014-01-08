@@ -17,8 +17,8 @@ public class Dataset {
 	private String id;
 	private String name;
 	private String description;
-	
 	private NetworkType networkType;
+    
 	private DatasetSource datasetSource;
 	private List<Taxon> taxons;
 
