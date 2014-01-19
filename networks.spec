@@ -1,8 +1,8 @@
 /* 
-	Module Networks version 2.0
+	Module KBaseNetworks version 2.0
 	This module provides access to various types of network-related datasets across all domains of  in a unified format.
 
-	Networks are composed of Nodes and Edges. Nodes represent entities from the datasets (e.g., genes, proteins,
+	KBaseNetworks are composed of Nodes and Edges. Nodes represent entities from the datasets (e.g., genes, proteins,
 	biclusters, subystems, etc.), and edges represent relationships (e.g., protein-protein interactions,
 	gene-subsystem membership, etc.). Networks can contain Nodes and Edges from multiple datasets.
 
@@ -13,7 +13,7 @@
 	   For example: buildFirstNeighborNetwork(), buildInternalNetwork()
 */
 
-module Networks 
+module KBaseNetworks 
 {
 
 
