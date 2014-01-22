@@ -10,7 +10,8 @@ import org.junit.Test;
 
 public class NetworksClientTest {
 
-	String url = "http://127.0.0.1:1111";
+	//String url = "http://127.0.0.1:1111";
+	String url = "http://127.0.0.1:7064/KBaseNetworksService";
 	
 	KBaseNetworksClient networksAPI;
 

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="KBaseNetworksRPC" basedir="../" default="build">
+<project name="KBaseNetworksService" basedir="../" default="build">
     <property name="src.dir" value="src" />
     <property name="test.dir" value="test" />
     <property name="web.dir" value="WebContent" />
     <property name="build.dir" value="${basedir}/build" />
     <property name="dist.dir" value="${basedir}/dist" />
     <property name="server.lib" value="lib" />
-    <property name="name" value="KBaseNetworksRPC" />
+    <property name="jardir" location="../jars/lib/jars/"/>
+    <property name="name" value="KBaseNetworksService" />
 
     <path id="project-classpath">
 
@@ -17,6 +18,12 @@
     	<fileset dir="${basedir}/lib">
     		<include name="*.jar" />
     	</fileset>
+    	<fileset dir="${jardir}/">
+    		<include name="*/*.jar" />
+    	</fileset>
+    	<fileset dir="${jardir}/">
+    		<include name="kbase/*/*.jar" />
+    	</fileset>
     	<pathelement path="${build.dir}" />
     </path>
 
@@ -24,6 +31,10 @@
          <war destfile="${dist.dir}/${name}.war"
              webxml="${web.dir}/WEB-INF/web.xml">
              <lib dir="${basedir}/lib"/>
+             <lib dir="${jardir}">
+		<include name="*/*.jar"/>
+		<include name="kbase/*/*.jar"/>
+             </lib>
              <classes dir="${build.dir}/classes" />
 	     <fileset dir="${web.dir}">
 	       <include name="**/*.*"/>

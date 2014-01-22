@@ -281,7 +281,7 @@ deploy_config:
 	@CRT_XMX='$(shell $(GLASSFISH_HOME)/bin/asadmin  create-jvm-options -Xmx$(TARGET_XMX))'
 
 deploy_war:
-	$(GLASSFISH_HOME)/bin/asadmin deploy --force=true ./dist/KBaseNetworksRPC.war;\
+	$(GLASSFISH_HOME)/bin/asadmin deploy --force=true ./dist/KBaseNetworksService.war;\
 
 generate_script:
 	@echo 'sudo '$(GLASSFISH_HOME)'/bin/asadmin start-domain ' > $(TARGET)/services/$(SERVICE_NAME)/start_service
