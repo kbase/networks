@@ -7,11 +7,33 @@
     <property name="dist.dir" value="${basedir}/dist" />
     <property name="server.lib" value="lib" />
     <property name="jardir" location="../jars/lib/jars/"/>
-    <property name="name" value="KBaseNetworksService" />
+    <property name="name" value="KBaseNetworksRPC" />
 
     <path id="project-classpath">
 
     	<!--  here give path for jar repository -->
+        <fileset dir="${jardir}" id="serverlib">
+          <include name="apache_commons/*.jar"/>
+          <include name="jung/*.jar"/>
+          <include name="jackson/*.jar"/>
+          <include name="c3p0/*.jar"/>
+          <include name="mysql/mysql-connector-java-5.1.22-bin.jar"/>
+          <include name="kbase/cdmi/*.jar"/>
+          <include name="kbase/auth/*.jar"/>
+          <include name="ini4j/ini4j-0.5.2.jar"/>
+          <include name="jetty/jetty-all-7.0.0.jar"/>
+          <include name="jna/jna-3.4.0.jar"/>
+          <include name="servlet/servlet-api-2.5.jar"/>
+          <include name="syslog4j/syslog4j-0.9.46.jar"/>
+        </fileset>
+    	<fileset dir="${basedir}/lib/jars" id="localjars">
+    		<include name="*.jar" />
+    	</fileset>
+        <union id="serverside">
+          <fileset refid="serverlib"/>
+          <fileset refid="localjars"/>
+        </union>
+        <!--
     	<fileset dir="${server.lib}">
     		<include name="servlet*.jar" />
     	</fileset>
@@ -24,25 +46,36 @@
     	<fileset dir="${jardir}/">
     		<include name="kbase/*/*.jar" />
     	</fileset>
+        -->
     	<pathelement path="${build.dir}" />
     </path>
 
     <target name="build" depends="compile,compile-test" description="build project, but first compile it">
+         <mkdir dir="${web.dir}/WEB-INF/lib"/>
+         <copy todir="${web.dir}/WEB-INF/lib/" flatten="true">
+           <union refid="serverside"/>
+         </copy>
          <war destfile="${dist.dir}/${name}.war"
              webxml="${web.dir}/WEB-INF/web.xml">
-             <lib dir="${basedir}/lib"/>
+        <!--
+             <lib dir="${basedir}/lib">
+		<include name="*.jar"/>
+             </lib>
              <lib dir="${jardir}">
 		<include name="*/*.jar"/>
 		<include name="kbase/*/*.jar"/>
              </lib>
-             <classes dir="${build.dir}/classes" />
 	     <fileset dir="${web.dir}">
 	       <include name="**/*.*"/>
 	     </fileset>
-        </war>
         <copy todir="${web.dir}/WEB-INF/classes" >
             <fileset dir="${src.dir}" excludes="*/.java"/>
+            <fileset dir="${build.dir}/classes" />
         </copy>
+        -->
+             <classes dir="${build.dir}/classes" />
+             <lib dir="${web.dir}/WEB-INF/lib/"/>
+        </war>
         <!-- <exec executable="cp ${basedir}/${src.dir}/us/kbase/networks/core/ecoli_correspondence ${basedir}/${web.dir}/WEB-INF/classes/us/kbase/networks/core/" /> -->
     </target>
 

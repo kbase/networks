@@ -4,11 +4,11 @@ use Carp;
 
 =head1 NAME
 
-net_taxon_to_datasets - find a list of all datasets from a given taxon
+net-taxon-to-datasets - find a list of all datasets from a given taxon
 
 =head1 SYNOPSIS
 
-net_taxon_to_datasets [--url=http://kbase.us/services/networks]  < taxon_id
+net-taxon-to-datasets [--url=http://kbase.us/services/networks]  < taxon_id
 
 =head1 DESCRIPTION
 
@@ -38,9 +38,9 @@ print version information
 
 =head1 EXAMPLE
 
- echo "kb|g.3899" | net_taxon_to_datasets 
- net_taxon_to_datasets --help
- net_taxon_to_datasets --version
+ echo "kb|g.3899" | net-taxon-to-datasets 
+ net-taxon-to-datasets --help
+ net-taxon-to-datasets --version
 
 =head1 VERSION
 
@@ -52,7 +52,7 @@ print version information
 use Getopt::Long;
 use Bio::KBase::KBaseNetworksService::Client;
 
-my $usage = "Usage: net_taxon_to_datasets [--url=http://kbase.us/services/networks] < taxon_id\n";
+my $usage = "Usage: net-taxon-to-datasets [--url=http://kbase.us/services/networks] < taxon_id\n";
 
 my $url       = "http://kbase.us/services/networks";
 my $help       = 0;
@@ -63,12 +63,12 @@ GetOptions("help"       => \$help,
            "url=s"     => \$url) or die $usage;
 if($help){
 print "NAME\n";
-print "net_taxon_to_datasets  -- This command retrieves a list of datasets for input taxon_id. \n";
+print "net-taxon-to-datasets  -- This command retrieves a list of datasets for input taxon_id. \n";
 print "VERSION\n";
 print "1.0\n";
 print "\n";
 print "SYNOPSIS\n";
-print "net_taxon_to_datasets <--url URL> < taxon_id\n";
+print "net-taxon-to-datasets <--url URL> < taxon_id\n";
 print "\n";
 print "DESCRIPTION\n";
 print "INPUT:     The input for this command is a KBase genome ID (taxon_id) read from STDIN and the URL of the service.\n";
@@ -86,7 +86,7 @@ print "\n";
 print "\n";
 print "\n";
 print "EXAMPLES \n";
-print "echo 'kb|g.3899' | net_taxon_to_datasets\n";
+print "echo 'kb|g.3899' | net-taxon-to-datasets\n";
 print "\n";
 print "This example will list the datasets for a specific organism with taxon_id =kb|g.3899.\n";
 print "\n";
@@ -103,11 +103,11 @@ if($help)
 	print "\t--version\t\tprint version information\n";
 	print "\n";
 	print "Examples: \n";
-	print "echo 'kb|g.3899' | net_taxon_to_datasets\n";
+	print "echo 'kb|g.3899' | net-taxon-to-datasets\n";
 	print "\n";
-	print "net_taxon_to_datasets --help\tprint out help\n";
+	print "net-taxon-to-datasets --help\tprint out help\n";
 	print "\n";
-	print "net_taxon_to_datasets --version\tprint out version information\n";
+	print "net-taxon-to-datasets --version\tprint out version information\n";
 	print "\n";
 	print "Report bugs to kbase-networks\@lists.kbase.us\n";
 	exit(0);
@@ -115,7 +115,7 @@ if($help)
 
 if($version)
 {
-	print "net_taxon_to_datasets version 1.0\n";
+	print "net-taxon-to-datasets version 1.0\n";
 	print "Copyright (C) 2012 KBase Network Team\n";
 	print "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n";
 	print "This is free software: you are free to change and redistribute it.\n";
@@ -130,7 +130,7 @@ die $usage unless @ARGV == 0;
 my $oc = Bio::KBase::KBaseNetworksService::Client->new($url);
 my $input = <STDIN>;
 $input =~ s/\s+//g;
-my $results = $oc->taxon2Datasets($input);
+my $results = $oc->taxon2datasets($input);
 foreach my $rh (@{$results}) {
-  print $rh->{"id"}."\t".$rh->{'networkType'}."\t".$rh->{"sourceReference"}."\t".$rh->{"name"}."\t".$rh->{"description"}."\n";
+  print $rh->{"id"}."\t".$rh->{'network_type'}."\t".$rh->{"source_reference"}."\t".$rh->{"name"}."\t".$rh->{"description"}."\n";
 }

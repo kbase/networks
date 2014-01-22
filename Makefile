@@ -258,11 +258,12 @@ build-libs:
 	rm lib/Bio/KBase/$(SERVICE_NAME)/Service*;
 	rm lib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)Impl*;
 #		--scripts scripts \ # automatically generated scripts not working
+	gen_java_types -S -o . ./networks.spec
 
 all: build-libs
-	mkdir -p WebContent/WEB-INF/classes; cp -r src/us WebContent/WEB-INF/classes
+	mkdir -p WebContent/WEB-INF/classes; cp -r src/us WebContent/WEB-INF/classes; mkdir -p lib/jars;
+	cd src; jar cvf ../lib/jars/JDBCGenericAdaptorConfig.jar us/kbase/kbasenetworks/adaptor/jdbc/*.config
 	cd ./conf; $(ANT) build 
-	cd src; jar cvf ../lib/JDBCGenericAdaptorConfig.jar us/kbase/networks/adaptor/jdbc/*.config
 
 # Deploying a server refers to the deployment of ...{TODO}
 deploy-service: deploy-dir stop_domain1 start_domain1 deploy_config deploy_war generate_script deploy-scripts deploy-libs deploy-docs
@@ -281,7 +282,7 @@ deploy_config:
 	@CRT_XMX='$(shell $(GLASSFISH_HOME)/bin/asadmin  create-jvm-options -Xmx$(TARGET_XMX))'
 
 deploy_war:
-	$(GLASSFISH_HOME)/bin/asadmin deploy --force=true ./dist/KBaseNetworksService.war;\
+	$(GLASSFISH_HOME)/bin/asadmin deploy --force=true ./dist/KBaseNetworksRPC.war;\
 
 generate_script:
 	@echo 'sudo '$(GLASSFISH_HOME)'/bin/asadmin start-domain ' > $(TARGET)/services/$(SERVICE_NAME)/start_service

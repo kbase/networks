@@ -127,7 +127,7 @@ if($version)
 die $usage unless @ARGV == 0;
 
 my $oc = Bio::KBase::KBaseNetworksService::Client->new($url);
-my $results = $oc->allDatasetSources();
+my $results = $oc->all_dataset_sources();
 foreach my $rh (@{$results}) {
   print $rh->{"id"}."\t".$rh->{"name"}."\t".$rh->{"description"}."\n";
 }

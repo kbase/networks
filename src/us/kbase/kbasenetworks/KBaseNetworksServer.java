@@ -3,10 +3,6 @@ package us.kbase.kbasenetworks;
 import java.util.List;
 import us.kbase.common.service.JsonServerMethod;
 import us.kbase.common.service.JsonServerServlet;
-import us.kbase.kbasenetworks.Dataset;
-import us.kbase.kbasenetworks.DatasetSource;
-import us.kbase.kbasenetworks.Network;
-import us.kbase.kbasenetworks.NetworksService;
 
 //BEGIN_HEADER
 //END_HEADER
@@ -16,7 +12,7 @@ import us.kbase.kbasenetworks.NetworksService;
  * <pre>
  * Module KBaseNetworks version 2.0
  * This module provides access to various types of network-related datasets across all domains of  in a unified format.
- * Networks are composed of Nodes and Edges. Nodes represent entities from the datasets (e.g., genes, proteins,
+ * KBaseNetworks are composed of Nodes and Edges. Nodes represent entities from the datasets (e.g., genes, proteins,
  * biclusters, subystems, etc.), and edges represent relationships (e.g., protein-protein interactions,
  * gene-subsystem membership, etc.). Networks can contain Nodes and Edges from multiple datasets.
  * All methods in this module can be classified into two types: 
@@ -44,9 +40,9 @@ public class KBaseNetworksServer extends JsonServerServlet {
      * <pre>
      * Returns a list of all datasets that can be used to create a network
      * </pre>
-     * @return   parameter "datasets" of list of type {@link us.kbase.networks.Dataset Dataset}
+     * @return   parameter "datasets" of list of type {@link us.kbase.kbasenetworks.Dataset Dataset}
      */
-    @JsonServerMethod(rpc = "Networks.all_datasets")
+    @JsonServerMethod(rpc = "KBaseNetworks.all_datasets")
     public List<Dataset> allDatasets() throws Exception {
         List<Dataset> returnVal = null;
         //BEGIN all_datasets
@@ -60,9 +56,9 @@ public class KBaseNetworksServer extends JsonServerServlet {
      * <pre>
      * Returns a list of all dataset sources available in  via Networks API
      * </pre>
-     * @return   parameter "datasetSources" of list of type {@link us.kbase.networks.DatasetSource DatasetSource}
+     * @return   parameter "datasetSources" of list of type {@link us.kbase.kbasenetworks.DatasetSource DatasetSource}
      */
-    @JsonServerMethod(rpc = "Networks.all_dataset_sources")
+    @JsonServerMethod(rpc = "KBaseNetworks.all_dataset_sources")
     public List<DatasetSource> allDatasetSources() throws Exception {
         List<DatasetSource> returnVal = null;
         //BEGIN all_dataset_sources
@@ -78,7 +74,7 @@ public class KBaseNetworksServer extends JsonServerServlet {
      * </pre>
      * @return   parameter "networkTypes" of list of original type "network_type" (Type of network that can be created from a dataset)
      */
-    @JsonServerMethod(rpc = "Networks.all_network_types")
+    @JsonServerMethod(rpc = "KBaseNetworks.all_network_types")
     public List<String> allNetworkTypes() throws Exception {
         List<String> returnVal = null;
         //BEGIN all_network_types
@@ -94,9 +90,9 @@ public class KBaseNetworksServer extends JsonServerServlet {
      *            dataset_source_ref datasetSourceRef - A reference to a dataset source
      * </pre>
      * @param   sourceRef   instance of original type "dataset_source_ref" (The name of a dataset that can be accessed as a source for creating a network)
-     * @return   parameter "datasets" of list of type {@link us.kbase.networks.Dataset Dataset}
+     * @return   parameter "datasets" of list of type {@link us.kbase.kbasenetworks.Dataset Dataset}
      */
-    @JsonServerMethod(rpc = "Networks.dataset_source2datasets")
+    @JsonServerMethod(rpc = "KBaseNetworks.dataset_source2datasets")
     public List<Dataset> datasetSource2datasets(String sourceRef) throws Exception {
         List<Dataset> returnVal = null;
         //BEGIN dataset_source2datasets
@@ -112,9 +108,9 @@ public class KBaseNetworksServer extends JsonServerServlet {
      *        taxon taxon - NCBI taxonomy id
      * </pre>
      * @param   taxid   instance of original type "taxon" (NCBI taxonomy id)
-     * @return   parameter "datasets" of list of type {@link us.kbase.networks.Dataset Dataset}
+     * @return   parameter "datasets" of list of type {@link us.kbase.kbasenetworks.Dataset Dataset}
      */
-    @JsonServerMethod(rpc = "Networks.taxon2datasets")
+    @JsonServerMethod(rpc = "KBaseNetworks.taxon2datasets")
     public List<Dataset> taxon2datasets(String taxid) throws Exception {
         List<Dataset> returnVal = null;
         //BEGIN taxon2datasets
@@ -130,9 +126,9 @@ public class KBaseNetworksServer extends JsonServerServlet {
      *           network_type networkType - The type of network
      * </pre>
      * @param   netType   instance of original type "network_type" (Type of network that can be created from a dataset)
-     * @return   parameter "datasets" of list of type {@link us.kbase.networks.Dataset Dataset}
+     * @return   parameter "datasets" of list of type {@link us.kbase.kbasenetworks.Dataset Dataset}
      */
-    @JsonServerMethod(rpc = "Networks.network_type2datasets")
+    @JsonServerMethod(rpc = "KBaseNetworks.network_type2datasets")
     public List<Dataset> networkType2datasets(String netType) throws Exception {
         List<Dataset> returnVal = null;
         //BEGIN network_type2datasets
@@ -147,9 +143,9 @@ public class KBaseNetworksServer extends JsonServerServlet {
      * Returns a list of all datasets that have at least one interaction for a given  entity
      * </pre>
      * @param   entityId   instance of String
-     * @return   parameter "datasets" of list of type {@link us.kbase.networks.Dataset Dataset}
+     * @return   parameter "datasets" of list of type {@link us.kbase.kbasenetworks.Dataset Dataset}
      */
-    @JsonServerMethod(rpc = "Networks.entity2datasets")
+    @JsonServerMethod(rpc = "KBaseNetworks.entity2datasets")
     public List<Dataset> entity2datasets(String entityId) throws Exception {
         List<Dataset> returnVal = null;
         //BEGIN entity2datasets
@@ -171,9 +167,9 @@ public class KBaseNetworksServer extends JsonServerServlet {
      * @param   datasetIds   instance of list of String
      * @param   entityIds   instance of list of String
      * @param   edgeTypes   instance of list of original type "edge_type" (Type of edge in a network)
-     * @return   parameter "network" of type {@link us.kbase.networks.Network Network}
+     * @return   parameter "network" of type {@link us.kbase.kbasenetworks.Network Network}
      */
-    @JsonServerMethod(rpc = "Networks.build_first_neighbor_network")
+    @JsonServerMethod(rpc = "KBaseNetworks.build_first_neighbor_network")
     public Network buildFirstNeighborNetwork(List<String> datasetIds, List<String> entityIds, List<String> edgeTypes) throws Exception {
         Network returnVal = null;
         //BEGIN build_first_neighbor_network
@@ -198,9 +194,9 @@ public class KBaseNetworksServer extends JsonServerServlet {
      * @param   entityIds   instance of list of String
      * @param   edgeTypes   instance of list of original type "edge_type" (Type of edge in a network)
      * @param   cutOff   instance of Double
-     * @return   parameter "network" of type {@link us.kbase.networks.Network Network}
+     * @return   parameter "network" of type {@link us.kbase.kbasenetworks.Network Network}
      */
-    @JsonServerMethod(rpc = "Networks.build_first_neighbor_network_limted_by_strength")
+    @JsonServerMethod(rpc = "KBaseNetworks.build_first_neighbor_network_limted_by_strength")
     public Network buildFirstNeighborNetworkLimtedByStrength(List<String> datasetIds, List<String> entityIds, List<String> edgeTypes, Double cutOff) throws Exception {
         Network returnVal = null;
         //BEGIN build_first_neighbor_network_limted_by_strength
@@ -222,9 +218,9 @@ public class KBaseNetworksServer extends JsonServerServlet {
      * @param   datasetIds   instance of list of String
      * @param   geneIds   instance of list of String
      * @param   edgeTypes   instance of list of original type "edge_type" (Type of edge in a network)
-     * @return   parameter "network" of type {@link us.kbase.networks.Network Network}
+     * @return   parameter "network" of type {@link us.kbase.kbasenetworks.Network Network}
      */
-    @JsonServerMethod(rpc = "Networks.build_internal_network")
+    @JsonServerMethod(rpc = "KBaseNetworks.build_internal_network")
     public Network buildInternalNetwork(List<String> datasetIds, List<String> geneIds, List<String> edgeTypes) throws Exception {
         Network returnVal = null;
         //BEGIN build_internal_network
@@ -249,9 +245,9 @@ public class KBaseNetworksServer extends JsonServerServlet {
      * @param   geneIds   instance of list of String
      * @param   edgeTypes   instance of list of original type "edge_type" (Type of edge in a network)
      * @param   cutOff   instance of Double
-     * @return   parameter "network" of type {@link us.kbase.networks.Network Network}
+     * @return   parameter "network" of type {@link us.kbase.kbasenetworks.Network Network}
      */
-    @JsonServerMethod(rpc = "Networks.build_internal_network_limited_by_strength")
+    @JsonServerMethod(rpc = "KBaseNetworks.build_internal_network_limited_by_strength")
     public Network buildInternalNetworkLimitedByStrength(List<String> datasetIds, List<String> geneIds, List<String> edgeTypes, Double cutOff) throws Exception {
         Network returnVal = null;
         //BEGIN build_internal_network_limited_by_strength

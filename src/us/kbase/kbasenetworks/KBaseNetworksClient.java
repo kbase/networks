@@ -11,9 +11,9 @@ import us.kbase.common.service.JsonClientException;
 /**
  * <p>Original spec-file module name: KBaseNetworks</p>
  * <pre>
- * Module Networks version 2.0
+ * Module KBaseNetworks version 2.0
  * This module provides access to various types of network-related datasets across all domains of  in a unified format.
- * Networks are composed of Nodes and Edges. Nodes represent entities from the datasets (e.g., genes, proteins,
+ * KBaseNetworks are composed of Nodes and Edges. Nodes represent entities from the datasets (e.g., genes, proteins,
  * biclusters, subystems, etc.), and edges represent relationships (e.g., protein-protein interactions,
  * gene-subsystem membership, etc.). Networks can contain Nodes and Edges from multiple datasets.
  * All methods in this module can be classified into two types: 

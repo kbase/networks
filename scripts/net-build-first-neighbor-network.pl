@@ -158,19 +158,19 @@ $istr =~ s/[,]/ /g;
 @input = split /\s+/, $istr;          
 my @datasetIds = split/,/, $dataset_ids;
 my @edgeTypes = split/,/, $edge_types;
-my $results = $oc->buildFirstNeighborNetwork(\@datasetIds, \@input, \@edgeTypes);
+my $results = $oc->build_first_neighbor_network(\@datasetIds, \@input, \@edgeTypes);
 
 my %nodes = ();
 foreach my $hr (@{$results->{'nodes'}}) {
-  $nodes{$hr->{'id'}} = [$hr->{'entityId'}, $hr->{'name'}];
+  $nodes{$hr->{'id'}} = [$hr->{'entity_id'}, $hr->{'name'}];
 }
 foreach my $hr (@{$results->{'edges'}}) {
-  my $id1 = $nodes{$hr->{'nodeId1'}}[0];
-  my $id2 = $nodes{$hr->{'nodeId2'}}[0];
-  my $nm1 = $nodes{$hr->{'nodeId1'}}[1];
-  my $nm2 = $nodes{$hr->{'nodeId2'}}[1];
+  my $id1 = $nodes{$hr->{'node_id1'}}[0];
+  my $id2 = $nodes{$hr->{'node_id2'}}[0];
+  my $nm1 = $nodes{$hr->{'node_id1'}}[1];
+  my $nm2 = $nodes{$hr->{'node_id2'}}[1];
   my $strength = $hr->{'strength'};
-  my $ds  = $hr->{'datasetId'};
+  my $ds  = $hr->{'dataset_id'};
   my $enm = $hr->{'name'};
   print "$id1\t$id2\t$strength\t$ds\t$nm1\t$nm2\t$enm\n";
 }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app>
     <servlet>
-    <servlet-name>RootServlet</servlet-name>
-    <servlet-class>us.kbase.kbasenetworks.KBaseNetworksServer</servlet-class>
+        <servlet-name>KBaseNetworksRPC</servlet-name>
+        <servlet-class>us.kbase.kbasenetworks.KBaseNetworksServer</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>RootServlet</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <servlet-name>KBaseNetworksRPC</servlet-name>
+        <url-pattern>/networks</url-pattern>
     </servlet-mapping>
 </web-app>

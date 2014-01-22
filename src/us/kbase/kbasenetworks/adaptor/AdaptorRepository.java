@@ -18,13 +18,13 @@ public class AdaptorRepository {
 		
 		// microbial adaptors
 
-
 		registerAdaptor(new GenericAdaptorFactory("regprecise.config"));
 //		registerAdaptor(new ModelSEEDAdaptorFactory());
 		registerAdaptor(new GenericAdaptorFactory("cmonkey.config"));
 		registerAdaptor(new GenericAdaptorFactory("mak.config"));
+
 		// registerAdaptor(new GenericAdaptorFactory("ppi.config"));
-		registerAdaptor(new GenericAdaptorFactory("ppi-cs.config"));
+//		registerAdaptor(new GenericAdaptorFactory("ppi-cs.config"));
 		
 		// plant adaptors
 		

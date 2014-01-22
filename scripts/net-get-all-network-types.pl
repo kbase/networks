@@ -124,7 +124,7 @@ if($version)
 die $usage unless @ARGV == 0;
 
 my $oc = Bio::KBase::KBaseNetworksService::Client->new($url);
-my $results = $oc->allNetworkTypes();
+my $results = $oc->all_network_types();
 foreach my $rh (@{$results}) {
   print "$rh\n";
 }

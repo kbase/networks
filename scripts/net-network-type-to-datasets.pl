@@ -134,7 +134,7 @@ die $usage unless @ARGV == 0;
 my $oc = Bio::KBase::KBaseNetworksService::Client->new($url);
 my $input = <STDIN>;
 $input =~ s/\s+//g;
-my $results = $oc->networkType2Datasets($input);
+my $results = $oc->network_type2datasets($input);
 foreach my $rh (@{$results}) {
-  print $rh->{"id"}."\t".$rh->{'networkType'}."\t".$rh->{"sourceReference"}."\t".$rh->{"name"}."\t".$rh->{"description"}."\n";
+  print $rh->{"id"}."\t".$rh->{'network_type'}."\t".$rh->{"source_reference"}."\t".$rh->{"name"}."\t".$rh->{"description"}."\n";
 }
