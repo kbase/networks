@@ -21,9 +21,9 @@ public abstract  class AbstractAdaptor implements Adaptor{
 	protected AbstractAdaptor(Configuration config) throws AdaptorException
 	{
 		this.config = config;
-		System.out.print("Initializing adaptor: " + getClass().getName() + "...");
+		System.err.print("Initializing adaptor: " + getClass().getName() + "...");
 		init();
-		System.out.println("Done!");
+		System.err.println("Done!");
 	}
 	
 	protected abstract List<Dataset> loadDatasets() throws AdaptorException;

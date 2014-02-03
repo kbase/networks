@@ -17,9 +17,9 @@ public class Dataset {
 	private String id;
 	private String name;
 	private String description;
-	private NetworkType networkType;
+	private String networkType;
     
-	private DatasetSource datasetSource;
+	private String datasetSource;
 	private List<Taxon> taxons;
 
 	
@@ -36,7 +36,7 @@ public class Dataset {
 	}
 
 	public Dataset(String id, String name, String description,
-			NetworkType networkType, DatasetSource datasetSource,
+			String networkType, String datasetSource,
 			List<Taxon> taxons) {
 		super();
 		this.id = id;
@@ -48,7 +48,7 @@ public class Dataset {
 	}
 	
 	public Dataset(String id, String name, String description,
-			NetworkType networkType, DatasetSource datasetSource,
+			String networkType, String datasetSource,
 			Taxon taxon) {
 		super();
 		this.id = id;
@@ -99,12 +99,12 @@ public class Dataset {
 	}
 
 
-	public NetworkType getNetworkType() {
+	public String getNetworkType() {
 		return networkType;
 	}
 
 
-	public DatasetSource getDatasetSource() {
+	public String getDatasetSource() {
 		return datasetSource;
 	}
 

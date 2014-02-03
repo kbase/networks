@@ -90,8 +90,8 @@ public class GenericAdaptor extends AbstractAdaptor{
 				rs.getString(Term.FIELD_NAME_DATASET_ID),
 				rs.getString(Term.FIELD_NAME_DATASET_NAME),
 				rs.getString(Term.FIELD_NAME_DATASET_DESCRIPTION),
-				Enum.valueOf(NetworkType.class, rs.getString(Term.FIELD_NAME_DATASET_NETWORKTYPE)),
-				Enum.valueOf(DatasetSource.class, rs.getString(Term.FIELD_NAME_DATASET_SOURCEREFERENCE)),
+				rs.getString(Term.FIELD_NAME_DATASET_NETWORKTYPE),
+				rs.getString(Term.FIELD_NAME_DATASET_SOURCEREFERENCE),
 				buildTaxons(rs.getString(Term.FIELD_NAME_DATASET_TAXONS))
 			);	
 	}

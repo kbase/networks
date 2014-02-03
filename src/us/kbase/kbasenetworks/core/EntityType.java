@@ -12,7 +12,7 @@ public enum EntityType {
 	SUBSYSTEM(new String[]{"|subsystem."}),
 	
 	
-	CLUSTER(new String[]{"|cluster."}), 
+	CLUSTER(new String[]{"|cluster.", ".clst.", ".cluster."}), 
 	BICLUSTER(new String[]{"|bicluster."}), 
 	SUBSYSTEMCLUSTER(new String[]{"|subsystemcluster."}), 
 	UNKNOWN(new String[]{});

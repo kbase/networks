@@ -30,8 +30,8 @@ public final class DatasetDeserializer extends JsonDeserializer<Dataset> {
 		}
 		
 		Dataset result = new Dataset(idNode.asText(),nameNode.asText(), descNode.asText(), 
-				Enum.valueOf(NetworkType.class, networkTypeNode.asText()), 
-				Enum.valueOf(DatasetSource.class, datasetSourceNode.asText()), tl);
+				networkTypeNode.asText(), 
+				datasetSourceNode.asText(), tl);
 		
 		for(Iterator<String> it = propertiesNode.fieldNames(); it.hasNext(); ) {
 			String key = it.next();
