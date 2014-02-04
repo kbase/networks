@@ -60,6 +60,7 @@ public class NetworksService {
      **/
     public List<Dataset> datasetSource2Datasets(String datasetSourceRef) throws Exception
     {
+        /*
     	us.kbase.kbasenetworks.core.DatasetSource datasetSource = null;
     	try{
     		datasetSource =
@@ -68,9 +69,10 @@ public class NetworksService {
     	{
     		throw new Exception(datasetSourceRef + " is not a valid DatasetSource. Please use allDatasetSources() method to get a list of suuported DatasetSources.");
     	}
+        */
   
     		
-		List<us.kbase.kbasenetworks.core.Dataset> serverDatasets =  api.getDatasets(datasetSource);				
+		List<us.kbase.kbasenetworks.core.Dataset> serverDatasets =  api.getDatasetsDatasetSource(datasetSourceRef);				
 		return toClientDatasets(serverDatasets); 		
     }
 
@@ -84,6 +86,7 @@ public class NetworksService {
 
     public List<Dataset> networkType2Datasets(String networkTypeRef) throws Exception
     {
+        /*
     	NetworkType networkType = null;
     	try{
     		networkType = Enum.valueOf(NetworkType.class, networkTypeRef);
@@ -91,9 +94,10 @@ public class NetworksService {
 		{
 			throw new Exception(networkTypeRef + " is not a valid NetworkType. Please use allNetworkTypes() method to get a list of suuported NetworkTypes.");
 		}
+        */
     	
     	
-		List<us.kbase.kbasenetworks.core.Dataset> serverDatasets =  api.getDatasets(networkType);				
+		List<us.kbase.kbasenetworks.core.Dataset> serverDatasets =  api.getDatasetsNetworkType(networkTypeRef);				
 		return toClientDatasets(serverDatasets); 		
     }
 

@@ -11,17 +11,17 @@ import us.kbase.kbasenetworks.core.Taxon;
 
 public interface Adaptor {
 
-	public List<NetworkType> getNetworkTypes();
-	public List<DatasetSource> getDatasetSources();
+	public List<String> getNetworkTypes();
+	public List<String> getDatasetSources();
 	public List<Taxon> getTaxons();
 
 	
 	public List<Dataset> getDatasets();
 	
-	public List<Dataset> getDatasets(NetworkType networkType) throws AdaptorException;
-	public List<Dataset> getDatasets(DatasetSource datasetSource) throws AdaptorException;
+	public List<Dataset> getDatasetsNetworkType(String networkType) throws AdaptorException;
+	public List<Dataset> getDatasetsDatasetSource(String datasetSource) throws AdaptorException;
 	public List<Dataset> getDatasets(Taxon taxon) throws AdaptorException;
-	public List<Dataset> getDatasets(NetworkType networkType, DatasetSource datasetSource, Taxon taxon) throws AdaptorException;
+	public List<Dataset> getDatasets(String networkType, String datasetSource, Taxon taxon) throws AdaptorException;
 	
 	public boolean hasDataset(String datasetId) throws AdaptorException;	
 	public Dataset getDataset(String datasetId) throws AdaptorException;

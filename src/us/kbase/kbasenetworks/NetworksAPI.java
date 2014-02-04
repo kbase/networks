@@ -44,41 +44,42 @@ public class NetworksAPI {
 		return networksAPI;
 	}
 	
-	public List<NetworkType> getNetworkTypes()
+	public List<String> getNetworkTypes()
 	{		
-		HashSet<NetworkType> networkTypeSet = new HashSet<NetworkType>();
+		HashSet<String> networkTypeSet = new HashSet<String>();
 		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
 		{
 			networkTypeSet.addAll(adaptor.getNetworkTypes());
 		}		
-		List<NetworkType> networkTypes = new ArrayList<NetworkType>(networkTypeSet);
-		Collections.sort(networkTypes,  new Comparator<NetworkType>(){
+		List<String> networkTypes = new ArrayList<String>(networkTypeSet);
+		Collections.sort(networkTypes);/*,  new Comparator<NetworkType>(){
 
 			@Override
 			public int compare(NetworkType nt1, NetworkType nt2) {
 				return nt1.name().compareTo(nt2.name()); 
 			}
 		}); 
+                */
 		
 		return networkTypes;
 	}
 	
-	public List<DatasetSource> getDatasetSources()
+	public List<String> getDatasetSources()
 	{
-		HashSet<DatasetSource> datasetSourceSet = new HashSet<DatasetSource>();
+		HashSet<String> datasetSourceSet = new HashSet<String>();
 		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
 		{
 			datasetSourceSet.addAll(adaptor.getDatasetSources());
 		}
 		
-		List<DatasetSource> datasetSources = new ArrayList<DatasetSource>(datasetSourceSet);
-		Collections.sort(datasetSources,  new Comparator<DatasetSource>(){
+		List<String> datasetSources = new ArrayList<String>(datasetSourceSet);
+		Collections.sort(datasetSources);/*,  new Comparator<DatasetSource>(){
 
 			@Override
 			public int compare(DatasetSource ds1, DatasetSource ds2) {
 				return ds1.name().compareTo(ds2.name()); 
 			}
-		}); 
+		}); */
 		
 		return datasetSources;
 	}
@@ -104,22 +105,22 @@ public class NetworksAPI {
 		return datasets;
 	}
 	
-	public List<Dataset> getDatasets(us.kbase.kbasenetworks.core.NetworkType networkType) throws AdaptorException
+	public List<Dataset> getDatasetsNetworkType(String networkType) throws AdaptorException
 	{
 		List<Dataset> datasets = new Vector<Dataset>();
 		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
 		{
-			datasets.addAll(adaptor.getDatasets(networkType));
+			datasets.addAll(adaptor.getDatasetsNetworkType(networkType));
 		}		
 		return datasets;
 	}
 	
-	public List<Dataset> getDatasets(DatasetSource datasetSource) throws AdaptorException
+	public List<Dataset> getDatasetsDatasetSource(String datasetSource) throws AdaptorException
 	{
 		List<Dataset> datasets = new Vector<Dataset>();
 		for(Adaptor adaptor: adaptorRepository.getDataAdaptors())
 		{
-			datasets.addAll(adaptor.getDatasets(datasetSource));
+			datasets.addAll(adaptor.getDatasetsDatasetSource(datasetSource));
 		}		
 		return datasets;
 	}	

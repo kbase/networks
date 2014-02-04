@@ -54,11 +54,11 @@ public abstract  class AbstractAdaptor implements Adaptor{
 	}
 	
 	@Override
-	public List<Dataset> getDatasets(NetworkType networkType) {
+	public List<Dataset> getDatasetsNetworkType(String networkType) {
 		List<Dataset> datasets = new Vector<Dataset>();
 		for(Dataset ds: id2datasetHash.values())
 		{
-			if(ds.getNetworkType() == networkType)
+			if(ds.getNetworkType().equals(networkType))
 			{
 				datasets.add(ds);
 			}
@@ -67,11 +67,11 @@ public abstract  class AbstractAdaptor implements Adaptor{
 	}
 
 	@Override
-	public List<Dataset> getDatasets(DatasetSource datasetSource) {
+	public List<Dataset> getDatasetsDatasetSource(String datasetSource) {
 		List<Dataset> datasets = new Vector<Dataset>();
 		for(Dataset ds: id2datasetHash.values())
 		{
-			if(ds.getDatasetSource() == datasetSource)
+			if(ds.getDatasetSource().equals(datasetSource))
 			{
 				datasets.add(ds);
 			}
@@ -97,14 +97,14 @@ public abstract  class AbstractAdaptor implements Adaptor{
 	}
 
 	@Override
-	public List<Dataset> getDatasets(NetworkType networkType,
-			DatasetSource datasetSource, Taxon taxon) {
+	public List<Dataset> getDatasets(String networkType,
+			String datasetSource, Taxon taxon) {
 		
 		List<Dataset> datasets = new Vector<Dataset>();
 		for(Dataset ds: id2datasetHash.values())
 		{
-			if(ds.getDatasetSource() != datasetSource) continue;
-			if(ds.getNetworkType() != networkType) continue;
+			if(! ds.getDatasetSource().equals(datasetSource)) continue;
+			if(! ds.getNetworkType().equals( networkType)) continue;
 			
 			for(Taxon tx: ds.getTaxons())
 			{
@@ -119,24 +119,24 @@ public abstract  class AbstractAdaptor implements Adaptor{
 	}
 	
 	@Override
-	public List<NetworkType> getNetworkTypes()
+	public List<String> getNetworkTypes()
 	{
-		HashSet<NetworkType> networkTypes = new HashSet<NetworkType>();
+		HashSet<String> networkTypes = new HashSet<String>();
 		for(Dataset ds: getDatasets())
 		{
 			networkTypes.add(ds.getNetworkType());
 		}
-		return new ArrayList<NetworkType>(networkTypes);
+		return new ArrayList<String>(networkTypes);
 	}
 	
 	@Override
-	public List<DatasetSource> getDatasetSources() {
-		HashSet<DatasetSource> datasetSources = new HashSet<DatasetSource>();
+	public List<String> getDatasetSources() {
+		HashSet<String> datasetSources = new HashSet<String>();
 		for(Dataset ds: getDatasets())
 		{
 			datasetSources.add(ds.getDatasetSource());
 		}
-		return new ArrayList<DatasetSource>(datasetSources);
+		return new ArrayList<String>(datasetSources);
 	}
 	
 	@Override
