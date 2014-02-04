@@ -1,7 +1,8 @@
-#make sure that these two variables was set:
-#	JAVA_HOME=/kb/runtime/java
-#	GLASSFISH_HOME=/kb/runtime/glassfish3
+COMPILATION REQUIREMENTS:
+typecomp dev-prototypes branch
+java_type_generator dev branch
 
-# the above two variable is included in user-env.sh
-# Don't need to declare it any more as long as you source it
-
+MEMORY REQUIREMENTS:
+A minimum of 15GB of main meory is required. Currently the Makefile specifies 10GB.
+Generally speaking, the more memory the more stable. Multiple people trying to retrieve
+multiple large network objects may cause GC.
