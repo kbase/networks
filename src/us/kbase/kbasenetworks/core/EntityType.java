@@ -5,15 +5,15 @@ public enum EntityType {
 	GENE(new String[]{".CDS.", ".peg."}), 
 	PROTEIN(new String[]{}), 
 	OPERON(new String[]{}), 
-	PPI_COMPLEX(new String[]{"|ppi."}), 
+	PPI_COMPLEX(new String[]{}),//"|ppi."}), 
 	GENOME(new String[]{}), 
 	REGULON(new String[]{".regulon."}), 
 	REGULOME(new String[]{".regulome."}), 
 	SUBSYSTEM(new String[]{"|subsystem."}),
 	
 	
-	CLUSTER(new String[]{"|cluster.", ".clst.", ".cluster.", ".edge."}), 
-	BICLUSTER(new String[]{"|bicluster."}), 
+	CLUSTER(new String[]{"|cluster.", ".clst.", ".cluster.", ".edge.", "|ppi.", "|bicluster."}), 
+	BICLUSTER(new String[]{}),//"|bicluster."}), 
 	SUBSYSTEMCLUSTER(new String[]{"|subsystemcluster."}), 
 	UNKNOWN(new String[]{});
 

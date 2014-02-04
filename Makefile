@@ -71,7 +71,7 @@ default: all
 
 # Test Section
 
-test: test-client test-scripts test-service
+test: test-service
 	@echo "running client and script tests"
 
 # test-all is deprecated. 
