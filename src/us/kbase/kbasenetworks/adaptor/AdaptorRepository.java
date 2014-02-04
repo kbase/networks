@@ -15,25 +15,27 @@ public class AdaptorRepository {
 	private AdaptorRepository() throws AdaptorException
 	{
 		// Register all adaptors; property file in the future
+		registerAdaptor(new GenericAdaptorFactory("cdmi.config"));
+		
 		
 		// microbial adaptors
 
-		registerAdaptor(new GenericAdaptorFactory("regprecise.config"));
+		//registerAdaptor(new GenericAdaptorFactory("regprecise.config"));
 //		registerAdaptor(new ModelSEEDAdaptorFactory());
-		registerAdaptor(new GenericAdaptorFactory("cmonkey.config"));
-		registerAdaptor(new GenericAdaptorFactory("mak.config"));
+		//registerAdaptor(new GenericAdaptorFactory("cmonkey.config"));
+		//registerAdaptor(new GenericAdaptorFactory("mak.config"));
 
 		// registerAdaptor(new GenericAdaptorFactory("ppi.config"));
 //		registerAdaptor(new GenericAdaptorFactory("ppi-cs.config"));
 		
 		// plant adaptors
 		
-		registerAdaptor(new GenericAdaptorFactory("plant-cc.config"));		
-		registerAdaptor(new GenericAdaptorFactory("plant-cn.config"));
-		registerAdaptor(new GenericAdaptorFactory("plant-fn.config"));
-		registerAdaptor(new GenericAdaptorFactory("plant-gp.config"));
-		registerAdaptor(new GenericAdaptorFactory("plant-ppip.config"));
-		registerAdaptor(new GenericAdaptorFactory("plant-rn.config"));
+		//registerAdaptor(new GenericAdaptorFactory("plant-cc.config"));		
+		//registerAdaptor(new GenericAdaptorFactory("plant-cn.config"));
+		//registerAdaptor(new GenericAdaptorFactory("plant-fn.config"));
+		//registerAdaptor(new GenericAdaptorFactory("plant-gp.config"));
+		//registerAdaptor(new GenericAdaptorFactory("plant-ppip.config"));
+		//registerAdaptor(new GenericAdaptorFactory("plant-rn.config"));
 		// registerAdaptor(new GenericAdaptorFactory("plant-ppi-ga.config"));
 		
 		// communities adaptors
