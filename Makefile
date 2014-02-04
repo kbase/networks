@@ -16,7 +16,7 @@ SERVICE_PORT = 7064
 ANT=ant
 
 #java -Xmx option for glassfish
-TARGET_XMX = 4096m
+TARGET_XMX = 10240m
 CURRENT_XMX = `$(GLASSFISH_HOME)/bin/asadmin list-jvm-options | grep Xmx`
 
 # it's in dev_container/bootstrap script, please `source /kb/dev_container/user-env.sh`
