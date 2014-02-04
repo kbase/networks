@@ -44,13 +44,13 @@ public class NetworksService {
 
 	public List<DatasetSource> allDatasetSources() throws Exception
     {
-		List<us.kbase.kbasenetworks.core.DatasetSource> serverDatasetSources =  api.getDatasetSources();
+		List<String> serverDatasetSources =  api.getDatasetSources();
 		return toClientDatasetSources(serverDatasetSources);
     }
 
 	public List<String> allNetworkTypes() throws Exception
     {
-		List<NetworkType> serverNetworkTypes =  api.getNetworkTypes();
+		List<String> serverNetworkTypes =  api.getNetworkTypes();
 		return toClientNetworkTypes(serverNetworkTypes);
     }
 
@@ -198,13 +198,27 @@ public class NetworksService {
     
     @SuppressWarnings("unchecked")
 	private List<DatasetSource> toClientDatasetSources(
-			List<us.kbase.kbasenetworks.core.DatasetSource> serverDatasetSources) throws JsonParseException, JsonMappingException, IOException {
+			List<String> serverDatasetSources) throws JsonParseException, JsonMappingException, IOException {
+		 
     	
-		return 	(List<DatasetSource>) m.readValue( toJson(serverDatasetSources) , new TypeReference<List<DatasetSource>>() {}); 
+		// TODO: temporary solution
+		StringBuffer sb = new StringBuffer();
+		boolean first = true;
+                for( String src : serverDatasetSources) {
+			if(first) {
+				sb.append("[");
+			} else {
+				sb.append(",");
+			}
+			sb.append("{ \"id\" : \"" + src + "\", \"name\" : \" \", \"reference\" : \""+src+"\", \"resource_url\" : \"\"}");
+			first = false;
+		}
+		sb.append("]");
+		return 	(List<DatasetSource>) m.readValue( sb.toString() , new TypeReference<List<DatasetSource>>() {}); 
 	}
 	
     @SuppressWarnings("unchecked")
-	private List<String> toClientNetworkTypes(List<us.kbase.kbasenetworks.core.NetworkType> serverNetworkTypes) throws JsonParseException, JsonMappingException, IOException {
+	private List<String> toClientNetworkTypes(List<String> serverNetworkTypes) throws JsonParseException, JsonMappingException, IOException {
     	
 		return 	(List<String>) m.readValue( toJson(serverNetworkTypes) , new TypeReference<List<String>>() {}); 
 	}
