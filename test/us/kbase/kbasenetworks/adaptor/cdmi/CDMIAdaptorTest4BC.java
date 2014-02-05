@@ -28,7 +28,8 @@ public class CDMIAdaptorTest4BC {
 
 	static Adaptor adaptor;
 	
-	final Taxon taxon = new Taxon("kb|g.3562");
+//	final Taxon taxon = new Taxon("kb|g.3562");
+	final Taxon taxon = new Taxon("kb|g.371");
 	
 	final String datasetId = "kb|biclusterset.23";
 	final String badDatasetId = "kb|g.3899.nds.abcd";
