@@ -58,8 +58,8 @@ public class NetworksUtil {
 		for(Dataset dataset: datasets)
 		{
 			System.out.println(dataset.getId() 
-					+ "\t" + dataset.getNetworkType().getName()
-					+ "\t" + dataset.getDatasetSource().getName()
+					+ "\t" + dataset.getNetworkType()
+					+ "\t" + dataset.getDatasetSource()
 					+ "\t" + dataset.getName()
 					);
 		}		

@@ -1,5 +1,6 @@
 package us.kbase.kbasenetworks;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -8,13 +9,65 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import us.kbase.common.service.JsonClientException;
+import us.kbase.kbasenetworks.core.Taxon;
+
 public class NetworksClientTest {
 
-	//String url = "http://127.0.0.1:1111";
-	String url = "http://127.0.0.1:7064/KBaseNetworksService";
+	String url = "http://127.0.0.1:1111";
+	//String url = "http://127.0.0.1:7064/KBaseNetworksService";
 	
 	KBaseNetworksClient networksAPI;
 
+	static class RegulomeData{
+		static final Taxon taxon = new Taxon("kb|g.3574");
+		
+		static final String datasetId = "kb|g.3574.regulome.0";
+		static final String badDatasetId = "kb|g.3899.nds.abcd";
+
+		static final String geneId = "kb|g.3574.peg.200";
+		static final String clusterId = "kb|g.3574.regulon.56";
+		
+		static final List<String> geneIds = Arrays.asList(
+				"kb|g.3574.peg.200", 
+				"kb|g.3574.peg.2438", 
+				"kb|g.3574.peg.603" 
+				);		
+		
+		static final List<String> clusterIds =  Arrays.asList(
+				"kb|g.3574.regulon.56", 
+				"kb|g.3574.regulon.57");
+
+		static final String dataSourceName = "REGPRECISE_CURATED 3.0";
+		static final String networkTypeName = "REGULATORY_NETWORK";		
+	};
+	
+	
+	
+    static class PlantData{
+    	static final Taxon taxon = new Taxon("kb|g.3899");
+		
+		static final String datasetId = "kb|g.3899.nds.12";
+		static final String badDatasetId = "kb|g.3899.nds.abcd";
+
+		static final String geneId = "kb|g.3899.CDS.69528";
+		static final String clusterId = "kb|g.3899.nds.12.edge.93313";
+		
+		
+		static final List<String> geneIds = Arrays.asList(
+				"kb|g.3899.CDS.68927", 
+				"kb|g.3899.CDS.43764", 
+				"kb|g.3899.CDS.66599",
+				"kb|g.3899.CDS.55077", 
+				"kb|g.3899.CDS.44955");		
+		
+		static final List<String> clusterIds =  Arrays.asList(
+				"kb|g.3899.nds.12.edge.93313", 
+				"kb|g.3899.nds.12.edge.830647", 
+				"kb|g.3899.nds.12.edge.831542", 
+				"kb|g.3899.nds.12.edge.832046", 
+				"kb|g.3899.nds.12.edge.832205" );     		
+	};  	
 
     @Before
     public void setUp() throws Exception {
@@ -24,116 +77,6 @@ public class NetworksClientTest {
     @After
     public void tearDown() throws Exception {
     }
-   
-    @Test
-    public void testUseCase4Shiran1() throws Exception {
-
-        Network network = networksAPI.buildFirstNeighborNetwork(
-                Arrays.asList(
-                        "kb|netdataset.regprecise.1"
-//                        ,"kb|dataset.mak2"
-                        ,"kb|dataset.mak4"
-                ),
-                                
-                Arrays.asList("kb|g.20848.CDS.837", "kb|g.20848.CDS.3186", "kb|g.20848.CDS.537"), 
-                Arrays.asList("GENE_CLUSTER"));
-
-        NetworksClientUtil.printNetwork(network);
-        NetworksClientUtil.visualizeNetwork(network);
-        System.out.println();    
-    }
-    
-    
-   @Test
-    public void testUseCase4Shiran() throws Exception {
-
-        Network network = networksAPI.buildFirstNeighborNetwork(
-                Arrays.asList(
-                        "kb|netdataset.regprecise.1"
-//                        "kb|dataset.mak2"
-                        ,"kb|dataset.mak4"
-                ),
-                                
-                Arrays.asList("kb|g.20848.CDS.837", "kb|g.20848.CDS.3186", "kb|g.20848.CDS.537"), //, "kb|g.20848.regulon.5239"
-                Arrays.asList("GENE_CLUSTER"));
-
-        NetworksClientUtil.printNetwork(network);
-        NetworksClientUtil.visualizeNetwork(network);
-        System.out.println();
-        
-/*        
-        network = networksAPI.buildFirstNeighborNetwork(
-                Arrays.asList(
-                		"kb|netdataset.regprecise.301",
-                        "kb|netdataset.modelseed.1697",
-                        "kb|netdataset.ppi.7"
-                ),
-                                
-                Arrays.asList("kb|g.1870.peg.3322", "kb|g.1870.peg.1532", "kb|g.1870.peg.2087"), //, "kb|g.20848.regulon.5239"
-                Arrays.asList("GENE_CLUSTER"));
-
-        ClientNetworksUtil.printNetwork(network);
-        ClientNetworksUtil.visualizeNetwork(network);
-        System.out.println();        
-        
-        network = networksAPI.buildFirstNeighborNetwork(
-                Arrays.asList(
-                		"kb|netdataset.regprecise.301",
-                        "kb|netdataset.modelseed.1697",
-                        "kb|netdataset.ppi.7"
-                ),
-                                
-                Arrays.asList("kb|g.1870.peg.3322", "kb|g.1870.peg.1532", "kb|g.1870.peg.2087"), //, "kb|g.20848.regulon.5239"
-                Arrays.asList("GENE_GENE"));
-
-        ClientNetworksUtil.printNetwork(network);
-        ClientNetworksUtil.visualizeNetwork(network);
-*/        
-        System.out.println();                   
-    }  
-    
-     
-    //@Test
-    public void testUseCase4Shiran2() throws Exception {
-
-    	Network network = networksAPI.buildFirstNeighborNetwork(
-                Arrays.asList(
-//                        "kb|netdataset.regprecise.301",
-                        "kb|netdataset.modelseed.1697"
-//                        "kb|netdataset.ppi.7"
-                ),
-                        
-                Arrays.asList("kb|subsystem.Butanol Biosynthesis"),
-//                Arrays.asList("kb|g.1870.peg.1847"), //, "kb|g.20848.regulon.5239"
-                //Arrays.asList("kb|subsystem.Nitrate and nitrite ammonification"),
-                //Arrays.asList("kb|subsystem.Fatty acid degradation regulons"), //, "kb|g.20848.regulon.5239"
-                Arrays.asList("GENE_CLUSTER"));
-
-        NetworksClientUtil.printNetwork(network);
-        NetworksClientUtil.visualizeNetwork(network);
-        System.out.println();
-    }
-    
-    
-    //@Test
-    public void testMetagenomes() throws Exception {
-
-    	List<Dataset> datasets = networksAPI.entity2datasets("kb|subsystem.Serine-glyoxylate_cycle");
-        NetworksClientUtil.printDatasets("=========", datasets);
-
-    	
-    	Network network = networksAPI.buildFirstNeighborNetwork(
-                Arrays.asList(
-                        datasets.get(0).getId()
-                ),
-                        
-                Arrays.asList("kb|subsystem.Serine-glyoxylate_cycle"),
-                Arrays.asList("SUBSYSTEM_CLUSTER"));    	
-        NetworksClientUtil.printNetwork(network);
-        NetworksClientUtil.visualizeNetwork(network);
-        System.out.println();
-    }
-    
     
     @Test
     public void testAllDatasets() throws Exception {
@@ -155,53 +98,31 @@ public class NetworksClientTest {
         System.out.println("testAllNetworkTypes");
         List<String> networkTypes = networksAPI.allNetworkTypes();
         printStrings("testAllNetworkTypes", networkTypes);
-    }
-
-
+    }  	
+    
     @Test
-    public void testPlantNetworks() throws Exception {
-        System.out.println("testAllNetworkTypes");
+    public void testInternalNetworks() throws Exception {
+    	
+    	
+        System.out.println("testPlantNetworks");
         Network network = networksAPI.buildInternalNetwork(
-        		Arrays.asList("kb|netdataset.plant.fn.25","kb|netdataset.plant.cn.6"),
-        		Arrays.asList("kb|g.3899.locus.10", "kb|g.3899.locus.11", "kb|g.3899.locus.28905", "kb|g.3899.locus.24583"), 
+        		Arrays.asList(RegulomeData.datasetId),
+        		RegulomeData.geneIds, 
         		Arrays.asList("GENE_GENE"));
         NetworksClientUtil.printNetwork(network);
         NetworksClientUtil.visualizeNetwork(network);
         
-        
-        network = networksAPI.buildInternalNetworkLimitedByStrength(
-        		Arrays.asList("kb|netdataset.plant.fn.25","kb|netdataset.plant.cn.6"),
-        		Arrays.asList("kb|g.3899.locus.10","kb|g.3899.locus.11","kb|g.3899.locus.28905","kb|g.3899.locus.24583"), 
-        		Arrays.asList("GENE_GENE"), 0d);
-        NetworksClientUtil.printNetwork(network);
-        NetworksClientUtil.visualizeNetwork(network);
-        
-        
-        
         System.out.println();                   
+    }    
+    
+    @Test
+    public void testDataSources() throws IOException, JsonClientException{
+    	for(DatasetSource ds: networksAPI.allDatasetSources()){
+    		System.out.println(ds.getName());
+    	}
+    	
     }
     
-    	
-    	
-    	
-    
-    //@Test
-    public void testDatasetSources2Datasets() throws Exception {
-        System.out.println("testDatasetSources2Datasets");
-        //String[] sources = new String[]{"AGRIS", "ARANET", "GEO", "INTACT", "PLANTCYC", "POPNET","KEGG"};
-        //String[] sources = new String[]{"PPI", "REGPRECISE", "CMONKEY", "ECOCYC", "MAK_BICLUSTER", "MO", "MODELSEED"};
-        //String[] sources = new String[]{"MG_RAST"};
-        String[] sources = new String[]{"REGPRECISE"};
-        
-        int count = 0;
-        for(String source: sources)
-        {
-            List<Dataset> datasets = networksAPI.datasetSource2datasets(source);
-            count += datasets.size();        	
-        }
-        System.out.println("Count = " + count);
-    }
-
     
     //@Test
     public void testDatasetSource2DatasetsModelSEED() throws Exception {

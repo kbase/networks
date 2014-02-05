@@ -3,10 +3,8 @@ package us.kbase.kbasenetworks.adaptor;
 import java.util.List;
 
 import us.kbase.kbasenetworks.core.Dataset;
-import us.kbase.kbasenetworks.core.DatasetSource;
 import us.kbase.kbasenetworks.core.Entity;
 import us.kbase.kbasenetworks.core.Network;
-import us.kbase.kbasenetworks.core.NetworkType;
 import us.kbase.kbasenetworks.core.Taxon;
 
 public interface Adaptor {

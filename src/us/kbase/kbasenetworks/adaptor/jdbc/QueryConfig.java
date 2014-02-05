@@ -103,7 +103,6 @@ public class QueryConfig{
 		boolean isPrepared = prepareConfiguration(propertiesArguments);
 		if(!isPrepared) return null;
 		PreparedStatement pst = connection.prepareStatement(preparedSql);
-		
 		for(QueryPropertyArguments propertyArguments: propertiesArguments){
 			
 			QueryProperty queryProperty = getQueryProperty(propertyArguments.properyPrefix);

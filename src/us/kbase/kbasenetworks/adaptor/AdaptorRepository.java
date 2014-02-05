@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Vector;
 
 import us.kbase.kbasenetworks.adaptor.jdbc.GenericAdaptorFactory;
-import us.kbase.kbasenetworks.adaptor.modelseed.ModelSEEDAdaptorFactory;
 
 public class AdaptorRepository {
 	
@@ -16,6 +15,7 @@ public class AdaptorRepository {
 	{
 		// Register all adaptors; property file in the future
 		registerAdaptor(new GenericAdaptorFactory("cdmi.config"));
+		registerAdaptor(new GenericAdaptorFactory("cdm_regulome.config"));
 		
 		
 		// microbial adaptors

@@ -11,19 +11,17 @@ import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
 
+import us.kbase.kbasenetworks.adaptor.AbstractAdaptor;
+import us.kbase.kbasenetworks.adaptor.AdaptorException;
+import us.kbase.kbasenetworks.adaptor.IdGenerator;
 import us.kbase.kbasenetworks.core.Dataset;
-import us.kbase.kbasenetworks.core.DatasetSource;
 import us.kbase.kbasenetworks.core.Edge;
 import us.kbase.kbasenetworks.core.Entity;
 import us.kbase.kbasenetworks.core.EntityType;
 import us.kbase.kbasenetworks.core.Network;
-import us.kbase.kbasenetworks.core.NetworkType;
 import us.kbase.kbasenetworks.core.Node;
 import us.kbase.kbasenetworks.core.NodeType;
 import us.kbase.kbasenetworks.core.Taxon;
-import us.kbase.kbasenetworks.adaptor.AbstractAdaptor;
-import us.kbase.kbasenetworks.adaptor.AdaptorException;
-import us.kbase.kbasenetworks.adaptor.IdGenerator;
 
 import com.mchange.v2.c3p0.C3P0ProxyConnection;
 

@@ -9,8 +9,6 @@ import java.util.Vector;
 import org.apache.commons.configuration.Configuration;
 
 import us.kbase.kbasenetworks.core.Dataset;
-import us.kbase.kbasenetworks.core.DatasetSource;
-import us.kbase.kbasenetworks.core.NetworkType;
 import us.kbase.kbasenetworks.core.Taxon;
 
 public abstract  class AbstractAdaptor implements Adaptor{
