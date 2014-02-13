@@ -6,8 +6,8 @@ TOOLS_DIR = $(TOP_DIR)/tools
 #	JAVA_HOME
 #	GLASSFISH_HOME
 TOP_DIR = ../..
-DEPLOY_RUNTIME = /kb/runtime
-TARGET = /kb/deployment
+DEPLOY_RUNTIME ?= /kb/runtime
+TARGET ?= /kb/deployment
 SERVICE_SPEC = kbase_network.spec
 SERVICE_NAME = KBaseNetworksService
 SERVICE_DIR = $(TARGET)/services/$(SERVICE_NAME)
