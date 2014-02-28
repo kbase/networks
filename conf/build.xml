@@ -81,7 +81,7 @@
 
     <target name="compile" description="Compile java files and place them webContents/web-inf/">
     	<mkdir dir="${build.dir}/classes"/>
-        <javac destdir="${build.dir}/classes" failonerror="true" includeantruntime="false">
+        <javac destdir="${build.dir}/classes" failonerror="true" includeantruntime="false" target="1.6" source="1.6" debug="true">
             <src path="${src.dir}"/>
             <classpath refid="project-classpath"/>
         </javac>
@@ -92,7 +92,7 @@
 
     <target name="compile-test" description="Compile java test files">
     	<mkdir dir="${build.dir}/classes"/>
-        <javac destdir="${build.dir}/classes" failonerror="true" includeantruntime="false">
+        <javac destdir="${build.dir}/classes" failonerror="true" includeantruntime="false" target="1.6" source="1.6" debug="true">
             <src path="${test.dir}"/>
             <classpath refid="project-classpath"/>
         </javac>
