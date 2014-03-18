@@ -245,7 +245,7 @@ compile-docs: build-libs
 # control repository (ie cvs, git). It also ensures that you always
 # have the most  up-to-date libs and documentation if your compile
 # docs depends on the compiled libs.
-build-libs:
+build-libs-dev:
 	mkdir -p scripts 
 	compile_typespec \
 		--impl Bio::KBase::$(SERVICE_NAME)::$(SERVICE_NAME)Impl \
@@ -264,6 +264,13 @@ all: build-libs
 	mkdir -p WebContent/WEB-INF/classes; cp -r src/us WebContent/WEB-INF/classes; mkdir -p lib/jars;
 	cd src; jar cvf ../lib/jars/JDBCGenericAdaptorConfig.jar us/kbase/kbasenetworks/adaptor/jdbc/*.config
 	cd ./conf; $(ANT) build 
+
+
+build-libs:
+	mkdir -p scripts 
+	# we only need client libraries
+	rm lib/Bio/KBase/$(SERVICE_NAME)/Service*;
+	rm lib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)Impl*;
 
 # Deploying a server refers to the deployment of ...{TODO}
 deploy-service: deploy-dir stop_domain1 start_domain1 deploy_config deploy_war generate_script deploy-scripts deploy-libs deploy-docs
