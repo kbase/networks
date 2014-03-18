@@ -268,9 +268,6 @@ all: build-libs
 
 build-libs:
 	mkdir -p scripts 
-	# we only need client libraries
-	rm lib/Bio/KBase/$(SERVICE_NAME)/Service*;
-	rm lib/Bio/KBase/$(SERVICE_NAME)/$(SERVICE_NAME)Impl*;
 
 # Deploying a server refers to the deployment of ...{TODO}
 deploy-service: deploy-dir stop_domain1 start_domain1 deploy_config deploy_war generate_script deploy-scripts deploy-libs deploy-docs
