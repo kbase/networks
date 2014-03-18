@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Vector;
 
 import us.kbase.kbasenetworks.adaptor.jdbc.GenericAdaptorFactory;
+import us.kbase.kbasenetworks.adaptor.modelseed.ModelSEEDAdaptorFactory;
 
 public class AdaptorRepository {
 	
@@ -14,8 +15,7 @@ public class AdaptorRepository {
 	private AdaptorRepository() throws AdaptorException
 	{
 		// Register all adaptors; property file in the future
-		registerAdaptor(new GenericAdaptorFactory("cdmi.config"));
-		registerAdaptor(new GenericAdaptorFactory("cdm_regulome.config"));
+		//registerAdaptor(new GenericAdaptorFactory("cdmi.config"));
 		
 		
 		// microbial adaptors
@@ -30,13 +30,13 @@ public class AdaptorRepository {
 		
 		// plant adaptors
 		
-		//registerAdaptor(new GenericAdaptorFactory("plant-cc.config"));		
-		//registerAdaptor(new GenericAdaptorFactory("plant-cn.config"));
-		//registerAdaptor(new GenericAdaptorFactory("plant-fn.config"));
-		//registerAdaptor(new GenericAdaptorFactory("plant-gp.config"));
-		//registerAdaptor(new GenericAdaptorFactory("plant-ppip.config"));
-		//registerAdaptor(new GenericAdaptorFactory("plant-rn.config"));
-		// registerAdaptor(new GenericAdaptorFactory("plant-ppi-ga.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-cc.config"));		
+		registerAdaptor(new GenericAdaptorFactory("plant-cn.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-fn.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-gp.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-ppip.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-rn.config"));
+		registerAdaptor(new GenericAdaptorFactory("plant-ppi-ga.config"));
 		
 		// communities adaptors
 /*		

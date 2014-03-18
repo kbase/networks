@@ -103,8 +103,8 @@ public class ModelSEEDAdaptor extends AbstractAdaptor {
 						IdGenerator.Dataset.toKBaseId(ADAPTOR_PREFIX, localId),
 						name, 
 						"Subsystems for " + name + " genome.", 
-						NetworkType.METABOLIC_SUBSYSTEM, 
-						DatasetSource.MODELSEED, taxons));
+						"METABOLIC_SUBSYSTEM", 
+						"MODELSEED", taxons));
 			}	
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
