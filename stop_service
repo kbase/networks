@@ -1,5 +1,6 @@
 #!/bin/sh
 
+export GLASSFISH_HOME=$KB_RUNTIME/glassfish3
 ASA=$GLASSFISH_HOME/bin/asadmin
 DOMAIN=domain1
 DOMAINDIR=$(dirname $0)/glassfish
