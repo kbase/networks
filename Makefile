@@ -15,12 +15,7 @@ SERVICE_PORT = 7064
 #Apache ANT compiler
 ANT=ant
 
-#java -Xmx option for glassfish
-TARGET_XMX = 10240m
-CURRENT_XMX = `$(GLASSFISH_HOME)/bin/asadmin list-jvm-options | grep Xmx`
-
 # it's in dev_container/bootstrap script, please `source /kb/dev_container/user-env.sh`
-#GLASSFISH_HOME = $(DEPLOY_RUNTIME)/glassfish3 
 
 #include $(TOP_DIR)/tools/Makefile.common
 
@@ -212,6 +207,9 @@ deploy-libs:
 deploy-dir:
 	if [ ! -d $(SERVICE_DIR) ] ; then mkdir $(SERVICE_DIR) ; fi
 	if [ ! -d $(SERVICE_DIR)/webroot ] ; then mkdir $(SERVICE_DIR)/webroot ; fi
+	@cp ./dist/KBaseNetworksRPC.war $(SERVICE_DIR)/
+	@cp start_service $(TARGET)/services/$(SERVICE_NAME)/start_service
+	@cp stop_service $(TARGET)/services/$(SERVICE_NAME)/stop_service
 
 # Deploying docs here refers to the deployment of documentation
 # of the API. We'll include a description of deploying documentation
@@ -270,29 +268,8 @@ build-libs:
 	mkdir -p scripts 
 
 # Deploying a server refers to the deployment of ...{TODO}
-deploy-service: deploy-dir stop_domain1 start_domain1 deploy_config deploy_war generate_script deploy-scripts deploy-libs deploy-docs
-
-stop_domain1:
-	$(GLASSFISH_HOME)/bin/asadmin stop-domain 
-
-start_domain1:
-	@START_RESULT='$(shell $(GLASSFISH_HOME)/bin/asadmin start-domain | grep successfully)'
-
-deploy_config:
-	@DEL_NET='$(shell $(GLASSFISH_HOME)/bin/asadmin delete-network-listener http-listener-1)'
-	@DEL_PROT='$(shell $(GLASSFISH_HOME)/bin/asadmin delete-protocol http-listener-1)'
-	@CRT_LST='$(shell $(GLASSFISH_HOME)/bin/asadmin create-http-listener --default-virtual-server server --listenerport $(SERVICE_PORT) --listeneraddress 0.0.0.0 http-listener-1)'
-	@DEL_XMX='$(shell $(GLASSFISH_HOME)/bin/asadmin  delete-jvm-options $(CURRENT_XMX))'
-	@CRT_XMX='$(shell $(GLASSFISH_HOME)/bin/asadmin  create-jvm-options -Xmx$(TARGET_XMX))'
-
-deploy_war:
-	$(GLASSFISH_HOME)/bin/asadmin deploy --force=true ./dist/KBaseNetworksRPC.war;\
-
-generate_script:
-	@echo 'sudo '$(GLASSFISH_HOME)'/bin/asadmin start-domain ' > $(TARGET)/services/$(SERVICE_NAME)/start_service
-	chmod 755 $(TARGET)/services/$(SERVICE_NAME)/start_service
-	@echo 'sudo '$(GLASSFISH_HOME)'/bin/asadmin stop-domain ' > $(TARGET)/services/$(SERVICE_NAME)/stop_service
-	chmod 755 $(TARGET)/services/$(SERVICE_NAME)/stop_service
+#deploy-service: deploy-dir stop_domain1 start_domain1 deploy_config deploy_war generate_script deploy-scripts deploy-libs deploy-docs
+deploy-service: deploy-dir deploy-scripts deploy-libs deploy-docs
 
 clean:
 	cd ./conf; $(ANT) clean	
