@@ -1,0 +1,18 @@
+#!/bin/sh
+
+export GLASSFISH_HOME=$KB_RUNTIME/glassfish3
+ASA=$GLASSFISH_HOME/bin/asadmin
+DOMAIN=domain1
+DOMAINDIR=$(dirname $0)/glassfish
+
+$ASA stop-domain --domaindir $DOMAINDIR $DOMAIN
+
+if [ -e $DOMAINDIR/$DOMAIN/config/pid ] ; then
+  $ASA list-domains --domaindir $DOMAINDIR|grep -v "not running"|grep running > /dev/null
+  if [ $? ] ;then
+    echo "Kill server"
+    kill $(cat $DOMAINDIR/$DOMAIN/config/pid)
+  fi
+fi
+
+

@@ -1,0 +1,34 @@
+#!/bin/sh
+
+export GLASSFISH_HOME=$KB_RUNTIME/glassfish3
+ASA=$GLASSFISH_HOME/bin/asadmin
+DOMAIN=domain1
+DOMAINDIR=$(dirname $0)/glassfish
+SERVICE_PORT=7064
+TARGET_XMX=-Xmx10240m
+TARGET_XMX=-Xmx1024m
+
+if [ ! -e $DOMAINDIR ] ;then
+  $ASA create-domain --domaindir $DOMAINDIR --nopassword=true $DOMAIN
+fi
+
+$ASA list-domains --domaindir $DOMAINDIR|grep "$DOMAIN running" > /dev/null
+
+if [ $? ] ; then
+  $ASA start-domain --domaindir $DOMAINDIR $DOMAIN
+fi
+
+$ASA list-http-listeners|grep http-listener-1 > /dev/null
+if [ ! $? ] ; then
+  $ASA create-http-listener --default-virtual-server server --listenerport $SERVICE_PORT --listeneraddress 0.0.0.0 http-listener-1
+fi
+
+CURRENT_XMX=$($ASA list-jvm-options | grep Xmx)
+if [ "$CURRENT_XMX" != "$TARGET_XMX" ] ; then
+  echo "Changing XMX"
+  $ASA  delete-jvm-options "$CURRENT_XMX"
+  $ASA  create-jvm-options "$TARGET_XMX"
+fi
+
+$ASA deploy --force=true $(dirname $0)/KBaseNetworksRPC.war
+
