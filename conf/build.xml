@@ -13,13 +13,33 @@
 
     	<!--  here give path for jar repository -->
         <fileset dir="${jardir}" id="serverlib">
-          <include name="apache_commons/*.jar"/>
-          <include name="jung/*.jar"/>
-          <include name="jackson/*.jar"/>
-          <include name="c3p0/*.jar"/>
+          <include name="apache_commons/collections-generic-4.01.jar"/>
+          <include name="apache_commons/commons-configuration-1.10.jar"/>
+          <include name="apache_commons/commons-collections-3.2.1.jar"/>
+          <include name="apache_commons/commons-exec-1.1.jar"/>
+          <include name="apache_commons/commons-io-2.4.jar"/>
+          <!-- <include name="apache_commons/commons-lang-2.4.jar"/> -->
+          <include name="apache_commons/commons-lang3-3.1.jar"/>
+          <include name="apache_commons/commons-logging-1.1.1.jar"/>
+          <include name="jung/jung-3d-2.0.1.jar"/>
+          <include name="jung/jung-algorithms-2.0.1.jar"/>
+          <include name="jung/jung-api-2.0.1.jar"/>
+          <include name="jung/jung-graph-impl-2.0.1.jar"/>
+          <include name="jung/jung-io-2.0.1.jar"/>
+          <include name="jung/jung-jai-2.0.1.jar"/>
+          <include name="jung/jung-visualization-2.0.1.jar"/>
+          <include name="apache_commons/"/>
+          <include name="jackson/jackson-annotations-2.2.3.jar"/>
+          <include name="jackson/jackson-core-2.2.3.jar"/>
+          <include name="jackson/jackson-databind-2.2.3.jar"/>
+          <include name="jackson/jackson-all-1.9.11.jar"/> <!-- for some portion of code compatibility... jackson use different namespace and thus no conflicts -->
+          <include name="c3p0/c3p0-0.9.2-pre7.jar"/>
+          <include name="c3p0/mchange-commons-java-0.2.3.2.jar"/>
           <include name="mysql/mysql-connector-java-5.1.22-bin.jar"/>
-          <include name="kbase/cdmi/*.jar"/>
-          <include name="kbase/auth/*.jar"/>
+          <include name="kbase/cdmi/cdmi-2012-1212.jar"/>
+          <include name="kbase/cdmi/CDS.jar"/>
+          <include name="kbase/common/kbase-common-0.0.9.jar"/>
+          <include name="kbase/auth/kbase-auth-1398468950-3552bb2.jar"/>
           <include name="ini4j/ini4j-0.5.2.jar"/>
           <include name="jetty/jetty-all-7.0.0.jar"/>
           <include name="jna/jna-3.4.0.jar"/>
